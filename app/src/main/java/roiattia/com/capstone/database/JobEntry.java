@@ -7,6 +7,8 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
+import org.joda.time.LocalDate;
+
 import java.util.Date;
 
 @Entity(tableName = "job",
@@ -20,37 +22,48 @@ public class JobEntry {
     @ColumnInfo(name = "category_id")
     private int mCategoryId;
     private String mDescription;
-    private Date mDate;
+    @ColumnInfo(name = "job_date")
+    private LocalDate mJobDate;
+    @ColumnInfo(name = "job_payment_date")
+    private LocalDate mDateOfPayment;
     private double mIncome;
     private double mExpenses;
     private double mProfit;
 
-    @Ignore
-    public JobEntry(int categoryId, String description, Date date, double income, double expenses, double profit) {
-        mCategoryId = categoryId;
-        mDescription = description;
-        mDate = date;
-        mIncome = income;
-        mExpenses = expenses;
-        mProfit = profit;
-    }
-
-    public JobEntry(int id, int categoryId, String description, Date date, double income, double expenses, double profit) {
+    public JobEntry(int id, int categoryId, String description, LocalDate jobDate,
+                    LocalDate dateOfPayment, double income, double expenses, double profit) {
         this.id = id;
         mCategoryId = categoryId;
         mDescription = description;
-        mDate = date;
+        mJobDate = jobDate;
+        mDateOfPayment = dateOfPayment;
         mIncome = income;
         mExpenses = expenses;
         mProfit = profit;
     }
 
-    public Date getDate() {
-        return mDate;
+    @Ignore
+    public JobEntry(int categoryId, String description, LocalDate jobDate,
+                    LocalDate dateOfPayment, double income, double expenses, double profit) {
+        mCategoryId = categoryId;
+        mDescription = description;
+        mJobDate = jobDate;
+        mDateOfPayment = dateOfPayment;
+        mIncome = income;
+        mExpenses = expenses;
+        mProfit = profit;
     }
 
-    public void setDate(Date date) {
-        mDate = date;
+    @Ignore
+    public JobEntry() {
+    }
+
+    public LocalDate getJobDate() {
+        return mJobDate;
+    }
+
+    public void setJobDate(LocalDate localDate) {
+        mJobDate = localDate;
     }
 
     public int getId() {
@@ -99,5 +112,13 @@ public class JobEntry {
 
     public void setCategoryId(int categoryId) {
         mCategoryId = categoryId;
+    }
+
+    public LocalDate getDateOfPayment() {
+        return mDateOfPayment;
+    }
+
+    public void setDateOfPayment(LocalDate dateOfPayment) {
+        mDateOfPayment = dateOfPayment;
     }
 }

@@ -2,16 +2,18 @@ package roiattia.com.capstone.database;
 
 import android.arch.persistence.room.TypeConverter;
 
+import org.joda.time.LocalDate;
+
 import java.util.Date;
 
 public class DateConverter {
     @TypeConverter
-    public static Date toDate(Long timeStamp){
-        return timeStamp == null ? null : new Date(timeStamp);
+    public static LocalDate toLocalDate(Long timeStamp){
+        return timeStamp == null ? null : new LocalDate(timeStamp);
     }
 
     @TypeConverter
-    public static Long toTimeStamp(Date date){
-        return date == null ? null : date.getTime();
+    public static Long toTimeStamp(LocalDate localDate){
+        return localDate == null ? null : localDate.toDate().getTime();
     }
 }

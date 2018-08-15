@@ -24,6 +24,9 @@ public class CategoryEntry {
         mType = type;
     }
 
+    @Ignore
+    public CategoryEntry() { }
+
     public enum Type{
         JOB(0),
         EXPENSE(1);

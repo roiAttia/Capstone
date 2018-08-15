@@ -12,7 +12,7 @@ import java.util.List;
 
 @Dao
 public interface ExpenseDao {
-    @Query("SELECT * FROM category")
+    @Query("SELECT * FROM expense")
     LiveData<List<ExpenseEntry>> loadAllExpenses();
 
     @Insert

@@ -8,6 +8,8 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import org.joda.time.LocalDate;
+
 import java.util.List;
 
 @Dao
@@ -17,11 +19,14 @@ public interface JobDao {
     LiveData<List<JobEntry>> loadAllJobs();
 
     @Insert
-    void insertJob(JobEntry jobEntry);
+    long insertJob(JobEntry jobEntry);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateJob(JobEntry jobEntry);
 
     @Delete
     void deleteJob(JobEntry jobEntry);
+
+    @Query("SELECT * FROM job WHERE job_date=:localDate ORDER BY mIncome")
+    LiveData<List<JobEntry>> loadJobsAtDate(LocalDate localDate);
 }

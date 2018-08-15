@@ -8,6 +8,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:launchMode="singleTop"
         android:theme="@style/AppTheme">
         <activity android:name=".ui.calendar.CalendarActivity">
             <intent-filter>
@@ -16,14 +17,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.NewJobActivity" />
-
-        <provider
-            android:name=".database.MyWorkContentProvider"
-            android:authorities="roiattia.com.capstone"
-            android:exported="false" />
-
-        <activity android:name=".ui.JobsListActivity"></activity>
+        <activity android:name=".ui.newjob.NewJobActivity"/>
+        <activity android:name=".ui.JobsListActivity" />
+        <activity android:name=".ui.expense.AddExpenseActivity"></activity>
     </application>
 
 </manifest>

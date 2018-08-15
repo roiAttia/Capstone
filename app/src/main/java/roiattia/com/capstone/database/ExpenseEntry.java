@@ -7,6 +7,8 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
+import org.joda.time.LocalDate;
+
 import java.util.Date;
 
 @Entity(tableName = "expense",
@@ -22,23 +24,41 @@ public class ExpenseEntry {
     private int jobId;
     @ColumnInfo(name = "category_id")
     private int categoryId;
+    private double cost;
     @ColumnInfo(name = "number_of_payments")
     private int numberOfPayments;
     @ColumnInfo(name = "payment_date")
-    private Date paymentDate;
+    private LocalDate paymentDate;
 
     @Ignore
-    public ExpenseEntry(int jobId, int categoryId, int numberOfPayments, Date paymentDate) {
-        this.jobId = jobId;
-        this.categoryId = categoryId;
+    public ExpenseEntry(double cost, int numberOfPayments, LocalDate paymentDate) {
+        this.cost = cost;
         this.numberOfPayments = numberOfPayments;
         this.paymentDate = paymentDate;
     }
 
-    public ExpenseEntry(int id, int jobId, int categoryId, int numberOfPayments, Date paymentDate) {
+    @Ignore
+    public ExpenseEntry(int categoryId, double cost, int numberOfPayments, LocalDate paymentDate) {
+        this.categoryId = categoryId;
+        this.cost = cost;
+        this.numberOfPayments = numberOfPayments;
+        this.paymentDate = paymentDate;
+    }
+
+    @Ignore
+    public ExpenseEntry(int jobId, int categoryId, double cost, int numberOfPayments, LocalDate paymentDate) {
+        this.jobId = jobId;
+        this.categoryId = categoryId;
+        this.cost = cost;
+        this.numberOfPayments = numberOfPayments;
+        this.paymentDate = paymentDate;
+    }
+
+    public ExpenseEntry(int id, int jobId, int categoryId, double cost, int numberOfPayments, LocalDate paymentDate) {
         this.id = id;
         this.jobId = jobId;
         this.categoryId = categoryId;
+        this.cost = cost;
         this.numberOfPayments = numberOfPayments;
         this.paymentDate = paymentDate;
     }
@@ -75,11 +95,19 @@ public class ExpenseEntry {
         this.numberOfPayments = numberOfPayments;
     }
 
-    public Date getPaymentDate() {
+    public LocalDate getPaymentDate() {
         return paymentDate;
     }
 
-    public void setPaymentDate(Date paymentDate) {
+    public void setPaymentDate(LocalDate paymentDate) {
         this.paymentDate = paymentDate;
+    }
+
+    public double getCost() {
+        return cost;
+    }
+
+    public void setCost(double cost) {
+        this.cost = cost;
     }
 }

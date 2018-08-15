@@ -14,14 +14,17 @@ import java.util.List;
 public interface CategoryDao {
 
     @Query("SELECT * FROM category WHERE mType=:type ORDER BY mName")
-    LiveData<List<CategoryEntry>> loadAllCategories(CategoryEntry.Type type);
+    LiveData<List<CategoryEntry>> loadCategories(CategoryEntry.Type type);
 
     @Insert
-    void insertCat(CategoryEntry categoryEntry);
+    long insertCat(CategoryEntry categoryEntry);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateCat(CategoryEntry categoryEntry);
 
     @Delete
     void deleteCat(CategoryEntry categoryEntry);
+
+    @Query("SELECT mName FROM category WHERE id=:categoryId")
+    String getCategoryName(int categoryId);
 }
