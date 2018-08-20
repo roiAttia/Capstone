@@ -6,6 +6,27 @@
     android:layout_height="match_parent"
     tools:context=".ui.expense.AddExpenseActivity">
 
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView7">
+
+        <RadioButton
+            android:id="@+id/rb_new_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <RadioButton
+            android:id="@+id/rb_existed_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </RadioGroup>
+
     <Button
         android:id="@+id/btn_confirm"
         android:layout_width="0dp"
@@ -31,8 +52,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="50dp"
-        android:text="Expense category"
+        android:layout_marginTop="32dp"
+        android:text="Select or enter new category"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,20 +62,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Enter category"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="@+id/textView7"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView7" />
+        app:layout_constraintTop_toBottomOf="@+id/textView7"
+        tools:layout_editor_absoluteY="24dp" />
 
     <Spinner
         android:id="@+id/spinner_expense_category"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/et_expense_category"
-        app:layout_constraintStart_toStartOf="@+id/textView7"
+        app:layout_constraintEnd_toEndOf="@+id/et_expense_category"
+        app:layout_constraintStart_toStartOf="@+id/et_expense_category"
         app:layout_constraintTop_toBottomOf="@+id/et_expense_category" />
 
     <TextView

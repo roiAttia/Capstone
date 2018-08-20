@@ -19,11 +19,11 @@ import java.util.Date;
         indices = {@Index("id"), @Index("job_id"), @Index("category_id")})
 public class ExpenseEntry {
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private long id;
     @ColumnInfo(name = "job_id")
-    private int jobId;
+    private long jobId;
     @ColumnInfo(name = "category_id")
-    private int categoryId;
+    private long categoryId;
     private double cost;
     @ColumnInfo(name = "number_of_payments")
     private int numberOfPayments;
@@ -38,7 +38,7 @@ public class ExpenseEntry {
     }
 
     @Ignore
-    public ExpenseEntry(int categoryId, double cost, int numberOfPayments, LocalDate paymentDate) {
+    public ExpenseEntry(long categoryId, double cost, int numberOfPayments, LocalDate paymentDate) {
         this.categoryId = categoryId;
         this.cost = cost;
         this.numberOfPayments = numberOfPayments;
@@ -46,7 +46,8 @@ public class ExpenseEntry {
     }
 
     @Ignore
-    public ExpenseEntry(int jobId, int categoryId, double cost, int numberOfPayments, LocalDate paymentDate) {
+    public ExpenseEntry(long jobId, long categoryId, double cost,
+                        int numberOfPayments, LocalDate paymentDate) {
         this.jobId = jobId;
         this.categoryId = categoryId;
         this.cost = cost;
@@ -54,7 +55,8 @@ public class ExpenseEntry {
         this.paymentDate = paymentDate;
     }
 
-    public ExpenseEntry(int id, int jobId, int categoryId, double cost, int numberOfPayments, LocalDate paymentDate) {
+    public ExpenseEntry(long id, long jobId, long categoryId, double cost,
+                        int numberOfPayments, LocalDate paymentDate) {
         this.id = id;
         this.jobId = jobId;
         this.categoryId = categoryId;
@@ -63,27 +65,27 @@ public class ExpenseEntry {
         this.paymentDate = paymentDate;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public int getJobId() {
+    public long getJobId() {
         return jobId;
     }
 
-    public void setJobId(int jobId) {
+    public void setJobId(long jobId) {
         this.jobId = jobId;
     }
 
-    public int getCategoryId() {
+    public long getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(int categoryId) {
+    public void setCategoryId(long categoryId) {
         this.categoryId = categoryId;
     }
 
@@ -109,5 +111,12 @@ public class ExpenseEntry {
 
     public void setCost(double cost) {
         this.cost = cost;
+    }
+
+    @Override
+    public String toString() {
+        return "**EXPENSE ENTRY** Expense id: " + id +"Job id: " + jobId + ", Category id: " + categoryId +
+                ", Cost: " + cost + ", number of payments: " + numberOfPayments +
+                ", payment day: " + paymentDate;
     }
 }

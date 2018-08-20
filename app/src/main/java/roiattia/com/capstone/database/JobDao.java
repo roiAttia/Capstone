@@ -18,6 +18,9 @@ public interface JobDao {
     @Query("SELECT * FROM job ORDER BY mProfit")
     LiveData<List<JobEntry>> loadAllJobs();
 
+    @Query("SELECT * FROM job ORDER BY mProfit")
+    List<JobEntry> debugLoadAllJobs();
+
     @Insert
     long insertJob(JobEntry jobEntry);
 

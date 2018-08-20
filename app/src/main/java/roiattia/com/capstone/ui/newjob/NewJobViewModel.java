@@ -2,6 +2,7 @@ package roiattia.com.capstone.ui.newjob;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
+import android.content.Context;
 
 import org.joda.time.LocalDate;
 
@@ -11,20 +12,20 @@ import java.util.List;
 import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.ExpenseEntry;
 import roiattia.com.capstone.database.JobEntry;
-import roiattia.com.capstone.database.Repository;
 import roiattia.com.capstone.utils.InjectorUtils;
 
 public class NewJobViewModel extends ViewModel
-    implements Repository.GetCategoryIdHandler {
+    implements JobRepository.GetIdHandler {
 
     private static final String TAG = NewJobViewModel.class.getSimpleName();
 
     private JobEntry mJobEntry;
     private List<ExpenseEntry> mExpenses;
-    private Repository mRepository;
+    private List<CategoryEntry> mCategories;
+    private JobRepository mRepository;
 
-    NewJobViewModel(Repository repository) {
-        mRepository = repository;
+    NewJobViewModel(Context context) {
+        mRepository = InjectorUtils.provideJobRepository(context, this);
         mJobEntry = InjectorUtils.provideJobEntry();
         mExpenses = new ArrayList<>();
     }
@@ -33,12 +34,18 @@ public class NewJobViewModel extends ViewModel
         return mRepository.getCategories(type);
     }
 
-    public void addNewJOb(){
-
+    @Override
+    public void onCategoryInserted(long categoryId, CategoryEntry.Type type) {
+        if(type.equals(CategoryEntry.Type.JOB)){
+            insertNewJobWithNewCategoryId(categoryId);
+        } else if(type.equals(CategoryEntry.Type.EXPENSE)){
+            insertExpensesWithNewCategoryId(categoryId);
+        }
     }
 
-    public void addExpenses(List<ExpenseEntry> expenses){
-        mExpenses = expenses;
+    @Override
+    public void onJobInserted(long jobId) {
+        insertExpensesWithJobId(jobId);
     }
 
     public void calculateProfit(){
@@ -75,38 +82,18 @@ public class NewJobViewModel extends ViewModel
         mJobEntry.setDateOfPayment(localDate);
     }
 
-    public void calculatePayments(int cost, int numberOfPayments,
-                                  LocalDate paymentDate) {
-        double monthlyCost = cost / numberOfPayments;
-        for(int i = 0; i<numberOfPayments; i++){
-            ExpenseEntry expenseEntry = new ExpenseEntry(monthlyCost, 1, paymentDate);
-            mExpenses.add(expenseEntry);
-            paymentDate = paymentDate.plusMonths(1);
-        }
-    }
-
     public List<ExpenseEntry> getExpensesList() {
         return mExpenses;
     }
 
     public void insertNewCategory(String name, CategoryEntry.Type type) {
-        mRepository.setGetJobIdInBackground(this);
         CategoryEntry categoryEntry = new CategoryEntry(name, type);
         mRepository.insertCategory(categoryEntry, type);
     }
 
-    @Override
-    public void onFinish(long newId, CategoryEntry.Type type) {
-        if(type.equals(CategoryEntry.Type.JOB)){
-            insertExpensesWithJobId(newId);
-        } else if(type.equals(CategoryEntry.Type.EXPENSE)){
-            insertExpensesWithNewCategoryId(newId);
-        }
-    }
-
     private void insertExpensesWithJobId(long newId) {
         for(ExpenseEntry expenseEntry : mExpenses){
-            expenseEntry.setJobId((int) newId);
+            expenseEntry.setJobId(newId);
             mRepository.insertExpense(expenseEntry);
         }
     }
@@ -116,14 +103,12 @@ public class NewJobViewModel extends ViewModel
         insertNewJob();
     }
 
-    private void insertNewJob() {
+    public void insertNewJob() {
         mRepository.insertJob(mJobEntry);
     }
 
     private void insertExpensesWithNewCategoryId(long categoryId) {
-        for(ExpenseEntry expenseEntry : mExpenses){
-            expenseEntry.setCategoryId((int) categoryId);
-        }
+        mExpenses.get(mExpenses.size()-1).setCategoryId(categoryId);
     }
 
     public void updateExpenses() {
@@ -132,5 +117,26 @@ public class NewJobViewModel extends ViewModel
             totalExpenses += expenseEntry.getCost();
         }
         mJobEntry.setExpenses(totalExpenses);
+    }
+
+    public void setCategories(List<CategoryEntry> categoryEntries) {
+        mCategories = categoryEntries;
+    }
+
+    public long getCategoryId(int categoryPosition) {
+        return mCategories.get(categoryPosition).getId();
+    }
+
+    public void setJobCategoryId(long categoryId) {
+        mJobEntry.setCategoryId((int) categoryId);
+    }
+
+    public void setExpenseDetails(long categoryId, int cost, int numberOfPayments, LocalDate paymentDate) {
+        ExpenseEntry expenseEntry = new ExpenseEntry(categoryId, cost, numberOfPayments, paymentDate);
+        mExpenses.add(expenseEntry);
+    }
+
+    public void debugPrint(){
+        mRepository.debugPrint();
     }
 }

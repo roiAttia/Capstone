@@ -12,8 +12,10 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,19 +31,22 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.CategoryEntry;
-import roiattia.com.capstone.database.ExpenseEntry;
 import roiattia.com.capstone.utils.InjectorUtils;
 
 public class JobExpensesFragment extends BaseFragment {
 
     @BindView(R.id.spinner_expense_category) Spinner mCategoriesSpinner;
-    @BindView(R.id.et_expense_cost) EditText mCost;
+    @BindView(R.id.et_expense_cost) EditText mCostView;
     @BindView(R.id.et_num_of_payments) EditText mNumPayments;
     @BindView(R.id.et_payment_date) EditText mPaymentDateView;
     @BindView(R.id.tv_payments_details) TextView mPaymentsDetailsView;
-    @BindView(R.id.et_expense_category) EditText mCategory;
+    @BindView(R.id.et_expense_category) EditText mCategoryView;
+    @BindView(R.id.rb_existed_category) RadioButton mExistedCategoryButton;
+    @BindView(R.id.rb_new_category) RadioButton mNewCategoryButton;
 
     private NewJobViewModel mViewModel;
+    private int mCost;
+    private int mNumberOfPayments;
     private LocalDate mPaymentDate;
 
     @Nullable
@@ -50,9 +55,12 @@ public class JobExpensesFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_new_job_expenses, container, false);
         ButterKnife.bind(this, rootView);
 
+        mCategoriesSpinner.setEnabled(false);
+        mCategoryView.setEnabled(false);
+
         // setup view_model
         NewJobViewModelFactory factory = InjectorUtils
-                .provideExpenseViewModelFactory(mListener, CategoryEntry.Type.EXPENSE);
+                .provideExpenseViewModelFactory(mListener);
         mViewModel = ViewModelProviders.of(mListener, factory)
                 .get(NewJobViewModel.class);
         mViewModel.getCategories(CategoryEntry.Type.EXPENSE).observe(this, new Observer<List<CategoryEntry>>() {
@@ -85,30 +93,54 @@ public class JobExpensesFragment extends BaseFragment {
             public void afterTextChanged(Editable s) {
                 if(!mNumPayments.getText().toString().equals("") &&
                         !mPaymentDateView.getText().toString().equals("") &&
-                        !mCost.getText().toString().equals("") ) {
-                    int cost = Integer.parseInt(mCost.getText().toString());
-                    int numberOfPayments = Integer.parseInt(mNumPayments.getText().toString());
-                    if (numberOfPayments > 0) {
-                        mViewModel.calculatePayments(cost, numberOfPayments, mPaymentDate);
-                        updateUiWithPayments();
+                        !mCostView.getText().toString().equals("") ) {
+                    mCost = Integer.parseInt(mCostView.getText().toString());
+                    mNumberOfPayments = Integer.parseInt(mNumPayments.getText().toString());
+                    if (mNumberOfPayments > 0) {
+                        updateUiWithPayments(mPaymentDate);
                     }
                 }
             }
         };
-
-        mCost.addTextChangedListener(textWatcher);
+        mCostView.addTextChangedListener(textWatcher);
         mNumPayments.addTextChangedListener(textWatcher);
         mPaymentDateView.addTextChangedListener(textWatcher);
+
+        mExistedCategoryButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    mCategoryView.setEnabled(false);
+                    mCategoriesSpinner.setEnabled(true);
+                }
+            }
+        });
+
+        mNewCategoryButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    mCategoryView.setEnabled(true);
+                    mCategoryView.requestFocus();
+                    mCategoriesSpinner.setEnabled(false);
+                }
+            }
+        });
 
         return rootView;
     }
 
-    private void updateUiWithPayments() {
-        List<ExpenseEntry> expenseEntries = mViewModel.getExpensesList();
-        for(int i = 0; i<expenseEntries.size(); i++){
+    /**
+     * Handle UI update of payments details
+     * @param paymentDate
+     */
+    private void updateUiWithPayments(LocalDate paymentDate) {
+        double monthlyCost = mCost / mNumberOfPayments;
+        for(int i = 0; i<mNumberOfPayments; i++){
             mPaymentsDetailsView.append(Html.fromHtml("<br>" + (i+1) + " payment: "
-                    + expenseEntries.get(i).getCost() +
-                    ", payment date: " + expenseEntries.get(i).getPaymentDate()));
+                    + monthlyCost +
+                    ", payment date: " + paymentDate));
+            paymentDate = paymentDate.plusMonths(1);
         }
     }
 
@@ -128,22 +160,16 @@ public class JobExpensesFragment extends BaseFragment {
         datePickerDialog.show();
     }
 
-    public void checkCategory() {
-        String categoryName = mCategory.getText().toString();
-        mViewModel.insertNewCategory(categoryName, CategoryEntry.Type.EXPENSE);
-    }
-
     public Boolean checkInputValidation() {
         boolean isInputValid = true;
         // check category validation
-        if(mCategoriesSpinner.getSelectedItemPosition() == 0 &&
-                mCategory.getText().toString().trim().equalsIgnoreCase("")){
-            mCategory.setError("Must enter new category or chose from the list");
+        if(!mNewCategoryButton.isChecked() && !mExistedCategoryButton.isChecked()){
+            Toast.makeText(mListener, "Invalid category", Toast.LENGTH_SHORT).show();
             isInputValid = false;
         }
         // check cost validation
-        if(mCost.getText().toString().trim().equals("")){
-            mCost.setError("Must enter a cost");
+        if(mCostView.getText().toString().trim().equals("")){
+            mCostView.setError("Must enter a cost");
             isInputValid = false;
         }
         // check number_of_payments validation
@@ -159,5 +185,15 @@ public class JobExpensesFragment extends BaseFragment {
         return isInputValid;
     }
 
-
+    public void setExpenseDetails() {
+        if(mNewCategoryButton.isChecked()){
+            mViewModel.setExpenseDetails(0, mCost, mNumberOfPayments, mPaymentDate);
+            String categoryName = mCategoryView.getText().toString();
+            mViewModel.insertNewCategory(categoryName, CategoryEntry.Type.EXPENSE);
+        } else if(mExistedCategoryButton.isChecked()){
+            int categoryPosition = mCategoriesSpinner.getSelectedItemPosition();
+            long categoryId = mViewModel.getCategoryId(categoryPosition);
+            mViewModel.setExpenseDetails(categoryId, mCost, mNumberOfPayments, mPaymentDate);
+        }
+    }
 }

@@ -7,6 +7,7 @@
     tools:context=".ui.calendar.CalendarActivity">
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
@@ -86,5 +87,16 @@
         app:layout_constraintEnd_toEndOf="@+id/rv_job_list"
         app:layout_constraintStart_toStartOf="@+id/rv_job_list"
         app:layout_constraintTop_toTopOf="@+id/guideline" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:clickable="true"
+        android:onClick="debugPrint"
+        app:layout_constraintBottom_toTopOf="@+id/rv_job_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/ic_dialog_info" />
 
 </android.support.constraint.ConstraintLayout>

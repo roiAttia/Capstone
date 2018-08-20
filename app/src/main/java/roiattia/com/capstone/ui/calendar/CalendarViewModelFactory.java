@@ -4,13 +4,13 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import roiattia.com.capstone.database.Repository;
+import roiattia.com.capstone.ui.newjob.JobRepository;
 
 public class CalendarViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
-    private Repository mRepository;
+    private CalendarRepository mRepository;
 
-    public CalendarViewModelFactory(Repository repository) {
+    public CalendarViewModelFactory(CalendarRepository repository) {
         mRepository = repository;
     }
 

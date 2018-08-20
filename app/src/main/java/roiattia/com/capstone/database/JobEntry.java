@@ -18,9 +18,9 @@ import java.util.Date;
         indices = {@Index("id"), @Index("category_id")})
 public class JobEntry {
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private long id;
     @ColumnInfo(name = "category_id")
-    private int mCategoryId;
+    private long mCategoryId;
     private String mDescription;
     @ColumnInfo(name = "job_date")
     private LocalDate mJobDate;
@@ -30,7 +30,7 @@ public class JobEntry {
     private double mExpenses;
     private double mProfit;
 
-    public JobEntry(int id, int categoryId, String description, LocalDate jobDate,
+    public JobEntry(long id, long categoryId, String description, LocalDate jobDate,
                     LocalDate dateOfPayment, double income, double expenses, double profit) {
         this.id = id;
         mCategoryId = categoryId;
@@ -43,7 +43,7 @@ public class JobEntry {
     }
 
     @Ignore
-    public JobEntry(int categoryId, String description, LocalDate jobDate,
+    public JobEntry(long categoryId, String description, LocalDate jobDate,
                     LocalDate dateOfPayment, double income, double expenses, double profit) {
         mCategoryId = categoryId;
         mDescription = description;
@@ -66,11 +66,11 @@ public class JobEntry {
         mJobDate = localDate;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -106,11 +106,11 @@ public class JobEntry {
         mProfit = profit;
     }
 
-    public int getCategoryId() {
+    public long getCategoryId() {
         return mCategoryId;
     }
 
-    public void setCategoryId(int categoryId) {
+    public void setCategoryId(long categoryId) {
         mCategoryId = categoryId;
     }
 
@@ -120,5 +120,13 @@ public class JobEntry {
 
     public void setDateOfPayment(LocalDate dateOfPayment) {
         mDateOfPayment = dateOfPayment;
+    }
+
+    @Override
+    public String toString() {
+        return "**JOB ENTRY** Job id: " + id + ", Category id: " + mCategoryId + ", job date: " + mJobDate +
+                ", payment date: " + mDateOfPayment + ", income: " + mIncome +
+                ", expenses: " + mExpenses + ", profits: " + mProfit +
+                ", description: " + mDescription;
     }
 }

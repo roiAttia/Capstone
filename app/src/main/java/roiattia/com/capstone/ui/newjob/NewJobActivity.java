@@ -1,43 +1,19 @@
 package roiattia.com.capstone.ui.newjob;
 
-import android.app.DatePickerDialog;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
-import roiattia.com.capstone.database.CategoryEntry;
-import roiattia.com.capstone.database.ExpenseEntry;
-import roiattia.com.capstone.database.Repository;
 import roiattia.com.capstone.ui.calendar.CalendarActivity;
-import roiattia.com.capstone.ui.expense.AddExpenseActivity;
-import roiattia.com.capstone.ui.finances.ExpensesFragment;
 import roiattia.com.capstone.utils.InjectorUtils;
 
 public class NewJobActivity extends AppCompatActivity {
@@ -60,10 +36,10 @@ public class NewJobActivity extends AppCompatActivity {
 
         // setup view_model
         NewJobViewModelFactory factory = InjectorUtils
-                .provideExpenseViewModelFactory(this, CategoryEntry.Type.JOB);
+                .provideExpenseViewModelFactory(this);
         mViewModel = ViewModelProviders.of(this, factory)
                 .get(NewJobViewModel.class);
-
+        mViewModel.debugPrint();
         // get date selected for job from calendar activity
         Intent intent = getIntent();
         String dateAsString = intent.getStringExtra(CalendarActivity.DATE);
@@ -105,15 +81,14 @@ public class NewJobActivity extends AppCompatActivity {
      * Handles the "confirm expense" of job expense fragment's button click event
      */
     public void confirmExpense(View view){
-        Boolean isValid = mJobExpensesFragment.checkInputValidation();
-        if(isValid) {
+        if(mJobExpensesFragment.checkInputValidation()) {
+            mJobExpensesFragment.setExpenseDetails();
             mViewModel.updateExpenses();
             mViewModel.calculateProfit();
             // add new Expenses to view_model
             mFragmentManager.beginTransaction()
                     .replace(R.id.fl_fragment_placeholder, mNewJobFragment)
                     .commit();
-//            mJobExpensesFragment.checkCategory();
             mJobExpensesFragment = new JobExpensesFragment();
         }
     }
@@ -126,10 +101,11 @@ public class NewJobActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // Confirm new Job
         if(item.getItemId() == R.id.mi_done){
-            Boolean isValid = mNewJobFragment.checkInputValidation();
-            if(isValid) {
-                mNewJobFragment.checkCategory();
+            if(mNewJobFragment.checkInputValidation()) {
+                mNewJobFragment.insertJobSequence();
+                finish();
             }
         }
         return super.onOptionsItemSelected(item);

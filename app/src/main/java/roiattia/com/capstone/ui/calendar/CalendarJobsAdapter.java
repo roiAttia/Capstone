@@ -1,7 +1,6 @@
 package roiattia.com.capstone.ui.calendar;
 
 import android.content.Context;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,7 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.JobEntry;
-import roiattia.com.capstone.database.Repository;
+import roiattia.com.capstone.ui.newjob.JobRepository;
 import roiattia.com.capstone.utils.InjectorUtils;
 
 public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapter.CalendarJobViewHolder> {
@@ -43,7 +42,7 @@ public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapte
     @Override
     public void onBindViewHolder(@NonNull final CalendarJobViewHolder holder, int position) {
         final JobEntry jobEntry = mJobEntries.get(position);
-        final Repository repository = InjectorUtils.provideRepository(mContext);
+        final CalendarRepository repository = InjectorUtils.provideCalendarRepository(mContext);
         repository.extractCategoryName(jobEntry.getCategoryId());
 
         holder.jobIncome.setText(String.format("%s", jobEntry.getIncome()));

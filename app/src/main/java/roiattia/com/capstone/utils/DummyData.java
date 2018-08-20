@@ -4,13 +4,9 @@ import android.content.Context;
 
 import org.joda.time.LocalDate;
 
-import java.util.Calendar;
-import java.util.Date;
-
 import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.JobEntry;
-import roiattia.com.capstone.database.Repository;
-import roiattia.com.capstone.utils.InjectorUtils;
+import roiattia.com.capstone.ui.newjob.JobRepository;
 
 public class DummyData {
 
@@ -20,7 +16,7 @@ public class DummyData {
         CategoryEntry expOne = new CategoryEntry("VAT", CategoryEntry.Type.EXPENSE);
         CategoryEntry expTwo = new CategoryEntry("Fuel", CategoryEntry.Type.EXPENSE);
 
-        Repository repository = InjectorUtils.provideRepository(context);
+//        JobRepository repository = InjectorUtils.provideJobRepository(context);
     }
 //    public JobEntry(int categoryId, String description, Date date, double income, double expenses, double profit) {
 
@@ -28,7 +24,7 @@ public class DummyData {
         LocalDate localDate = new LocalDate("2018-08-23");
         JobEntry jobEntry = new JobEntry(4,
                 "Sarah", localDate, localDate, 1000, 300, 700);
-        Repository repository = InjectorUtils.provideRepository(context);
-        repository.insertJob(jobEntry);
+//        JobRepository repository = InjectorUtils.provideJobRepository(context);
+//        repository.insertJob(jobEntry);
     }
 }

@@ -21,6 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.JobEntry;
+import roiattia.com.capstone.ui.newjob.JobRepository;
 import roiattia.com.capstone.ui.newjob.NewJobActivity;
 import roiattia.com.capstone.utils.InjectorUtils;
 
@@ -42,8 +43,6 @@ public class CalendarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
         ButterKnife.bind(this);
-
-//        DummyData.insertCategories(this);
 
         CalendarViewModelFactory factory =
                 InjectorUtils.provideCalendarViewModelFactory(this.getApplicationContext());
@@ -80,9 +79,17 @@ public class CalendarActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Handles the add job button click event
+     */
     public void addJob(View view){
         Intent intent = new Intent(CalendarActivity.this, NewJobActivity.class);
         intent.putExtra(DATE, mLocalDate.toString());
         startActivity(intent);
     }
+
+//    public void debugPrint(View view){
+//        JobRepository repository = InjectorUtils.provideJobRepository(this);
+//        repository.debugPrint();
+//    }
 }

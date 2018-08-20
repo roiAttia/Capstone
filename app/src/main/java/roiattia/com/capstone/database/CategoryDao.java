@@ -16,6 +16,9 @@ public interface CategoryDao {
     @Query("SELECT * FROM category WHERE mType=:type ORDER BY mName")
     LiveData<List<CategoryEntry>> loadCategories(CategoryEntry.Type type);
 
+    @Query("SELECT * FROM category")
+    List<CategoryEntry> debugLoadCategories();
+
     @Insert
     long insertCategory(CategoryEntry categoryEntry);
 
@@ -26,5 +29,5 @@ public interface CategoryDao {
     void deleteCategory(CategoryEntry categoryEntry);
 
     @Query("SELECT mName FROM category WHERE id=:categoryId")
-    String getCategoryName(int categoryId);
+    String getCategoryName(long categoryId);
 }

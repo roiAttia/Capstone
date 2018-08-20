@@ -5,17 +5,16 @@ import android.arch.lifecycle.ViewModel;
 
 import org.joda.time.LocalDate;
 
-import java.util.Date;
 import java.util.List;
 
 import roiattia.com.capstone.database.JobEntry;
-import roiattia.com.capstone.database.Repository;
+import roiattia.com.capstone.ui.newjob.JobRepository;
 
 public class CalendarViewModel extends ViewModel {
 
-    private Repository mRepository;
+    private CalendarRepository mRepository;
 
-    CalendarViewModel(Repository repository) {
+    CalendarViewModel(CalendarRepository repository) {
         mRepository = repository;
     }
 

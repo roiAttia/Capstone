@@ -3,30 +3,27 @@ package roiattia.com.capstone.ui.newjob;
 import android.app.DatePickerDialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -35,7 +32,6 @@ import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.ExpenseEntry;
-import roiattia.com.capstone.database.Repository;
 import roiattia.com.capstone.utils.InjectorUtils;
 
 import static roiattia.com.capstone.ui.newjob.NewJobActivity.JOB_DATE;
@@ -51,11 +47,15 @@ public class NewJobFragment extends BaseFragment {
     @BindView(R.id.tv_expenses) TextView mExpensesView;
     @BindView(R.id.tv_profit) TextView mProfitView;
     @BindView(R.id.tv_income) TextView mIncomeView;
-    @BindView(R.id.tv_selected_category) TextView mSelectedCategoryView;
     @BindView(R.id.ll_expense_list_view) LinearLayout mExpensesListView;
+    @BindView(R.id.rb_existed_category) RadioButton mExistedCategoryButton;
+    @BindView(R.id.rb_new_category) RadioButton mNewCategoryButton;
 
     private NewJobViewModel mViewModel;
-    private Boolean mIsNewCategory;
+    private LocalDate mJobDate;
+    private LocalDate mJobPaymentDate;
+    private int mJobIncome;
+    private String mJobDescription;
 
     @Nullable
     @Override
@@ -63,15 +63,19 @@ public class NewJobFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_new_job_details, container, false);
         ButterKnife.bind(this, rootView);
 
+        mCategorySpinner.setEnabled(false);
+        mJobCategoryView.setEnabled(false);
+
         // setup view_model
         NewJobViewModelFactory factory = InjectorUtils
-                .provideExpenseViewModelFactory(mListener, CategoryEntry.Type.JOB);
+                .provideExpenseViewModelFactory(mListener);
         mViewModel = ViewModelProviders.of(mListener, factory)
                 .get(NewJobViewModel.class);
         mViewModel.getCategories(CategoryEntry.Type.JOB).observe(this, new Observer<List<CategoryEntry>>() {
             @Override
             public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
                 if(categoryEntries != null) {
+                    mViewModel.setCategories(categoryEntries);
                     NewJobFragment.super.setupCategoriesSpinner(mCategorySpinner, categoryEntries);
                 }
             }
@@ -79,6 +83,7 @@ public class NewJobFragment extends BaseFragment {
 
         DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
         mJobDateView.setText(fmt.print(mViewModel.getJobDate()));
+        mJobDate = mViewModel.getJobDate();
 
         // setup job_date and payment_date with on_click_listeners
         mJobDateView.setFocusable(false);
@@ -96,35 +101,6 @@ public class NewJobFragment extends BaseFragment {
             }
         });
 
-        // setup category_view and spinner with listeners
-        mJobCategoryView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                mSelectedCategoryView.setText(s.toString());
-                mCategorySpinner.setSelection(0);
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-        });
-
-        mCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position != 0) mSelectedCategoryView
-                        .setText(parent.getItemAtPosition(position).toString());
-                else mSelectedCategoryView.setText(mJobCategoryView.getText());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) { }
-
-        });
-
         // setup fee change listener
         mFeeView.addTextChangedListener(new TextWatcher() {
             @Override
@@ -136,8 +112,30 @@ public class NewJobFragment extends BaseFragment {
             public void afterTextChanged(Editable s) {
                 if(!s.toString().equals("")) {
                     int fee = Integer.parseInt(s.toString());
-                    mViewModel.insertFee(fee);
+                    mJobIncome = fee;
+//                    mViewModel.insertFee(fee);
                     updateSummaryCard();
+                }
+            }
+        });
+
+        mExistedCategoryButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    mJobCategoryView.setEnabled(false);
+                    mCategorySpinner.setEnabled(true);
+                }
+            }
+        });
+
+        mNewCategoryButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    mJobCategoryView.setEnabled(true);
+                    mJobCategoryView.requestFocus();
+                    mCategorySpinner.setEnabled(false);
                 }
             }
         });
@@ -176,16 +174,27 @@ public class NewJobFragment extends BaseFragment {
         datePickerDialog.show();
     }
 
-    public void checkCategory() {
-
+    /**
+     * Check which option selected - new or existed category
+     * and start insert new job sequence
+     */
+    public void insertJobSequence() {
+        if(mNewCategoryButton.isChecked()){
+            String categoryName = mJobCategoryView.getText().toString();
+            mViewModel.insertNewCategory(categoryName, CategoryEntry.Type.JOB);
+        } else if(mExistedCategoryButton.isChecked()){
+            int categoryPosition = mCategorySpinner.getSelectedItemPosition();
+            long categoryId = mViewModel.getCategoryId(categoryPosition);
+            mViewModel.setJobCategoryId(categoryId);
+            mViewModel.insertNewJob();
+        }
     }
 
     public Boolean checkInputValidation() {
         boolean isInputValid = true;
         // check category validation
-        if(mCategorySpinner.getSelectedItemPosition() == 0 &&
-                mJobCategoryView.getText().toString().trim().equalsIgnoreCase("")){
-            mJobCategoryView.setError("Must enter new category or chose from the list");
+        if(!mNewCategoryButton.isChecked() && !mExistedCategoryButton.isChecked()){
+            Toast.makeText(mListener, "Invalid category", Toast.LENGTH_SHORT).show();
             isInputValid = false;
         }
         // check cost validation

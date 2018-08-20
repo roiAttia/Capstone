@@ -15,6 +15,9 @@ public interface ExpenseDao {
     @Query("SELECT * FROM expense")
     LiveData<List<ExpenseEntry>> loadAllExpenses();
 
+    @Query("SELECT * FROM expense")
+    List<ExpenseEntry> debugLoadAllExpenses();
+
     @Insert
     void insertExpense(ExpenseEntry expenseEntry);
 

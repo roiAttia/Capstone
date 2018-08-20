@@ -8,7 +8,7 @@ import android.arch.persistence.room.PrimaryKey;
 public class CategoryEntry {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private long id;
     private String mName;
     private Type mType;
 
@@ -18,7 +18,7 @@ public class CategoryEntry {
         mType = type;
     }
 
-    public CategoryEntry(int id, String name, Type type) {
+    public CategoryEntry(long id, String name, Type type) {
         this.id = id;
         mName = name;
         mType = type;
@@ -42,11 +42,11 @@ public class CategoryEntry {
         }
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -60,5 +60,10 @@ public class CategoryEntry {
 
     public Type getType() {
         return mType;
+    }
+
+    @Override
+    public String toString() {
+        return "**CATEGORY ENTRY** Category id: " + id + "Category type: " + mType + ", Category name: " +mName;
     }
 }
