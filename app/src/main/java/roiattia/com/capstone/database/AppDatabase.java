@@ -8,7 +8,7 @@ import android.content.Context;
 
 @Database(entities = {JobEntry.class, CategoryEntry.class, ExpenseEntry.class},
         version = 4, exportSchema = false)
-@TypeConverters({DateConverter.class, CategoryTypeConverter.class})
+@TypeConverters({DateTypeConverter.class, CategoryTypeConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 
     private static final Object LOCK = new Object();

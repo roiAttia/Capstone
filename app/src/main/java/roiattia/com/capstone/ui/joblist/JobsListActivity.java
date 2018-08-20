@@ -1,4 +1,4 @@
-package roiattia.com.capstone.ui;
+package roiattia.com.capstone.ui.joblist;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

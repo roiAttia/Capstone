@@ -1,4 +1,4 @@
-package roiattia.com.capstone;
+package roiattia.com.capstone.utils;
 
 import android.content.Context;
 
@@ -21,10 +21,6 @@ public class DummyData {
         CategoryEntry expTwo = new CategoryEntry("Fuel", CategoryEntry.Type.EXPENSE);
 
         Repository repository = InjectorUtils.provideRepository(context);
-        repository.insertCategory(jobOne);
-        repository.insertCategory(jobTwo);
-        repository.insertCategory(expOne);
-        repository.insertCategory(expTwo);
     }
 //    public JobEntry(int categoryId, String description, Date date, double income, double expenses, double profit) {
 

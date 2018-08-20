@@ -18,10 +18,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
-import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.JobEntry;
 import roiattia.com.capstone.database.Repository;
-import roiattia.com.capstone.model.JobModel;
 import roiattia.com.capstone.utils.InjectorUtils;
 
 public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapter.CalendarJobViewHolder> {
@@ -47,17 +45,7 @@ public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapte
         final JobEntry jobEntry = mJobEntries.get(position);
         final Repository repository = InjectorUtils.provideRepository(mContext);
         repository.extractCategoryName(jobEntry.getCategoryId());
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                JobModel jobModel = JobModel.getInstance();
-                holder.jobDescription.setText(jobModel.getCategoryName());
-                if(jobEntry.getDescription() != null){
-                    holder.jobDescription.append(" - " +
-                            jobEntry.getDescription());
-                }
-            }
-        }, 100);
+
         holder.jobIncome.setText(String.format("%s", jobEntry.getIncome()));
         LocalDate localDate = new LocalDate(jobEntry.getJobDate());
         DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");

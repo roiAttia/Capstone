@@ -6,7 +6,7 @@ import org.joda.time.LocalDate;
 
 import java.util.Date;
 
-public class DateConverter {
+public class DateTypeConverter {
     @TypeConverter
     public static LocalDate toLocalDate(Long timeStamp){
         return timeStamp == null ? null : new LocalDate(timeStamp);

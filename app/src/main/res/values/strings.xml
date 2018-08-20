@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Capstone</string>
+    <string name="overall_fragment_title">Overall</string>
+    <string name="income_fragment_title">Income</string>
+    <string name="expenses_fragment_title">Expenses</string>
+    <string name="finances_current_headline">CURRENT</string>
+    <string name="finances_expected_headline">EXPECTED</string>
+    <string name="number_of_transactions">Number of transactions:</string>
+    <string name="total_cost">Total cost:</string>
+    <string name="number_of_jobs">Number of jobs:</string>
+    <string name="total_income">Total income:</string>
+    <string name="spinner_category_default_value">Pick category from list</string>
 </resources>

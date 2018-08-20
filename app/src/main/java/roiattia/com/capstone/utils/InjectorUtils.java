@@ -4,9 +4,11 @@ import android.content.Context;
 
 import roiattia.com.capstone.database.AppDatabase;
 import roiattia.com.capstone.database.CategoryEntry;
+import roiattia.com.capstone.database.JobEntry;
 import roiattia.com.capstone.database.Repository;
 import roiattia.com.capstone.ui.calendar.CalendarViewModelFactory;
-import roiattia.com.capstone.ui.expense.CategoriesViewModelFactory;
+import roiattia.com.capstone.ui.newjob.NewJobViewModel;
+import roiattia.com.capstone.ui.newjob.NewJobViewModelFactory;
 
 public class InjectorUtils {
 
@@ -22,9 +24,13 @@ public class InjectorUtils {
         return new CalendarViewModelFactory(repository);
     }
 
-    public static CategoriesViewModelFactory provideExpenseViewModelFactory(Context context,
-                                                                            CategoryEntry.Type type) {
+    public static NewJobViewModelFactory provideExpenseViewModelFactory(Context context,
+                                                                        CategoryEntry.Type type) {
         Repository repository = provideRepository(context.getApplicationContext());
-        return new CategoriesViewModelFactory(repository, type);
+        return new NewJobViewModelFactory(repository, type);
+    }
+
+    public static JobEntry provideJobEntry(){
+        return new JobEntry();
     }
 }

@@ -3,11 +3,8 @@ package roiattia.com.capstone.database;
 import android.arch.lifecycle.LiveData;
 
 import org.joda.time.LocalDate;
-
-import java.util.Date;
 import java.util.List;
 
-import roiattia.com.capstone.model.JobModel;
 import roiattia.com.capstone.utils.AppExecutors;
 
 public class Repository {
@@ -19,7 +16,7 @@ public class Repository {
     private final CategoryDao mCategoryDao;
     private final ExpenseDao mExpenseDao;
     private final AppExecutors mExecutors;
-    private long catId;
+    private GetCategoryIdHandler mGetJobIdInBackground;
 
     private Repository(JobDao jobDao, CategoryDao categoryDao, ExpenseDao expenseDao,
                        AppExecutors appExecutors){
@@ -27,7 +24,6 @@ public class Repository {
         mCategoryDao = categoryDao;
         mExpenseDao = expenseDao;
         mExecutors = appExecutors;
-        catId = 0;
     }
 
     public synchronized static Repository getInstance(
@@ -39,6 +35,27 @@ public class Repository {
             }
         }
         return sInstance;
+    }
+
+    /**
+     * The interface that receives onClick messages.
+     */
+    public interface GetCategoryIdHandler {
+        void onFinish(long jobId ,CategoryEntry.Type type);
+    }
+
+    public void setGetJobIdInBackground(GetCategoryIdHandler getJobIdInBackground){
+        mGetJobIdInBackground = getJobIdInBackground;
+    }
+
+    public void insertJobInBackground(final JobEntry jobEntry){
+        mExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                long jobId = mJobDao.insertJob(jobEntry);
+//                mGetJobIdInBackground.onFinish(jobId);
+            }
+        });
     }
 
 
@@ -74,17 +91,14 @@ public class Repository {
         return mCategoryDao.loadCategories(CategoryEntry.Type.EXPENSE);
     }
 
-    public void insertCategory(final CategoryEntry categoryEntry){
+    public void insertCategory(final CategoryEntry categoryEntry, final CategoryEntry.Type type){
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                catId = mCategoryDao.insertCat(categoryEntry);
+                long id = mCategoryDao.insertCategory(categoryEntry);
+                mGetJobIdInBackground.onFinish(id, type);
             }
         });
-    }
-
-    public long getCatId(){
-        return catId;
     }
 
     public void extractCategoryName(final int categoryId){
@@ -92,9 +106,11 @@ public class Repository {
             @Override
             public void run() {
                 String categoryName = mCategoryDao.getCategoryName(categoryId);
-                JobModel jobModel = JobModel.getInstance();
-                jobModel.setCategoryName(categoryName);
             }
         });
+    }
+
+    public LiveData<List<CategoryEntry>> getCategories(CategoryEntry.Type type) {
+        return mCategoryDao.loadCategories(type);
     }
 }

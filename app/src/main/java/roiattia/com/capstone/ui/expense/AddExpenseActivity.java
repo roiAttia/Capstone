@@ -19,11 +19,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.joda.time.LocalDate;
-import org.joda.time.Months;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -33,8 +31,8 @@ import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.ExpenseEntry;
-import roiattia.com.capstone.model.ExpenseModel;
-import roiattia.com.capstone.model.JobModel;
+import roiattia.com.capstone.ui.newjob.NewJobViewModel;
+import roiattia.com.capstone.ui.newjob.NewJobViewModelFactory;
 import roiattia.com.capstone.utils.InjectorUtils;
 
 public class AddExpenseActivity extends AppCompatActivity {
@@ -48,9 +46,7 @@ public class AddExpenseActivity extends AppCompatActivity {
     @BindView(R.id.et_payment_date) EditText mPaymentDate;
     @BindView(R.id.tv_payments_details) TextView mPaymentsDetailsView;
 
-    private CategoriesViewModel mViewModel;
-    private JobModel mJobModel;
-    private ExpenseModel mExpenseModel;
+    private NewJobViewModel mViewModel;
     private LocalDate mLocalDate;
 
     @Override
@@ -59,51 +55,6 @@ public class AddExpenseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_expense);
         ButterKnife.bind(this);
 
-        mJobModel = JobModel.getInstance();
-        mExpenseModel = ExpenseModel.getInstance();
-
-        // configure view_model and factory for categories list
-        CategoriesViewModelFactory factory = InjectorUtils
-                .provideExpenseViewModelFactory(this, CategoryEntry.Type.EXPENSE);
-        mViewModel = ViewModelProviders.of(this, factory)
-                .get(CategoriesViewModel.class);
-        mViewModel.getCategories().observe(this, new Observer<List<CategoryEntry>>() {
-            @Override
-            public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
-                if(categoryEntries != null) {
-                    setupCategoriesSpinner(categoryEntries);
-                }
-            }
-        });
-
-        // configure selection of payment date
-        mPaymentDate.setFocusable(false);
-        mPaymentDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pickDate();
-            }
-        });
-
-        // configure text_watcher to listen to text input for payments calculations
-        TextWatcher textWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String numberOfPaymentsString = mNumPayments.getText().toString();
-                String paymentDateString = mPaymentDate.getText().toString();
-                String costString = mCost.getText().toString();
-                calculatePayments(costString, numberOfPaymentsString, paymentDateString);
-            }
-        };
-
-        mCost.addTextChangedListener(textWatcher);
-        mNumPayments.addTextChangedListener(textWatcher);
-        mPaymentDate.addTextChangedListener(textWatcher);
     }
 
     private void calculatePayments(String costString, String numberOfPaymentsString, String paymentDateString) {
@@ -112,13 +63,8 @@ public class AddExpenseActivity extends AppCompatActivity {
             mPaymentsDetailsView.setText("");
             double numberOfPayments = Double.parseDouble(numberOfPaymentsString);
             double cost = Double.parseDouble(costString);
-            mExpenseModel.calculateExpenses(cost, numberOfPayments, mLocalDate);
             mPaymentsDetailsView.setText("Payments details:");
-            List<ExpenseEntry> expenses = mExpenseModel.getExpenses();
-            for(int i = 0; i<expenses.size(); i++){
-                mPaymentsDetailsView.append(Html.fromHtml("<br>" + (i+1) + " payment: "
-                        + expenses.get(i).getCost() + ", payment date: " + expenses.get(i).getPaymentDate()));
-            }
+
         } else {
             mPaymentsDetailsView.setText("");
         }
@@ -191,7 +137,7 @@ public class AddExpenseActivity extends AppCompatActivity {
      */
     private void addExpense() {
         // get picked category id
-        CategoryEntry categoryEntry = mViewModel.getCategories().getValue()
+        CategoryEntry categoryEntry = mViewModel.getCategories(CategoryEntry.Type.EXPENSE).getValue()
                 .get(mCategorySpinner.getSelectedItemPosition()-1);
         int categoryId = categoryEntry.getId();
         // get expense number of payments
@@ -200,7 +146,6 @@ public class AddExpenseActivity extends AppCompatActivity {
         double cost = Double.parseDouble(mCost.getText().toString());
         ExpenseEntry expenseEntry = new ExpenseEntry(categoryId, cost, numOfPayments,
                 mLocalDate);
-        mJobModel.addExpense(expenseEntry);
         finish();
     }
 
@@ -214,25 +159,8 @@ public class AddExpenseActivity extends AppCompatActivity {
         double cost = Double.parseDouble(mCost.getText().toString());
         ExpenseEntry expenseEntry = new ExpenseEntry(cost, numOfPayments,
                 mLocalDate);
-        mJobModel.addExpenseWithNewCategory(InjectorUtils.provideRepository(this), categoryEntry,
-                expenseEntry);
+
         finish();
     }
 
-    private void pickDate(){
-        final Calendar calendar = Calendar.getInstance();
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
-                new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                String dateString = year + "-" + (month+1) + "-" + dayOfMonth;
-                mLocalDate = LocalDate.parse(dateString);
-                DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
-                mLocalDate = new LocalDate(dateString);
-                mPaymentDate.setText(fmt.print(mLocalDate));
-            }
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-
-        datePickerDialog.show();
-    }
 }

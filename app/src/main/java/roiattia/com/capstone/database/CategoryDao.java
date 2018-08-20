@@ -17,13 +17,13 @@ public interface CategoryDao {
     LiveData<List<CategoryEntry>> loadCategories(CategoryEntry.Type type);
 
     @Insert
-    long insertCat(CategoryEntry categoryEntry);
+    long insertCategory(CategoryEntry categoryEntry);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateCat(CategoryEntry categoryEntry);
+    void updateCategory(CategoryEntry categoryEntry);
 
     @Delete
-    void deleteCat(CategoryEntry categoryEntry);
+    void deleteCategory(CategoryEntry categoryEntry);
 
     @Query("SELECT mName FROM category WHERE id=:categoryId")
     String getCategoryName(int categoryId);
