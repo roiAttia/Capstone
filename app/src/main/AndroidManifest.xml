@@ -19,14 +19,16 @@
         </activity>
         <activity android:name=".ui.newjob.NewJobActivity" />
         <activity android:name=".ui.joblist.JobsListActivity" />
-        <activity android:name=".ui.expense.AddExpenseActivity" />
         <activity android:name=".ui.finances.FinancesActivity">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:categoryName="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:categoryName="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
+        <activity android:name=".ui.newexpense.ExpenseActivity"></activity>
     </application>
 
 </manifest>

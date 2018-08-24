@@ -10,6 +10,7 @@ import roiattia.com.capstone.database.CategoryDao;
 import roiattia.com.capstone.database.ExpenseDao;
 import roiattia.com.capstone.database.JobDao;
 import roiattia.com.capstone.database.JobEntry;
+import roiattia.com.capstone.model.JobCalendarModel;
 import roiattia.com.capstone.ui.newjob.JobRepository;
 import roiattia.com.capstone.utils.AppExecutors;
 
@@ -19,35 +20,27 @@ public class CalendarRepository {
     private static final Object LOCK = new Object();
     private static CalendarRepository sInstance;
     private final JobDao mJobDao;
-    private final CategoryDao mCategoryDao;
-    private final AppExecutors mExecutors;
 
-    private CalendarRepository(JobDao jobDao, CategoryDao categoryDao, AppExecutors executors){
+    private CalendarRepository(JobDao jobDao){
         mJobDao = jobDao;
-        mCategoryDao = categoryDao;
-        mExecutors = executors;
     }
 
-    public synchronized static CalendarRepository getInstance(JobDao jobDao, CategoryDao categoryDao,
-                                                              AppExecutors appExecutors) {
+    public synchronized static CalendarRepository getInstance(JobDao jobDao) {
         if (sInstance == null) {
             synchronized (LOCK) {
-                sInstance = new CalendarRepository(jobDao, categoryDao, appExecutors);
+                sInstance = new CalendarRepository(jobDao);
             }
         }
         return sInstance;
     }
 
-    public LiveData<List<JobEntry>> getJobsByDate(final LocalDate localDate){
-        return mJobDao.loadJobsAtDate(localDate);
+    /**
+     * Get jobs with category name on a specific date
+     * @param datePicked date picked
+     * @return a live_data contains a list of jobs
+     */
+    public LiveData<List<JobCalendarModel>> getJobsByDate(final LocalDate datePicked){
+        return mJobDao.loadJobsAtDate(datePicked);
     }
 
-    public void extractCategoryName(final long categoryId) {
-        mExecutors.diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                String categoryName = mCategoryDao.getCategoryName(categoryId);
-            }
-        });
-    }
 }

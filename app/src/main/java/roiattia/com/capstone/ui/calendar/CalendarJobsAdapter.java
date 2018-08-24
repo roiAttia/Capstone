@@ -17,13 +17,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
-import roiattia.com.capstone.database.JobEntry;
-import roiattia.com.capstone.ui.newjob.JobRepository;
-import roiattia.com.capstone.utils.InjectorUtils;
+import roiattia.com.capstone.model.JobCalendarModel;
 
 public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapter.CalendarJobViewHolder> {
 
-    private List<JobEntry> mJobEntries;
+    private List<JobCalendarModel> mJobEntries;
     private Context mContext;
 
     CalendarJobsAdapter(Context context) {
@@ -41,11 +39,9 @@ public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapte
 
     @Override
     public void onBindViewHolder(@NonNull final CalendarJobViewHolder holder, int position) {
-        final JobEntry jobEntry = mJobEntries.get(position);
-        final CalendarRepository repository = InjectorUtils.provideCalendarRepository(mContext);
-        repository.extractCategoryName(jobEntry.getCategoryId());
-
-        holder.jobIncome.setText(String.format("%s", jobEntry.getIncome()));
+        final JobCalendarModel jobEntry = mJobEntries.get(position);
+        holder.jobIncome.setText(String.format("%s", jobEntry.getJobIncome()));
+        holder.jobCategoryName.setText(jobEntry.getCategoryName());
         LocalDate localDate = new LocalDate(jobEntry.getJobDate());
         DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
         holder.jobDate.setText(fmt.print(localDate));
@@ -59,7 +55,7 @@ public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapte
 
     public class CalendarJobViewHolder extends RecyclerView.ViewHolder{
 
-        @BindView(R.id.tv_description) TextView jobDescription;
+        @BindView(R.id.tv_category_name) TextView jobCategoryName;
         @BindView(R.id.tv_date) TextView jobDate;
         @BindView(R.id.tv_income) TextView jobIncome;
 
@@ -69,7 +65,7 @@ public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapte
         }
     }
 
-    public void setJobs(List<JobEntry> jobEntries) {
+    public void setJobs(List<JobCalendarModel> jobEntries) {
         mJobEntries = jobEntries;
         notifyDataSetChanged();
     }

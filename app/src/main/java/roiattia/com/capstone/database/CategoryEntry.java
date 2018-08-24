@@ -1,27 +1,32 @@
 package roiattia.com.capstone.database;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 @Entity(tableName = "category")
 public class CategoryEntry {
 
     @PrimaryKey(autoGenerate = true)
-    private long id;
-    private String mName;
-    private Type mType;
+    @ColumnInfo(name = "category_id")
+    private long mCategoryId;
+    @ColumnInfo(name = "category_name")
+    private String mCategoryName;
+    @ColumnInfo(name = "category_type")
+    private Type mCategoryType;
 
     @Ignore
-    public CategoryEntry(String name, Type type) {
-        mName = name;
-        mType = type;
+    public CategoryEntry(@NonNull String categoryName, Type categoryType) {
+        mCategoryName = categoryName;
+        mCategoryType = categoryType;
     }
 
-    public CategoryEntry(long id, String name, Type type) {
-        this.id = id;
-        mName = name;
-        mType = type;
+    public CategoryEntry(long categoryId, String categoryName, Type categoryType) {
+        mCategoryId = categoryId;
+        mCategoryName = categoryName;
+        mCategoryType = categoryType;
     }
 
     @Ignore
@@ -42,28 +47,32 @@ public class CategoryEntry {
         }
     }
 
-    public long getId() {
-        return id;
+    public long getCategoryId() {
+        return mCategoryId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setCategoryId(long categoryId) {
+        this.mCategoryId = categoryId;
     }
 
-    public String getName() {
-        return mName;
+    public String getCategoryName() {
+        return mCategoryName;
     }
 
-    public void setName(String name) {
-        mName = name;
+    public void setCategoryName(String categoryName) {
+        this.mCategoryName = categoryName;
     }
 
-    public Type getType() {
-        return mType;
+    public Type getCategoryType() {
+        return mCategoryType;
+    }
+
+    public void setCategoryType(Type categoryType) {
+        mCategoryType = categoryType;
     }
 
     @Override
     public String toString() {
-        return "**CATEGORY ENTRY** Category id: " + id + "Category type: " + mType + ", Category name: " +mName;
+        return "**CATEGORY ENTRY** Category mCategoryId: " + mCategoryId + "Category type: " + mCategoryType + ", Category name: " + mCategoryName;
     }
 }

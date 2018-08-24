@@ -31,9 +31,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.CategoryEntry;
+import roiattia.com.capstone.database.ExpenseEntry;
 import roiattia.com.capstone.utils.InjectorUtils;
 
-public class JobExpensesFragment extends BaseFragment {
+public class ExpenseFragment extends BaseJobFragment {
 
     @BindView(R.id.spinner_expense_category) Spinner mCategoriesSpinner;
     @BindView(R.id.et_expense_cost) EditText mCostView;
@@ -48,6 +49,10 @@ public class JobExpensesFragment extends BaseFragment {
     private int mCost;
     private int mNumberOfPayments;
     private LocalDate mPaymentDate;
+    private List<CategoryEntry> mCategoriesList;
+    private ExpenseEntry mExpense;
+
+    public ExpenseFragment(){}
 
     @Nullable
     @Override
@@ -63,15 +68,15 @@ public class JobExpensesFragment extends BaseFragment {
                 .provideExpenseViewModelFactory(mListener);
         mViewModel = ViewModelProviders.of(mListener, factory)
                 .get(NewJobViewModel.class);
-        mViewModel.getCategories(CategoryEntry.Type.EXPENSE).observe(this, new Observer<List<CategoryEntry>>() {
-            @Override
-            public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
-                if(categoryEntries != null) {
-                    JobExpensesFragment.super.setupCategoriesSpinner(
-                            mCategoriesSpinner, categoryEntries);
-                }
-            }
-        });
+//        mViewModel.getCategories(CategoryEntry.Type.EXPENSE).observe(this, new Observer<List<CategoryEntry>>() {
+//            @Override
+//            public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
+//                if(categoryEntries != null) {
+//                    ExpenseFragment.super.setupCategoriesSpinner(
+//                            mCategoriesSpinner, categoryEntries);
+//                }
+//            }
+//        });
 
         // configure selection of payment date
         mPaymentDateView.setFocusable(false);
@@ -127,6 +132,12 @@ public class JobExpensesFragment extends BaseFragment {
             }
         });
 
+        if(mExpense != null){
+            updateUiWithDetails();
+        }
+
+        setupCategoriesSpinner(mCategoriesSpinner, mCategoriesList);
+
         return rootView;
     }
 
@@ -144,6 +155,9 @@ public class JobExpensesFragment extends BaseFragment {
         }
     }
 
+    /**
+     * Handle date picker dialog click
+     */
     private void pickDate(){
         final Calendar calendar = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(mListener,
@@ -160,10 +174,15 @@ public class JobExpensesFragment extends BaseFragment {
         datePickerDialog.show();
     }
 
+    /**
+     * Handles input validation
+     * @return true if input valid
+     */
     public Boolean checkInputValidation() {
         boolean isInputValid = true;
         // check category validation
-        if(!mNewCategoryButton.isChecked() && !mExistedCategoryButton.isChecked()){
+        if(!mNewCategoryButton.isChecked() && !mExistedCategoryButton.isChecked()
+                && mCategoriesSpinner.getSelectedItemPosition() == 0){
             Toast.makeText(mListener, "Invalid category", Toast.LENGTH_SHORT).show();
             isInputValid = false;
         }
@@ -185,15 +204,32 @@ public class JobExpensesFragment extends BaseFragment {
         return isInputValid;
     }
 
+    /**
+     * Handle expenses details update and insertion as new expense
+     */
     public void setExpenseDetails() {
         if(mNewCategoryButton.isChecked()){
             mViewModel.setExpenseDetails(0, mCost, mNumberOfPayments, mPaymentDate);
             String categoryName = mCategoryView.getText().toString();
             mViewModel.insertNewCategory(categoryName, CategoryEntry.Type.EXPENSE);
         } else if(mExistedCategoryButton.isChecked()){
-            int categoryPosition = mCategoriesSpinner.getSelectedItemPosition();
+            int categoryPosition = mCategoriesSpinner.getSelectedItemPosition() - 1;
             long categoryId = mViewModel.getCategoryId(categoryPosition);
             mViewModel.setExpenseDetails(categoryId, mCost, mNumberOfPayments, mPaymentDate);
         }
+    }
+
+    public void setCategoriesData(List<CategoryEntry> categoryEntries) {
+        mCategoriesList = categoryEntries;
+    }
+
+    public void setExpense(ExpenseEntry expenseEntry) {
+        mExpense = expenseEntry;
+    }
+
+    private void updateUiWithDetails() {
+        mCostView.setText(String.valueOf(mExpense.getExpenseCost()));
+        mPaymentDateView.setText(mPaymentDate.toString());
+        mExistedCategoryButton.setChecked(true);
     }
 }

@@ -6,7 +6,6 @@ import org.joda.time.LocalDate;
 
 import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.JobEntry;
-import roiattia.com.capstone.ui.newjob.JobRepository;
 
 public class DummyData {
 
@@ -22,7 +21,7 @@ public class DummyData {
 
     public static void insertJob(Context context){
         LocalDate localDate = new LocalDate("2018-08-23");
-        JobEntry jobEntry = new JobEntry(4,
+        JobEntry jobEntry = new JobEntry(
                 "Sarah", localDate, localDate, 1000, 300, 700);
 //        JobRepository repository = InjectorUtils.provideJobRepository(context);
 //        repository.insertJob(jobEntry);

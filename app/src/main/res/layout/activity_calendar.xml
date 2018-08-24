@@ -80,7 +80,7 @@
         android:id="@+id/tv_empty_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No jobs at this date yet..."
+        android:text="@string/no_jobs_at_this_date_yet_message"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@+id/fab_add_job"

@@ -30,6 +30,11 @@ public class NewJobViewModel extends ViewModel
         mExpenses = new ArrayList<>();
     }
 
+    /**
+     * Handle categories retrieval from db
+     * @param type the type of categories needed - JOB or EXPENSE
+     * @return categories wrapped with live_data
+     */
     public LiveData<List<CategoryEntry>> getCategories(CategoryEntry.Type type) {
         return mRepository.getCategories(type);
     }
@@ -37,7 +42,8 @@ public class NewJobViewModel extends ViewModel
     @Override
     public void onCategoryInserted(long categoryId, CategoryEntry.Type type) {
         if(type.equals(CategoryEntry.Type.JOB)){
-            insertNewJobWithNewCategoryId(categoryId);
+            updateJobCategoryId(categoryId);
+            insertNewJob();
         } else if(type.equals(CategoryEntry.Type.EXPENSE)){
             insertExpensesWithNewCategoryId(categoryId);
         }
@@ -49,37 +55,23 @@ public class NewJobViewModel extends ViewModel
     }
 
     public void calculateProfit(){
-        double profit = mJobEntry.getIncome() - mJobEntry.getExpenses();
-        mJobEntry.setProfit(profit);
+        double profit = mJobEntry.getJobIncome() - mJobEntry.getJobExpenses();
+        mJobEntry.setJobProfits(profit);
     }
 
-    public double getProfit(){
-        return mJobEntry.getProfit();
+    /**
+     * Set job date
+     * @param jobDate - date of the job
+     */
+    public void setJobDate(LocalDate jobDate) {
+        mJobEntry.setJobDate(jobDate);
     }
 
-    public void insertFee(int income) {
-        mJobEntry.setIncome(income);
-        calculateProfit();
-    }
-
-    public double getIncome() {
-        return mJobEntry.getIncome();
-    }
-
-    public double getExpenses() {
-        return mJobEntry.getExpenses();
-    }
-
-    public void setJobDate(LocalDate localDate) {
-        mJobEntry.setJobDate(localDate);
-    }
-
+    /**
+     * @return job date
+     */
     public LocalDate getJobDate() {
         return mJobEntry.getJobDate();
-    }
-
-    public void setJobPaymentDate(LocalDate localDate) {
-        mJobEntry.setDateOfPayment(localDate);
     }
 
     public List<ExpenseEntry> getExpensesList() {
@@ -98,9 +90,14 @@ public class NewJobViewModel extends ViewModel
         }
     }
 
-    private void insertNewJobWithNewCategoryId(long categoryId) {
-        mJobEntry.setCategoryId((int) categoryId);
-        insertNewJob();
+    public void updateJobDetails(LocalDate jobDate, LocalDate jobPaymentDate,
+                                 int jobIncome, int jobExpense, int jobProfit, String jobDescription) {
+        mJobEntry = new JobEntry(jobDescription, jobDate, jobPaymentDate,
+                jobIncome, jobExpense, jobProfit);
+    }
+
+    public void updateJobCategoryId(long categoryId) {
+        mJobEntry.setCategoryId(categoryId);
     }
 
     public void insertNewJob() {
@@ -108,15 +105,15 @@ public class NewJobViewModel extends ViewModel
     }
 
     private void insertExpensesWithNewCategoryId(long categoryId) {
-        mExpenses.get(mExpenses.size()-1).setCategoryId(categoryId);
+        mExpenses.get(mExpenses.size()).setCategoryId(categoryId);
     }
 
     public void updateExpenses() {
         int totalExpenses = 0;
         for(ExpenseEntry expenseEntry : mExpenses){
-            totalExpenses += expenseEntry.getCost();
+            totalExpenses += expenseEntry.getExpenseCost();
         }
-        mJobEntry.setExpenses(totalExpenses);
+        mJobEntry.setJobExpenses(totalExpenses);
     }
 
     public void setCategories(List<CategoryEntry> categoryEntries) {
@@ -124,11 +121,7 @@ public class NewJobViewModel extends ViewModel
     }
 
     public long getCategoryId(int categoryPosition) {
-        return mCategories.get(categoryPosition).getId();
-    }
-
-    public void setJobCategoryId(long categoryId) {
-        mJobEntry.setCategoryId((int) categoryId);
+        return mCategories.get(categoryPosition).getCategoryId();
     }
 
     public void setExpenseDetails(long categoryId, int cost, int numberOfPayments, LocalDate paymentDate) {
@@ -139,4 +132,6 @@ public class NewJobViewModel extends ViewModel
     public void debugPrint(){
         mRepository.debugPrint();
     }
+
+
 }

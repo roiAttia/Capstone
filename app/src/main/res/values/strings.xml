@@ -6,8 +6,35 @@
     <string name="finances_current_headline">CURRENT</string>
     <string name="finances_expected_headline">EXPECTED</string>
     <string name="number_of_transactions">Number of transactions:</string>
-    <string name="total_cost">Total cost:</string>
+    <string name="total_cost">Total expenseCost:</string>
     <string name="number_of_jobs">Number of jobs:</string>
-    <string name="total_income">Total income:</string>
+    <string name="total_income">Total jobIncome:</string>
     <string name="spinner_category_default_value">Pick category from list</string>
+    <string name="overall_income">Income -> </string>
+    <string name="overall_expenses">Expenses -> </string>
+    <string name="overall_profits">Profits -> </string>
+    <string name="details_cardview_headline">DETAILS</string>
+    <string name="insert_category_label">Select or enter new category</string>
+    <string name="enter_new_category_hint">Enter new category</string>
+    <string name="date_of_job_label">Date of job</string>
+    <string name="enter_job_date_hint">Enter localDate</string>
+    <string name="job_date_of_payment_label">Date of payment</string>
+    <string name="enter_job_date_of_payment_label">Enter date of payment</string>
+    <string name="job_income_label">Income</string>
+    <string name="enter_income_hint">Enter income</string>
+    <string name="more_information_label">More information</string>
+    <string name="enter_information_hint">Enter information</string>
+    <string name="expenses_cardview_headline">EXPENSES</string>
+    <string name="add_expense_button">add expense</string>
+    <string name="summary_cardview_headline">Summary</string>
+    <string name="profit_label">Profit</string>
+    <string name="income_label">Income</string>
+    <string name="expenses_label">Expenses</string>
+    <string name="no_jobs_at_this_date_yet_message">No jobs at this date yet...</string>
+
+    <string-array name="period_selection_options">
+        <item>Week</item>
+        <item>Month</item>
+        <item>Year</item>
+    </string-array>
 </resources>

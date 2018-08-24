@@ -12,7 +12,7 @@ import java.util.List;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.CategoryEntry;
 
-public class BaseFragment extends Fragment {
+public class BaseJobFragment extends Fragment {
 
     public FragmentActivity mListener;
 
@@ -37,7 +37,7 @@ public class BaseFragment extends Fragment {
         categoriesNames.add(getString(R.string.spinner_category_default_value));
         if(categoryEntries != null) {
             for (CategoryEntry categoryEntry : categoryEntries) {
-                categoriesNames.add(categoryEntry.getName());
+                categoriesNames.add(categoryEntry.getCategoryName());
             }
             // Creating adapter for spinner
             ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(

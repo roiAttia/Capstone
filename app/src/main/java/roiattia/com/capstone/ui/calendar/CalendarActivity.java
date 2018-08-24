@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.CalendarView;
 import android.widget.TextView;
@@ -21,6 +22,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.JobEntry;
+import roiattia.com.capstone.model.JobCalendarModel;
+import roiattia.com.capstone.ui.finances.FinancesActivity;
 import roiattia.com.capstone.ui.newjob.JobRepository;
 import roiattia.com.capstone.ui.newjob.NewJobActivity;
 import roiattia.com.capstone.utils.InjectorUtils;
@@ -32,7 +35,7 @@ public class CalendarActivity extends AppCompatActivity {
 
     private CalendarJobsAdapter mJobsAdapter;
     private CalendarViewModel mCalendarJobsViewModel;
-    private LocalDate mLocalDate;
+    private LocalDate mSelectedDate;
 
     @BindView(R.id.rv_job_list) RecyclerView mJobsListView;
     @BindView(R.id.calendarView) CalendarView mCalendarView;
@@ -44,35 +47,44 @@ public class CalendarActivity extends AppCompatActivity {
         setContentView(R.layout.activity_calendar);
         ButterKnife.bind(this);
 
+        // initialize view_model
         CalendarViewModelFactory factory =
                 InjectorUtils.provideCalendarViewModelFactory(this.getApplicationContext());
         mCalendarJobsViewModel = ViewModelProviders.of(this, factory).get(CalendarViewModel.class);
 
+        // initialize jobs_list and it's adapter
         mJobsAdapter = new CalendarJobsAdapter(this);
         mJobsListView.setAdapter(mJobsAdapter);
         mJobsListView.setLayoutManager(new LinearLayoutManager(this));
         mJobsListView.setHasFixedSize(true);
 
-        mLocalDate = new LocalDate();
-        setupViewModel(mLocalDate);
-
+        // initialize date and calendar_view on date listener
+        mSelectedDate = new LocalDate();
+        setupViewModel(mSelectedDate);
         mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 String date = year + "-" + (month+1) + "-" + dayOfMonth;
-                mLocalDate = LocalDate.parse(date);
-                setupViewModel(mLocalDate);
+                Log.i(TAG, date);
+                mSelectedDate = LocalDate.parse(date);
+                setupViewModel(mSelectedDate);
             }
         });
     }
 
-    private void setupViewModel(LocalDate localDate) {
-        mCalendarJobsViewModel.getJobs(localDate).observe(CalendarActivity.this,
-                new Observer<List<JobEntry>>() {
+    /**
+     * Handle date clicks on calendar to load data on that date
+     * @param pickedDate the date picked in calendar
+     */
+    private void setupViewModel(LocalDate pickedDate) {
+        Log.i(TAG, pickedDate.toString());
+        mCalendarJobsViewModel.getJobsAtDate(pickedDate).observe(CalendarActivity.this,
+                new Observer<List<JobCalendarModel>>() {
                     @Override
-                    public void onChanged(@Nullable List<JobEntry> jobEntries) {
-                        mJobsAdapter.setJobs(jobEntries);
-                        if(jobEntries != null && jobEntries.size() > 0) {
+                    public void onChanged(@Nullable List<JobCalendarModel> jobCalendarList) {
+                        Log.i(TAG, jobCalendarList.size() + "");
+                        mJobsAdapter.setJobs(jobCalendarList);
+                        if(jobCalendarList != null && jobCalendarList.size() > 0) {
                             mEmptyListView.setVisibility(View.INVISIBLE);
                         } else mEmptyListView.setVisibility(View.VISIBLE);
                     }
@@ -84,12 +96,12 @@ public class CalendarActivity extends AppCompatActivity {
      */
     public void addJob(View view){
         Intent intent = new Intent(CalendarActivity.this, NewJobActivity.class);
-        intent.putExtra(DATE, mLocalDate.toString());
+        intent.putExtra(DATE, mSelectedDate.toString());
         startActivity(intent);
     }
 
-//    public void debugPrint(View view){
-//        JobRepository repository = InjectorUtils.provideJobRepository(this);
-//        repository.debugPrint();
-//    }
+    public void debugPrint(View view){
+        Intent intent = new Intent(CalendarActivity.this, FinancesActivity.class);
+        startActivity(intent);
+    }
 }

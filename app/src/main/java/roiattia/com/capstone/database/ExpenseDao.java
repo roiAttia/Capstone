@@ -8,7 +8,11 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import org.joda.time.LocalDate;
+
 import java.util.List;
+
+import roiattia.com.capstone.model.ExpensesModel;
 
 @Dao
 public interface ExpenseDao {
@@ -26,4 +30,15 @@ public interface ExpenseDao {
 
     @Delete
     void deleteExpense(ExpenseEntry expenseEntry);
+
+    @Query("SELECT COUNT(category_name) as mCount, category_name as mName, SUM(expense_cost) as mCost " +
+            "FROM expense JOIN category ON expense.category_id = category.category_id " +
+            "WHERE expense_payment_date BETWEEN :from AND :to " +
+            "AND category_type=:type " +
+            "GROUP BY category_name")
+    LiveData<List<ExpensesModel>> loadExpensesBetweenDates(LocalDate from, LocalDate to,
+                                                           CategoryEntry.Type type);
+
+    @Query("SELECT * FROM expense WHERE expense_id=:expenseId")
+    LiveData<ExpenseEntry> loadExpense(long expenseId);
 }

@@ -9,49 +9,51 @@ import android.arch.persistence.room.PrimaryKey;
 
 import org.joda.time.LocalDate;
 
-import java.util.Date;
-
 @Entity(tableName = "job",
         foreignKeys = @ForeignKey(entity = CategoryEntry.class,
-            parentColumns = "id",
+            parentColumns = "category_id",
             childColumns = "category_id"),
-        indices = {@Index("id"), @Index("category_id")})
+        indices = {@Index("job_id"), @Index("category_id")})
 public class JobEntry {
     @PrimaryKey(autoGenerate = true)
-    private long id;
+    @ColumnInfo(name = "job_id")
+    private long mJobId;
     @ColumnInfo(name = "category_id")
     private long mCategoryId;
-    private String mDescription;
+    @ColumnInfo(name = "job_description")
+    private String mJobDescription;
     @ColumnInfo(name = "job_date")
     private LocalDate mJobDate;
     @ColumnInfo(name = "job_payment_date")
-    private LocalDate mDateOfPayment;
-    private double mIncome;
-    private double mExpenses;
-    private double mProfit;
+    private LocalDate mJobDateOfPayment;
+    @ColumnInfo(name = "job_income")
+    private double mJobIncome;
+    @ColumnInfo(name = "job_expenses")
+    private double mJobExpenses;
+    @ColumnInfo(name = "job_profits")
+    private double mJobProfits;
 
-    public JobEntry(long id, long categoryId, String description, LocalDate jobDate,
-                    LocalDate dateOfPayment, double income, double expenses, double profit) {
-        this.id = id;
+    public JobEntry(long jobId, long categoryId, String jobDescription, LocalDate jobDate,
+                    LocalDate jobDateOfPayment, double jobIncome, double jobExpenses, double jobProfits) {
+        mJobId = jobId;
         mCategoryId = categoryId;
-        mDescription = description;
+        mJobDescription = jobDescription;
         mJobDate = jobDate;
-        mDateOfPayment = dateOfPayment;
-        mIncome = income;
-        mExpenses = expenses;
-        mProfit = profit;
+        mJobDateOfPayment = jobDateOfPayment;
+        mJobIncome = jobIncome;
+        mJobExpenses = jobExpenses;
+        mJobProfits = jobProfits;
     }
 
     @Ignore
-    public JobEntry(long categoryId, String description, LocalDate jobDate,
+    public JobEntry(String description, LocalDate jobDate,
                     LocalDate dateOfPayment, double income, double expenses, double profit) {
-        mCategoryId = categoryId;
-        mDescription = description;
+        mJobDescription = description;
         mJobDate = jobDate;
-        mDateOfPayment = dateOfPayment;
-        mIncome = income;
-        mExpenses = expenses;
-        mProfit = profit;
+        mJobDateOfPayment = dateOfPayment;
+        mJobIncome = income;
+        mJobExpenses = expenses;
+        mJobProfits = profit;
     }
 
     @Ignore
@@ -66,44 +68,32 @@ public class JobEntry {
         mJobDate = localDate;
     }
 
-    public long getId() {
-        return id;
+    public long getJobId() {
+        return mJobId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public String getJobDescription() {
+        return mJobDescription;
     }
 
-    public String getDescription() {
-        return mDescription;
+    public double getJobIncome() {
+        return mJobIncome;
     }
 
-    public void setDescription(String description) {
-        mDescription = description;
+    public double getJobExpenses() {
+        return mJobExpenses;
     }
 
-    public double getIncome() {
-        return mIncome;
+    public void setJobExpenses(double jobExpenses) {
+        mJobExpenses = jobExpenses;
     }
 
-    public void setIncome(double income) {
-        mIncome = income;
+    public double getJobProfits() {
+        return mJobProfits;
     }
 
-    public double getExpenses() {
-        return mExpenses;
-    }
-
-    public void setExpenses(double expenses) {
-        mExpenses = expenses;
-    }
-
-    public double getProfit() {
-        return mProfit;
-    }
-
-    public void setProfit(double profit) {
-        mProfit = profit;
+    public void setJobProfits(double jobProfits) {
+        mJobProfits = jobProfits;
     }
 
     public long getCategoryId() {
@@ -114,19 +104,31 @@ public class JobEntry {
         mCategoryId = categoryId;
     }
 
-    public LocalDate getDateOfPayment() {
-        return mDateOfPayment;
+    public LocalDate getJobDateOfPayment() {
+        return mJobDateOfPayment;
     }
 
-    public void setDateOfPayment(LocalDate dateOfPayment) {
-        mDateOfPayment = dateOfPayment;
+    public void setJobId(long jobId) {
+        mJobId = jobId;
+    }
+
+    public void setJobDescription(String jobDescription) {
+        mJobDescription = jobDescription;
+    }
+
+    public void setJobDateOfPayment(LocalDate jobDateOfPayment) {
+        mJobDateOfPayment = jobDateOfPayment;
+    }
+
+    public void setJobIncome(double jobIncome) {
+        mJobIncome = jobIncome;
     }
 
     @Override
     public String toString() {
-        return "**JOB ENTRY** Job id: " + id + ", Category id: " + mCategoryId + ", job date: " + mJobDate +
-                ", payment date: " + mDateOfPayment + ", income: " + mIncome +
-                ", expenses: " + mExpenses + ", profits: " + mProfit +
-                ", description: " + mDescription;
+        return "**JOB ENTRY** Job mJobId: " + mJobId + ", Category mJobId: " + mCategoryId + ", job date: " + mJobDate +
+                ", payment date: " + mJobDateOfPayment + ", income: " + mJobIncome +
+                ", expenses: " + mJobExpenses + ", profits: " + mJobProfits +
+                ", description: " + mJobDescription;
     }
 }

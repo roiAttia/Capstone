@@ -25,7 +25,7 @@ public class NewJobActivity extends AppCompatActivity {
 
     private NewJobViewModel mViewModel;
     private FragmentManager mFragmentManager;
-    private JobExpensesFragment mJobExpensesFragment;
+    private ExpenseFragment mJobExpensesFragment;
     private NewJobFragment mNewJobFragment;
 
     @Override
@@ -51,7 +51,7 @@ public class NewJobActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             mFragmentManager = getSupportFragmentManager();
             mNewJobFragment = new NewJobFragment();
-            mJobExpensesFragment = new JobExpensesFragment();
+            mJobExpensesFragment = new ExpenseFragment();
             mFragmentManager.beginTransaction()
                     .add(R.id.fl_fragment_placeholder, mNewJobFragment)
                     .commit();
@@ -71,7 +71,7 @@ public class NewJobActivity extends AppCompatActivity {
      * Handles the "cancel expense" of job expense fragment's button click event
      */
     public void cancelExpense(View view){
-        mJobExpensesFragment = new JobExpensesFragment();
+        mJobExpensesFragment = new ExpenseFragment();
         mFragmentManager.beginTransaction()
                 .replace(R.id.fl_fragment_placeholder, mNewJobFragment)
                 .commit();
@@ -89,7 +89,7 @@ public class NewJobActivity extends AppCompatActivity {
             mFragmentManager.beginTransaction()
                     .replace(R.id.fl_fragment_placeholder, mNewJobFragment)
                     .commit();
-            mJobExpensesFragment = new JobExpensesFragment();
+            mJobExpensesFragment = new ExpenseFragment();
         }
     }
 

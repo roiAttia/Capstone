@@ -31,7 +31,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:text="DETAILS"
+                    android:text="@string/details_cardview_headline"
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -42,20 +42,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Select or enter new category"
+                    android:text="@string/insert_category_label"
                     android:textColor="@android:color/black"
                     app:layout_constraintStart_toStartOf="@+id/textView"
                     app:layout_constraintTop_toBottomOf="@+id/textView" />
 
                 <EditText
                     android:id="@+id/et_category"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="16dp"
                     android:ems="10"
-                    android:hint="Enter new category"
+                    android:hint="@string/enter_new_category_hint"
                     android:inputType="textPersonName"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/spinner_job_category"
+                    app:layout_constraintStart_toStartOf="@+id/spinner_job_category"
                     app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
                 <Spinner
@@ -63,8 +64,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    app:layout_constraintEnd_toEndOf="@+id/et_category"
-                    app:layout_constraintStart_toStartOf="@+id/et_category"
+                    app:layout_constraintEnd_toEndOf="@+id/et_date"
+                    app:layout_constraintStart_toStartOf="@+id/et_date"
                     app:layout_constraintTop_toBottomOf="@+id/et_category" />
 
                 <TextView
@@ -72,20 +73,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Date of job"
+                    android:text="@string/date_of_job_label"
                     android:textColor="@android:color/black"
                     app:layout_constraintStart_toStartOf="@+id/textView2"
                     app:layout_constraintTop_toBottomOf="@+id/spinner_job_category" />
 
                 <EditText
                     android:id="@+id/et_date"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:ems="10"
-                    android:hint="Enter localDate"
+                    android:hint="@string/enter_job_date_hint"
                     app:layout_constraintBottom_toBottomOf="@+id/textView3"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/et_date_of_payment"
+                    app:layout_constraintStart_toStartOf="@+id/et_date_of_payment"
                     app:layout_constraintTop_toTopOf="@+id/textView3" />
 
                 <TextView
@@ -93,20 +94,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Date of payment"
+                    android:text="@string/job_date_of_payment_label"
                     android:textColor="@android:color/black"
                     app:layout_constraintStart_toStartOf="@+id/textView3"
                     app:layout_constraintTop_toBottomOf="@+id/et_date" />
 
                 <EditText
                     android:id="@+id/et_date_of_payment"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:ems="10"
-                    android:hint="Enter localDate"
+                    android:hint="@string/enter_job_date_of_payment_label"
                     app:layout_constraintBottom_toBottomOf="@+id/textView4"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/et_fee"
+                    app:layout_constraintStart_toStartOf="@+id/et_fee"
                     app:layout_constraintTop_toTopOf="@+id/textView4" />
 
                 <TextView
@@ -114,21 +115,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Fee"
+                    android:text="@string/job_income_label"
                     android:textColor="@android:color/black"
                     app:layout_constraintStart_toStartOf="@+id/textView4"
                     app:layout_constraintTop_toBottomOf="@+id/et_date_of_payment" />
 
                 <EditText
                     android:id="@+id/et_fee"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:ems="10"
-                    android:hint="Enter fee"
+                    android:hint="@string/enter_income_hint"
                     android:inputType="numberDecimal"
                     app:layout_constraintBottom_toBottomOf="@+id/textView5"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/et_job_description"
+                    app:layout_constraintStart_toStartOf="@+id/et_job_description"
                     app:layout_constraintTop_toTopOf="@+id/textView5" />
 
                 <TextView
@@ -136,29 +137,33 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="More information"
+                    android:text="@string/more_information_label"
                     android:textColor="@android:color/black"
                     app:layout_constraintStart_toStartOf="@+id/textView5"
                     app:layout_constraintTop_toBottomOf="@+id/et_fee" />
 
                 <EditText
-                    android:id="@+id/et_information"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/et_job_description"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
                     android:ems="10"
-                    android:hint="Enter information"
+                    android:hint="@string/enter_information_hint"
                     android:inputType="textPersonName"
                     app:layout_constraintBottom_toBottomOf="@+id/textView6"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/textView6"
                     app:layout_constraintTop_toTopOf="@+id/textView6" />
 
                 <RadioGroup
+                    android:id="@+id/radioGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="@+id/textView2"
-                    app:layout_constraintTop_toBottomOf="@+id/textView2">
+                    android:layout_marginEnd="16dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/spinner_job_category"
+                    app:layout_constraintEnd_toStartOf="@+id/et_category"
+                    app:layout_constraintTop_toTopOf="@+id/et_category">
 
                     <RadioButton
                         android:id="@+id/rb_new_category"
@@ -200,7 +205,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:text="EXPENSES"
+                    android:text="@string/expenses_cardview_headline"
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -212,7 +217,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:onClick="addExpense"
-                    android:text="add expense"
+                    android:text="@string/add_expense_button"
                     app:layout_constraintBottom_toBottomOf="@+id/textView9"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/textView9" />
@@ -256,7 +261,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:text="Summary"
+                    android:text="@string/summary_cardview_headline"
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -267,7 +272,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Profit"
+                    android:text="@string/profit_label"
                     android:textColor="@android:color/black"
                     app:layout_constraintStart_toStartOf="@+id/textView13"
                     app:layout_constraintTop_toBottomOf="@+id/textView13" />
@@ -277,7 +282,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Income"
+                    android:text="@string/income_label"
                     android:textColor="@android:color/black"
                     app:layout_constraintStart_toStartOf="@+id/textView10"
                     app:layout_constraintTop_toBottomOf="@+id/textView10" />
@@ -287,7 +292,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Expenses"
+                    android:text="@string/expenses_label"
                     android:textColor="@android:color/black"
                     app:layout_constraintStart_toStartOf="@+id/textView12"
                     app:layout_constraintTop_toBottomOf="@+id/textView12" />

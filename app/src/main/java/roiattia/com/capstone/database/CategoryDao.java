@@ -13,7 +13,7 @@ import java.util.List;
 @Dao
 public interface CategoryDao {
 
-    @Query("SELECT * FROM category WHERE mType=:type ORDER BY mName")
+    @Query("SELECT * FROM category WHERE category_type=:type ORDER BY category_name")
     LiveData<List<CategoryEntry>> loadCategories(CategoryEntry.Type type);
 
     @Query("SELECT * FROM category")
@@ -28,6 +28,6 @@ public interface CategoryDao {
     @Delete
     void deleteCategory(CategoryEntry categoryEntry);
 
-    @Query("SELECT mName FROM category WHERE id=:categoryId")
+    @Query("SELECT category_name FROM category WHERE category_id=:categoryId")
     String getCategoryName(long categoryId);
 }

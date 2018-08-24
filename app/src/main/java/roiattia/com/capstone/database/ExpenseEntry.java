@@ -9,114 +9,114 @@ import android.arch.persistence.room.PrimaryKey;
 
 import org.joda.time.LocalDate;
 
-import java.util.Date;
-
 @Entity(tableName = "expense",
-        foreignKeys = {@ForeignKey(entity = JobEntry.class, parentColumns = "id",
+        foreignKeys = {@ForeignKey(entity = JobEntry.class, parentColumns = "job_id",
                 childColumns = "job_id"),
-                @ForeignKey(entity = CategoryEntry.class, parentColumns = "id",
+                @ForeignKey(entity = CategoryEntry.class, parentColumns = "category_id",
                         childColumns = "category_id")},
-        indices = {@Index("id"), @Index("job_id"), @Index("category_id")})
+        indices = {@Index("expense_id"), @Index("job_id"), @Index("category_id")})
 public class ExpenseEntry {
     @PrimaryKey(autoGenerate = true)
-    private long id;
+    @ColumnInfo(name = "expense_id")
+    private long mExpenseId;
     @ColumnInfo(name = "job_id")
-    private long jobId;
+    private long mJobId;
     @ColumnInfo(name = "category_id")
-    private long categoryId;
-    private double cost;
+    private long mCategoryId;
+    @ColumnInfo(name = "expense_cost")
+    private double mExpenseCost;
     @ColumnInfo(name = "number_of_payments")
     private int numberOfPayments;
-    @ColumnInfo(name = "payment_date")
-    private LocalDate paymentDate;
+    @ColumnInfo(name = "expense_payment_date")
+    private LocalDate mExpensePaymentDate;
 
     @Ignore
-    public ExpenseEntry(double cost, int numberOfPayments, LocalDate paymentDate) {
-        this.cost = cost;
+    public ExpenseEntry(double expenseCost, int numberOfPayments, LocalDate expensePaymentDate) {
+        this.mExpenseCost = expenseCost;
         this.numberOfPayments = numberOfPayments;
-        this.paymentDate = paymentDate;
-    }
-
-    @Ignore
-    public ExpenseEntry(long categoryId, double cost, int numberOfPayments, LocalDate paymentDate) {
-        this.categoryId = categoryId;
-        this.cost = cost;
-        this.numberOfPayments = numberOfPayments;
-        this.paymentDate = paymentDate;
+        this.mExpensePaymentDate = expensePaymentDate;
     }
 
     @Ignore
-    public ExpenseEntry(long jobId, long categoryId, double cost,
-                        int numberOfPayments, LocalDate paymentDate) {
-        this.jobId = jobId;
-        this.categoryId = categoryId;
-        this.cost = cost;
+    public ExpenseEntry(long categoryId, double expenseCost, int numberOfPayments, LocalDate expensePaymentDate) {
+        this.mCategoryId = categoryId;
+        this.mExpenseCost = expenseCost;
         this.numberOfPayments = numberOfPayments;
-        this.paymentDate = paymentDate;
+        this.mExpensePaymentDate = expensePaymentDate;
     }
 
-    public ExpenseEntry(long id, long jobId, long categoryId, double cost,
-                        int numberOfPayments, LocalDate paymentDate) {
-        this.id = id;
-        this.jobId = jobId;
-        this.categoryId = categoryId;
-        this.cost = cost;
+    @Ignore
+    public ExpenseEntry(long jobId, long categoryId, double expenseCost,
+                        int numberOfPayments, LocalDate expensePaymentDate) {
+        this.mJobId = jobId;
+        this.mCategoryId = categoryId;
+        this.mExpenseCost = expenseCost;
         this.numberOfPayments = numberOfPayments;
-        this.paymentDate = paymentDate;
+        this.mExpensePaymentDate = expensePaymentDate;
     }
 
-    public long getId() {
-        return id;
+    ExpenseEntry(long expenseId, long jobId, long categoryId, double expenseCost,
+                 int numberOfPayments, LocalDate expensePaymentDate) {
+        this.mExpenseId = expenseId;
+        this.mJobId = jobId;
+        this.mCategoryId = categoryId;
+        this.mExpenseCost = expenseCost;
+        this.numberOfPayments = numberOfPayments;
+        this.mExpensePaymentDate = expensePaymentDate;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public long getExpenseId() {
+        return mExpenseId;
     }
 
     public long getJobId() {
-        return jobId;
+        return mJobId;
     }
 
     public void setJobId(long jobId) {
-        this.jobId = jobId;
+        this.mJobId = jobId;
     }
 
     public long getCategoryId() {
-        return categoryId;
+        return mCategoryId;
     }
 
     public void setCategoryId(long categoryId) {
-        this.categoryId = categoryId;
+        this.mCategoryId = categoryId;
     }
 
     public int getNumberOfPayments() {
         return numberOfPayments;
     }
 
+    public LocalDate getExpensePaymentDate() {
+        return mExpensePaymentDate;
+    }
+
+    public double getExpenseCost() {
+        return mExpenseCost;
+    }
+
+    public void setExpenseId(long expenseId) {
+        mExpenseId = expenseId;
+    }
+
+    public void setExpenseCost(double expenseCost) {
+        mExpenseCost = expenseCost;
+    }
+
     public void setNumberOfPayments(int numberOfPayments) {
         this.numberOfPayments = numberOfPayments;
     }
 
-    public LocalDate getPaymentDate() {
-        return paymentDate;
-    }
-
-    public void setPaymentDate(LocalDate paymentDate) {
-        this.paymentDate = paymentDate;
-    }
-
-    public double getCost() {
-        return cost;
-    }
-
-    public void setCost(double cost) {
-        this.cost = cost;
+    public void setExpensePaymentDate(LocalDate expensePaymentDate) {
+        mExpensePaymentDate = expensePaymentDate;
     }
 
     @Override
     public String toString() {
-        return "**EXPENSE ENTRY** Expense id: " + id +"Job id: " + jobId + ", Category id: " + categoryId +
-                ", Cost: " + cost + ", number of payments: " + numberOfPayments +
-                ", payment day: " + paymentDate;
+        return "**EXPENSE ENTRY** Expense mExpenseId: " + mExpenseId +"Job mExpenseId: " + mJobId + ", Category mExpenseId: " + mCategoryId +
+                ", Cost: " + mExpenseCost + ", number of payments: " + numberOfPayments +
+                ", payment day: " + mExpensePaymentDate;
     }
 }

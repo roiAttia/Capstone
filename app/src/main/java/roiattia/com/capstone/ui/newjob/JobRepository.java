@@ -55,19 +55,6 @@ public class JobRepository {
         void onJobInserted(long jobId);
     }
 
-    // Jobs table methods
-    public LiveData<List<JobEntry>> getJobs(){
-        return mJobDao.loadAllJobs();
-    }
-
-    public LiveData<List<JobEntry>> getJobsByDate(final LocalDate localDate){
-        return mJobDao.loadJobsAtDate(localDate);
-    }
-
-    public LiveData<List<CategoryEntry>> getJobsCategories(){
-        return mCategoryDao.loadCategories(CategoryEntry.Type.JOB);
-    }
-
     public void insertJob(final JobEntry jobEntry){
         mExecutors.diskIO().execute(new Runnable() {
             @Override
@@ -81,11 +68,6 @@ public class JobRepository {
     // Expanses table methods
     public void insertExpense(ExpenseEntry expenseEntry){
         mExpenseDao.insertExpense(expenseEntry);
-    }
-
-    // Categories table methods
-    public LiveData<List<CategoryEntry>> getExpensesCategories(){
-        return mCategoryDao.loadCategories(CategoryEntry.Type.EXPENSE);
     }
 
     public void insertCategory(final CategoryEntry categoryEntry, final CategoryEntry.Type type){

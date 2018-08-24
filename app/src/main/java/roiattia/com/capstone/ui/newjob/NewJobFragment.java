@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.CardView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -37,12 +38,13 @@ import roiattia.com.capstone.utils.InjectorUtils;
 import static roiattia.com.capstone.ui.newjob.NewJobActivity.JOB_DATE;
 import static roiattia.com.capstone.ui.newjob.NewJobActivity.JOB_PAYMENT_DATE;
 
-public class NewJobFragment extends BaseFragment {
+public class NewJobFragment extends BaseJobFragment {
 
     @BindView(R.id.et_date) EditText mJobDateView;
     @BindView(R.id.et_date_of_payment)EditText mPaymentDateView;
     @BindView(R.id.et_fee)EditText mFeeView;
     @BindView(R.id.et_category)EditText mJobCategoryView;
+    @BindView(R.id.et_job_description)EditText mJobDescriptionView;
     @BindView(R.id.spinner_job_category) Spinner mCategorySpinner;
     @BindView(R.id.tv_expenses) TextView mExpensesView;
     @BindView(R.id.tv_profit) TextView mProfitView;
@@ -50,12 +52,14 @@ public class NewJobFragment extends BaseFragment {
     @BindView(R.id.ll_expense_list_view) LinearLayout mExpensesListView;
     @BindView(R.id.rb_existed_category) RadioButton mExistedCategoryButton;
     @BindView(R.id.rb_new_category) RadioButton mNewCategoryButton;
+    @BindView(R.id.cardview_summary) CardView mSummaryCardView;
 
     private NewJobViewModel mViewModel;
     private LocalDate mJobDate;
     private LocalDate mJobPaymentDate;
     private int mJobIncome;
-    private String mJobDescription;
+    private int mJobExpense;
+    private int mJobProfit;
 
     @Nullable
     @Override
@@ -111,9 +115,7 @@ public class NewJobFragment extends BaseFragment {
             @Override
             public void afterTextChanged(Editable s) {
                 if(!s.toString().equals("")) {
-                    int fee = Integer.parseInt(s.toString());
-                    mJobIncome = fee;
-//                    mViewModel.insertFee(fee);
+                    mJobIncome = Integer.parseInt(s.toString());
                     updateSummaryCard();
                 }
             }
@@ -147,9 +149,15 @@ public class NewJobFragment extends BaseFragment {
      * Update job summary card_view with new sums
      */
     public void updateSummaryCard() {
-        mIncomeView.setText(String.format("%s", mViewModel.getIncome()));
-        mExpensesView.setText(String.format("%s", mViewModel.getExpenses()));
-        mProfitView.setText(String.format("%s", mViewModel.getProfit()));
+        mJobProfit = mJobIncome - mJobExpense;
+        if(mJobProfit < 0){
+            mSummaryCardView.setCardBackgroundColor(getResources().getColor(R.color.colorNegativeRed));
+        } else {
+            mSummaryCardView.setCardBackgroundColor(getResources().getColor(R.color.colorPositiveGreen));
+        }
+        mIncomeView.setText(String.format("%s", mJobIncome));
+        mExpensesView.setText(String.format("%s", mJobExpense));
+        mProfitView.setText(String.format("%s", mJobProfit));
     }
 
     /**
@@ -167,8 +175,8 @@ public class NewJobFragment extends BaseFragment {
                         LocalDate localDate = new LocalDate(dateString);
                         DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
                         jobDateView.setText(fmt.print(localDate));
-                        if(dateType.equals(JOB_DATE)) mViewModel.setJobDate(localDate);
-                        if(dateType.equals(JOB_PAYMENT_DATE)) mViewModel.setJobPaymentDate(localDate);
+                        if(dateType.equals(JOB_DATE)) mJobDate = localDate;
+                        if(dateType.equals(JOB_PAYMENT_DATE)) mJobPaymentDate = localDate;
                     }
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
@@ -179,21 +187,28 @@ public class NewJobFragment extends BaseFragment {
      * and start insert new job sequence
      */
     public void insertJobSequence() {
+        String jobDescription = mJobDescriptionView.getText().toString();
+        mViewModel.updateJobDetails(mJobDate, mJobPaymentDate, mJobIncome,
+                mJobExpense, mJobProfit, jobDescription);
         if(mNewCategoryButton.isChecked()){
             String categoryName = mJobCategoryView.getText().toString();
             mViewModel.insertNewCategory(categoryName, CategoryEntry.Type.JOB);
         } else if(mExistedCategoryButton.isChecked()){
             int categoryPosition = mCategorySpinner.getSelectedItemPosition();
             long categoryId = mViewModel.getCategoryId(categoryPosition);
-            mViewModel.setJobCategoryId(categoryId);
+            mViewModel.updateJobCategoryId(categoryId);
             mViewModel.insertNewJob();
         }
     }
 
+    /**
+     * Check input validation
+     */
     public Boolean checkInputValidation() {
         boolean isInputValid = true;
         // check category validation
-        if(!mNewCategoryButton.isChecked() && !mExistedCategoryButton.isChecked()){
+        if(!mNewCategoryButton.isChecked() && !mExistedCategoryButton.isChecked()
+                && mCategorySpinner.getSelectedItemPosition() == 0){
             Toast.makeText(mListener, "Invalid category", Toast.LENGTH_SHORT).show();
             isInputValid = false;
         }
@@ -215,10 +230,15 @@ public class NewJobFragment extends BaseFragment {
         return isInputValid;
     }
 
+    /**
+     * Update expenses with new data
+     */
     public void updateExpenses() {
+        mJobExpense = 0;
         for(ExpenseEntry expenseEntry : mViewModel.getExpensesList()){
+            mJobExpense += expenseEntry.getExpenseCost();
             TextView textView = new TextView(mListener);
-            textView.setText(expenseEntry.getCost() + "");
+            textView.setText(String.valueOf(expenseEntry.getExpenseCost()));
             mExpensesListView.addView(textView);
         }
     }
