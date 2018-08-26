@@ -6,11 +6,13 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.Nullable;
 
 import org.joda.time.LocalDate;
 
 @Entity(tableName = "expense",
-        foreignKeys = {@ForeignKey(entity = JobEntry.class, parentColumns = "job_id",
+        foreignKeys = {
+                @ForeignKey(entity = JobEntry.class, parentColumns = "job_id",
                 childColumns = "job_id"),
                 @ForeignKey(entity = CategoryEntry.class, parentColumns = "category_id",
                         childColumns = "category_id")},
@@ -18,11 +20,11 @@ import org.joda.time.LocalDate;
 public class ExpenseEntry {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "expense_id")
-    private long mExpenseId;
+    private Long mExpenseId;
     @ColumnInfo(name = "job_id")
-    private long mJobId;
+    private Long mJobId;
     @ColumnInfo(name = "category_id")
-    private long mCategoryId;
+    private Long mCategoryId;
     @ColumnInfo(name = "expense_cost")
     private double mExpenseCost;
     @ColumnInfo(name = "number_of_payments")
@@ -38,7 +40,7 @@ public class ExpenseEntry {
     }
 
     @Ignore
-    public ExpenseEntry(long categoryId, double expenseCost, int numberOfPayments, LocalDate expensePaymentDate) {
+    public ExpenseEntry(Long categoryId, double expenseCost, int numberOfPayments, LocalDate expensePaymentDate) {
         this.mCategoryId = categoryId;
         this.mExpenseCost = expenseCost;
         this.numberOfPayments = numberOfPayments;
@@ -46,7 +48,7 @@ public class ExpenseEntry {
     }
 
     @Ignore
-    public ExpenseEntry(long jobId, long categoryId, double expenseCost,
+    public ExpenseEntry(Long jobId, Long categoryId, double expenseCost,
                         int numberOfPayments, LocalDate expensePaymentDate) {
         this.mJobId = jobId;
         this.mCategoryId = categoryId;
@@ -55,7 +57,10 @@ public class ExpenseEntry {
         this.mExpensePaymentDate = expensePaymentDate;
     }
 
-    ExpenseEntry(long expenseId, long jobId, long categoryId, double expenseCost,
+    @Ignore
+    public ExpenseEntry(){}
+
+    ExpenseEntry(Long expenseId, Long jobId, Long categoryId, double expenseCost,
                  int numberOfPayments, LocalDate expensePaymentDate) {
         this.mExpenseId = expenseId;
         this.mJobId = jobId;
@@ -65,23 +70,23 @@ public class ExpenseEntry {
         this.mExpensePaymentDate = expensePaymentDate;
     }
 
-    public long getExpenseId() {
+    public Long getExpenseId() {
         return mExpenseId;
     }
 
-    public long getJobId() {
+    public Long getJobId() {
         return mJobId;
     }
 
-    public void setJobId(long jobId) {
+    public void setJobId(Long jobId) {
         this.mJobId = jobId;
     }
 
-    public long getCategoryId() {
+    public Long getCategoryId() {
         return mCategoryId;
     }
 
-    public void setCategoryId(long categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.mCategoryId = categoryId;
     }
 

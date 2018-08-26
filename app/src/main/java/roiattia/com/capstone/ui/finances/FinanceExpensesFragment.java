@@ -15,7 +15,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
-import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.model.ExpensesModel;
 
 public class FinanceExpensesFragment extends BaseFinancialFragment {
@@ -32,7 +31,7 @@ public class FinanceExpensesFragment extends BaseFinancialFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_expenses, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_finances_expenses, container, false);
         ButterKnife.bind(this, rootView);
 
         mExpensesAdapter = new ExpensesAdapter(mListener);

@@ -20,6 +20,7 @@ public class ExpenseRepository {
     private final CategoryDao mCategoryDao;
     private final ExpenseDao mExpenseDao;
     private final AppExecutors mExecutors;
+    private GetIdHandler mGetIdCallback;
 
     private ExpenseRepository(CategoryDao categoryDao, ExpenseDao expenseDao,
                           AppExecutors appExecutors){
@@ -39,6 +40,17 @@ public class ExpenseRepository {
         return sInstance;
     }
 
+    /**
+     * The interface that receives onClick messages.
+     */
+    public interface GetIdHandler {
+        void onCategoryInserted(long categoryId);
+    }
+
+    public void setCallbackListener(GetIdHandler getIdCallback){
+        mGetIdCallback = getIdCallback;
+    }
+
     public LiveData<List<CategoryEntry>> getCategories(CategoryEntry.Type type) {
         return mCategoryDao.loadCategories(type);
     }
@@ -47,20 +59,21 @@ public class ExpenseRepository {
         return mExpenseDao.loadExpense(expensesId);
     }
 
-    public void insertCategory(CategoryEntry categoryEntry){
+    public void insertCategory(final CategoryEntry categoryEntry){
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                //TODO: finish
+                long categoryId = mCategoryDao.insertCategory(categoryEntry);
+                mGetIdCallback.onCategoryInserted(categoryId);
             }
         });
     }
 
-    public void insertExpense(ExpenseEntry expenseEntry){
+    public void insertExpense(final ExpenseEntry expenseEntry){
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                //TODO: finish
+                mExpenseDao.insertExpense(expenseEntry);
             }
         });
     }

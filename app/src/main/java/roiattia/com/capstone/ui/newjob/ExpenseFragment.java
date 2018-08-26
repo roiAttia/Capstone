@@ -1,17 +1,18 @@
 package roiattia.com.capstone.ui.newjob;
 
 import android.app.DatePickerDialog;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -32,9 +33,11 @@ import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.ExpenseEntry;
-import roiattia.com.capstone.utils.InjectorUtils;
+import roiattia.com.capstone.ui.finances.PickPeriodDialog;
 
 public class ExpenseFragment extends BaseJobFragment {
+
+    private static final String TAG = ExpenseFragment.class.getSimpleName();
 
     @BindView(R.id.spinner_expense_category) Spinner mCategoriesSpinner;
     @BindView(R.id.et_expense_cost) EditText mCostView;
@@ -44,39 +47,34 @@ public class ExpenseFragment extends BaseJobFragment {
     @BindView(R.id.et_expense_category) EditText mCategoryView;
     @BindView(R.id.rb_existed_category) RadioButton mExistedCategoryButton;
     @BindView(R.id.rb_new_category) RadioButton mNewCategoryButton;
+    @BindView(R.id.btn_confirm) Button mConfirmExpenseButton;
 
-    private NewJobViewModel mViewModel;
+    public static final long NEW_CATEGORY_ID_INDICATOR = 0;
     private int mCost;
     private int mNumberOfPayments;
     private LocalDate mPaymentDate;
     private List<CategoryEntry> mCategoriesList;
     private ExpenseEntry mExpense;
+    private long mCategoryId = NEW_CATEGORY_ID_INDICATOR;
+    private String mCategoryName;
+    private ConfirmExpenseHandler mCallback;
+
+    public interface ConfirmExpenseHandler {
+        void onConfirmExpenseClick(ExpenseEntry expenseEntry, String newCategoryName);
+    }
 
     public ExpenseFragment(){}
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_new_job_expenses, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_expense, container, false);
         ButterKnife.bind(this, rootView);
 
+        // set_enabled false for category spinner and edit_text to be able
+        // to interact via radio buttons
         mCategoriesSpinner.setEnabled(false);
         mCategoryView.setEnabled(false);
-
-        // setup view_model
-        NewJobViewModelFactory factory = InjectorUtils
-                .provideExpenseViewModelFactory(mListener);
-        mViewModel = ViewModelProviders.of(mListener, factory)
-                .get(NewJobViewModel.class);
-//        mViewModel.getCategories(CategoryEntry.Type.EXPENSE).observe(this, new Observer<List<CategoryEntry>>() {
-//            @Override
-//            public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
-//                if(categoryEntries != null) {
-//                    ExpenseFragment.super.setupCategoriesSpinner(
-//                            mCategoriesSpinner, categoryEntries);
-//                }
-//            }
-//        });
 
         // configure selection of payment date
         mPaymentDateView.setFocusable(false);
@@ -96,6 +94,7 @@ public class ExpenseFragment extends BaseJobFragment {
 
             @Override
             public void afterTextChanged(Editable s) {
+                // check if all needed details for payments calculations are inserted
                 if(!mNumPayments.getText().toString().equals("") &&
                         !mPaymentDateView.getText().toString().equals("") &&
                         !mCostView.getText().toString().equals("") ) {
@@ -111,6 +110,7 @@ public class ExpenseFragment extends BaseJobFragment {
         mNumPayments.addTextChangedListener(textWatcher);
         mPaymentDateView.addTextChangedListener(textWatcher);
 
+        // setup category radio buttons
         mExistedCategoryButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -120,7 +120,6 @@ public class ExpenseFragment extends BaseJobFragment {
                 }
             }
         });
-
         mNewCategoryButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -132,13 +131,37 @@ public class ExpenseFragment extends BaseJobFragment {
             }
         });
 
+        // check if it's an update operation, if so then update UI
         if(mExpense != null){
             updateUiWithDetails();
+        } else {
+            mExpense = new ExpenseEntry();
         }
 
-        setupCategoriesSpinner(mCategoriesSpinner, mCategoriesList);
+        // setup "confirm expense" button listener
+        mConfirmExpenseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(checkInputValidation()) {
+                    setExpenseDetails();
+                    mCallback.onConfirmExpenseClick(mExpense, mCategoryName);
+                    mListener.onBackPressed();
+                }
+            }
+        });
 
         return rootView;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mCallback = (ConfirmExpenseHandler) context;
+        } catch (ClassCastException e) {
+            // The activity doesn't implement the interface, throw exception
+            Log.i(TAG, " must implement ConfirmExpenseHandler");
+        }
     }
 
     /**
@@ -208,25 +231,41 @@ public class ExpenseFragment extends BaseJobFragment {
      * Handle expenses details update and insertion as new expense
      */
     public void setExpenseDetails() {
+        mExpense.setExpenseCost(mCost);
+        mExpense.setNumberOfPayments(mNumberOfPayments);
+        mExpense.setExpensePaymentDate(mPaymentDate);
         if(mNewCategoryButton.isChecked()){
-            mViewModel.setExpenseDetails(0, mCost, mNumberOfPayments, mPaymentDate);
-            String categoryName = mCategoryView.getText().toString();
-            mViewModel.insertNewCategory(categoryName, CategoryEntry.Type.EXPENSE);
+            if(mCategoryId != NEW_CATEGORY_ID_INDICATOR){
+                mExpense.setCategoryId(mCategoryId);
+            }
+            mCategoryName = mCategoryView.getText().toString();
         } else if(mExistedCategoryButton.isChecked()){
             int categoryPosition = mCategoriesSpinner.getSelectedItemPosition() - 1;
-            long categoryId = mViewModel.getCategoryId(categoryPosition);
-            mViewModel.setExpenseDetails(categoryId, mCost, mNumberOfPayments, mPaymentDate);
+            long categoryId = mCategoriesList.get(categoryPosition).getCategoryId();
+            mExpense.setCategoryId(categoryId);
         }
     }
 
+    /**
+     * Set categories list for spinner selection
+     * @param categoryEntries list of categories
+     */
     public void setCategoriesData(List<CategoryEntry> categoryEntries) {
         mCategoriesList = categoryEntries;
+        setupCategoriesSpinner(mCategoriesSpinner, mCategoriesList);
     }
 
+    /**
+     * Set expense for update operation
+     * @param expenseEntry expense entry to update
+     */
     public void setExpense(ExpenseEntry expenseEntry) {
         mExpense = expenseEntry;
     }
 
+    /**
+     * Update ui with expense details
+     */
     private void updateUiWithDetails() {
         mCostView.setText(String.valueOf(mExpense.getExpenseCost()));
         mPaymentDateView.setText(mPaymentDate.toString());

@@ -17,9 +17,9 @@ import org.joda.time.LocalDate;
 public class JobEntry {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "job_id")
-    private long mJobId;
+    private Long mJobId;
     @ColumnInfo(name = "category_id")
-    private long mCategoryId;
+    private Long mCategoryId;
     @ColumnInfo(name = "job_description")
     private String mJobDescription;
     @ColumnInfo(name = "job_date")
@@ -33,7 +33,7 @@ public class JobEntry {
     @ColumnInfo(name = "job_profits")
     private double mJobProfits;
 
-    public JobEntry(long jobId, long categoryId, String jobDescription, LocalDate jobDate,
+    public JobEntry(Long jobId, Long categoryId, String jobDescription, LocalDate jobDate,
                     LocalDate jobDateOfPayment, double jobIncome, double jobExpenses, double jobProfits) {
         mJobId = jobId;
         mCategoryId = categoryId;
@@ -68,7 +68,7 @@ public class JobEntry {
         mJobDate = localDate;
     }
 
-    public long getJobId() {
+    public Long getJobId() {
         return mJobId;
     }
 
@@ -96,11 +96,11 @@ public class JobEntry {
         mJobProfits = jobProfits;
     }
 
-    public long getCategoryId() {
+    public Long getCategoryId() {
         return mCategoryId;
     }
 
-    public void setCategoryId(long categoryId) {
+    public void setCategoryId(Long categoryId) {
         mCategoryId = categoryId;
     }
 
@@ -108,7 +108,7 @@ public class JobEntry {
         return mJobDateOfPayment;
     }
 
-    public void setJobId(long jobId) {
+    public void setJobId(Long jobId) {
         mJobId = jobId;
     }
 

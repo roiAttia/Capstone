@@ -18,7 +18,8 @@ import roiattia.com.capstone.ui.finances.FinanceExpensesFragment;
 import roiattia.com.capstone.ui.newjob.ExpenseFragment;
 import roiattia.com.capstone.utils.InjectorUtils;
 
-public class ExpenseActivity extends AppCompatActivity {
+public class ExpenseActivity extends AppCompatActivity
+    implements ExpenseFragment.ConfirmExpenseHandler{
 
     private final String TAG = ExpenseActivity.class.getSimpleName();
 
@@ -27,6 +28,8 @@ public class ExpenseActivity extends AppCompatActivity {
 
     private long mExpenseId = DEFAULT_EXPENSE_ID;
     private ExpenseFragment mExpensesFragment;
+    private FragmentManager mFragmentManager;
+    private ExpenseViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +49,10 @@ public class ExpenseActivity extends AppCompatActivity {
         ExpenseRepository repository = InjectorUtils.provideExpenseRepository(this);
         ExpenseViewModelFactory viewModelFactory =
                 new ExpenseViewModelFactory(repository, mExpenseId);
-        ExpenseViewModel viewModel = ViewModelProviders.of(this, viewModelFactory)
+        mViewModel = ViewModelProviders.of(this, viewModelFactory)
                 .get(ExpenseViewModel.class);
 
-        viewModel.getCategories().observe(this, new Observer<List<CategoryEntry>>() {
+        mViewModel.getCategories().observe(this, new Observer<List<CategoryEntry>>() {
             @Override
             public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
                 if(categoryEntries != null){
@@ -62,7 +65,7 @@ public class ExpenseActivity extends AppCompatActivity {
         });
 
         if(mExpenseId != DEFAULT_EXPENSE_ID){
-            viewModel.getExpense().observe(this, new Observer<ExpenseEntry>() {
+            mViewModel.getExpense().observe(this, new Observer<ExpenseEntry>() {
                 @Override
                 public void onChanged(@Nullable ExpenseEntry expenseEntry) {
                     if(expenseEntry != null) {
@@ -73,12 +76,26 @@ public class ExpenseActivity extends AppCompatActivity {
             });
         }
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
+        mFragmentManager = getSupportFragmentManager();
+        mFragmentManager.beginTransaction()
                 .add(R.id.expense_fragment_placeholder, mExpensesFragment)
                 .commit();
     }
 
-    //TODO: add inert new category and new expense
+    @Override
+    public void onConfirmExpenseClick(ExpenseEntry expenseEntry, String newCategoryName) {
+        Log.i(TAG, expenseEntry.toString() + "   " + newCategoryName);
+        // Insert new category
+        if(expenseEntry.getCategoryId() == ExpenseFragment.NEW_CATEGORY_ID_INDICATOR){
+            mViewModel.setExpense(expenseEntry);
+            mViewModel.insertNewCategory(newCategoryName);
+        }
+        // Existed category selected
+        else{
+            mViewModel.insertNewExpense(expenseEntry);
+        }
+
+        mFragmentManager.popBackStack();
+    }
 
 }

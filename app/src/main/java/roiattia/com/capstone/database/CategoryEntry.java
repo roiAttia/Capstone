@@ -11,7 +11,7 @@ public class CategoryEntry {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "category_id")
-    private long mCategoryId;
+    private Long mCategoryId;
     @ColumnInfo(name = "category_name")
     private String mCategoryName;
     @ColumnInfo(name = "category_type")
@@ -23,7 +23,7 @@ public class CategoryEntry {
         mCategoryType = categoryType;
     }
 
-    public CategoryEntry(long categoryId, String categoryName, Type categoryType) {
+    public CategoryEntry(Long categoryId, String categoryName, Type categoryType) {
         mCategoryId = categoryId;
         mCategoryName = categoryName;
         mCategoryType = categoryType;
@@ -47,11 +47,11 @@ public class CategoryEntry {
         }
     }
 
-    public long getCategoryId() {
+    public Long getCategoryId() {
         return mCategoryId;
     }
 
-    public void setCategoryId(long categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.mCategoryId = categoryId;
     }
 

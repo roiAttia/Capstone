@@ -13,10 +13,12 @@ import org.joda.time.LocalDate;
 
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
+import roiattia.com.capstone.database.ExpenseEntry;
 import roiattia.com.capstone.ui.calendar.CalendarActivity;
 import roiattia.com.capstone.utils.InjectorUtils;
 
-public class NewJobActivity extends AppCompatActivity {
+public class NewJobActivity extends AppCompatActivity
+    implements ExpenseFragment.ConfirmExpenseHandler{
 
     public static final String TAG = NewJobActivity.class.getSimpleName();
 
@@ -111,4 +113,8 @@ public class NewJobActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onConfirmExpenseClick(ExpenseEntry expenseEntry, String newCategoryName) {
+
+    }
 }
