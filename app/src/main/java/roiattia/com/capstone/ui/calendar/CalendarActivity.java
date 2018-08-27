@@ -21,20 +21,20 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
-import roiattia.com.capstone.database.JobEntry;
 import roiattia.com.capstone.model.JobCalendarModel;
 import roiattia.com.capstone.ui.finances.FinancesActivity;
-import roiattia.com.capstone.ui.newjob.JobRepository;
 import roiattia.com.capstone.ui.newjob.NewJobActivity;
-import roiattia.com.capstone.utils.InjectorUtils;
 
-public class CalendarActivity extends AppCompatActivity {
+import static roiattia.com.capstone.ui.newjob.NewJobActivity.JOB_ID_UPDATE;
+
+public class CalendarActivity extends AppCompatActivity
+    implements CalendarJobsAdapter.OnJobClickHandler{
 
     private static final String TAG = CalendarActivity.class.getSimpleName();
     public static final String DATE = "date";
 
     private CalendarJobsAdapter mJobsAdapter;
-    private CalendarViewModel mCalendarJobsViewModel;
+    private CalendarViewModel mViewModel;
     private LocalDate mSelectedDate;
 
     @BindView(R.id.rv_job_list) RecyclerView mJobsListView;
@@ -48,12 +48,9 @@ public class CalendarActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         // initialize view_model
-        CalendarViewModelFactory factory =
-                InjectorUtils.provideCalendarViewModelFactory(this.getApplicationContext());
-        mCalendarJobsViewModel = ViewModelProviders.of(this, factory).get(CalendarViewModel.class);
-
+        mViewModel = ViewModelProviders.of(this).get(CalendarViewModel.class);
         // initialize jobs_list and it's adapter
-        mJobsAdapter = new CalendarJobsAdapter(this);
+        mJobsAdapter = new CalendarJobsAdapter(this, this);
         mJobsListView.setAdapter(mJobsAdapter);
         mJobsListView.setLayoutManager(new LinearLayoutManager(this));
         mJobsListView.setHasFixedSize(true);
@@ -78,13 +75,14 @@ public class CalendarActivity extends AppCompatActivity {
      */
     private void setupViewModel(LocalDate pickedDate) {
         Log.i(TAG, pickedDate.toString());
-        mCalendarJobsViewModel.getJobsAtDate(pickedDate).observe(CalendarActivity.this,
+        mViewModel.getJobsAtDate(pickedDate).observe(CalendarActivity.this,
                 new Observer<List<JobCalendarModel>>() {
                     @Override
                     public void onChanged(@Nullable List<JobCalendarModel> jobCalendarList) {
-                        Log.i(TAG, jobCalendarList.size() + "");
+                        Log.i(TAG, "onChanged");
                         mJobsAdapter.setJobs(jobCalendarList);
                         if(jobCalendarList != null && jobCalendarList.size() > 0) {
+                            Log.i(TAG, jobCalendarList.size() + "");
                             mEmptyListView.setVisibility(View.INVISIBLE);
                         } else mEmptyListView.setVisibility(View.VISIBLE);
                     }
@@ -102,6 +100,13 @@ public class CalendarActivity extends AppCompatActivity {
 
     public void debugPrint(View view){
         Intent intent = new Intent(CalendarActivity.this, FinancesActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClick(long jobId) {
+        Intent intent = new Intent(CalendarActivity.this, NewJobActivity.class);
+        intent.putExtra(JOB_ID_UPDATE, jobId);
         startActivity(intent);
     }
 }

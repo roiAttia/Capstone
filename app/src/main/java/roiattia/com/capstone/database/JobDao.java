@@ -58,7 +58,7 @@ public interface JobDao {
     LiveData<List<IncomeModel>> loadIncomeBetweenDates(LocalDate from, LocalDate to,
                                                        CategoryEntry.Type type);
 
-    @Query("SELECT category_name as mCategoryName, job_income as mJobIncome, " +
+    @Query("SELECT job_id as mJobId, category_name as mCategoryName, job_income as mJobIncome, " +
             "job_description as mJobDescription, job_date as mJobDate " +
             "FROM job JOIN category ON job.category_id = category.category_id " +
             "WHERE job_date=:date")

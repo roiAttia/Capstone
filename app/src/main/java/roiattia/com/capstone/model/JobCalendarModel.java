@@ -4,16 +4,27 @@ import org.joda.time.LocalDate;
 
 public class JobCalendarModel {
 
+    private Long mJobId;
     private String mCategoryName;
     private double mJobIncome;
     private String mJobDescription;
     private LocalDate mJobDate;
 
-    public JobCalendarModel(String categoryName, double jobIncome, String jobDescription, LocalDate jobDate) {
+    public JobCalendarModel(Long jobId, String categoryName, double jobIncome,
+                            String jobDescription, LocalDate jobDate) {
+        mJobId = jobId;
         mCategoryName = categoryName;
         mJobIncome = jobIncome;
         mJobDescription = jobDescription;
         mJobDate = jobDate;
+    }
+
+    public Long getJobId() {
+        return mJobId;
+    }
+
+    public void setJobId(Long jobId) {
+        mJobId = jobId;
     }
 
     public String getCategoryName() {

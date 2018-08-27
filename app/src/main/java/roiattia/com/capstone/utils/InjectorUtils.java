@@ -10,7 +10,6 @@ import roiattia.com.capstone.ui.finances.FinancesViewModelFactory;
 import roiattia.com.capstone.ui.newexpense.ExpenseRepository;
 import roiattia.com.capstone.ui.newexpense.ExpenseViewModelFactory;
 import roiattia.com.capstone.ui.newjob.JobRepository;
-import roiattia.com.capstone.ui.calendar.CalendarViewModelFactory;
 import roiattia.com.capstone.ui.newjob.NewJobViewModelFactory;
 
 public class InjectorUtils {
@@ -43,11 +42,6 @@ public class InjectorUtils {
     /* FACTORIES */
     public static FinancesViewModelFactory provideFinancesViewModelFactory(Context context) {
         return new FinancesViewModelFactory(context);
-    }
-
-    public static CalendarViewModelFactory provideCalendarViewModelFactory(Context context) {
-        CalendarRepository repository = provideCalendarRepository(context.getApplicationContext());
-        return new CalendarViewModelFactory(repository);
     }
 
     public static NewJobViewModelFactory provideNewJobViewModelFactory(Context context, Long jobId,

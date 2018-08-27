@@ -23,9 +23,15 @@ public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapte
 
     private List<JobCalendarModel> mJobEntries;
     private Context mContext;
+    private OnJobClickHandler mOnJobClickHandler;
 
-    CalendarJobsAdapter(Context context) {
+    CalendarJobsAdapter(Context context, OnJobClickHandler onJobClickHandler) {
         mContext = context;
+        mOnJobClickHandler = onJobClickHandler;
+    }
+
+    public interface OnJobClickHandler{
+        void onClick(long jobId);
     }
 
     @NonNull
@@ -53,7 +59,8 @@ public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapte
     }
 
 
-    public class CalendarJobViewHolder extends RecyclerView.ViewHolder{
+    public class CalendarJobViewHolder extends RecyclerView.ViewHolder
+        implements View.OnClickListener{
 
         @BindView(R.id.tv_category_name) TextView jobCategoryName;
         @BindView(R.id.tv_date) TextView jobDate;
@@ -62,6 +69,12 @@ public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapte
         CalendarJobViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            mOnJobClickHandler.onClick(mJobEntries.get(getAdapterPosition()).getJobId());
         }
     }
 

@@ -67,14 +67,14 @@ public class NewJobActivity extends AppCompatActivity
     private List<CategoryEntry> mCategories;
 
     @BindView(R.id.et_date) EditText mJobDateView;
-    @BindView(R.id.et_date_of_payment)EditText mPaymentDateView;
+    @BindView(R.id.et_date_of_payment)EditText mJobPaymentDateView;
     @BindView(R.id.et_fee)EditText mFeeView;
     @BindView(R.id.et_category)EditText mJobCategoryView;
     @BindView(R.id.et_job_description)EditText mJobDescriptionView;
     @BindView(R.id.spinner_job_category) Spinner mCategorySpinner;
     @BindView(R.id.tv_expenses) TextView mExpensesView;
     @BindView(R.id.tv_profit) TextView mProfitView;
-    @BindView(R.id.tv_income) TextView mIncomeView;
+    @BindView(R.id.tv_income) TextView mJobIncomeView;
     @BindView(R.id.ll_expense_list_view) LinearLayout mExpensesListView;
     @BindView(R.id.rb_existed_category) RadioButton mExistedCategoryButton;
     @BindView(R.id.rb_new_category) RadioButton mNewCategoryButton;
@@ -83,7 +83,7 @@ public class NewJobActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_new_job_details);
+        setContentView(R.layout.activity_job);
         ButterKnife.bind(this);
 
         // get date selected for job from calendar activity
@@ -92,6 +92,7 @@ public class NewJobActivity extends AppCompatActivity
             if(intent.hasExtra(CalendarActivity.DATE)) {
                 String dateAsString = intent.getStringExtra(CalendarActivity.DATE);
                 LocalDate localDate = new LocalDate(dateAsString);
+                mJobDate = localDate;
                 DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
                 mJobDateView.setText(fmt.print(localDate));
             }
@@ -138,17 +139,17 @@ public class NewJobActivity extends AppCompatActivity
 
         // setup job_date and payment_date with on_click_listeners
         mJobDateView.setFocusable(false);
-        mPaymentDateView.setFocusable(false);
+        mJobPaymentDateView.setFocusable(false);
         mJobDateView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setupDatePicker(mJobDateView, JOB_DATE);
             }
         });
-        mPaymentDateView.setOnClickListener(new View.OnClickListener() {
+        mJobPaymentDateView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setupDatePicker(mPaymentDateView, JOB_PAYMENT_DATE);
+                setupDatePicker(mJobPaymentDateView, JOB_PAYMENT_DATE);
             }
         });
 
@@ -206,7 +207,19 @@ public class NewJobActivity extends AppCompatActivity
     }
 
     private void updateUiWithJobDetails(JobEntry jobEntry) {
-
+        mJobProfit = jobEntry.getJobProfits();
+        mJobExpense = jobEntry.getJobExpenses();
+        mJobIncome = jobEntry.getJobIncome();
+        mJobIncomeView.setText(String.valueOf(mJobIncome));
+        updateSummaryCard();
+        mJobDate = jobEntry.getJobDate();
+        mJobPaymentDate = jobEntry.getJobDateOfPayment();
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
+        mJobDateView.setText(fmt.print(mJobDate));
+        mJobPaymentDateView.setText(fmt.print(mJobPaymentDate));
+        mDescription = jobEntry.getJobDescription();
+        mJobDescriptionView.setText(mDescription);
+        mCategoryId = jobEntry.getCategoryId();
     }
 
     private void setupDatePicker(final EditText jobDateView, final String dateType) {
@@ -233,7 +246,7 @@ public class NewJobActivity extends AppCompatActivity
         } else {
             mSummaryCardView.setCardBackgroundColor(getResources().getColor(R.color.colorPositiveGreen));
         }
-        mIncomeView.setText(String.format("%s", mJobIncome));
+        mJobIncomeView.setText(String.format("%s", mJobIncome));
         mExpensesView.setText(String.format("%s", mJobExpense));
         mProfitView.setText(String.format("%s", mJobProfit));
     }
@@ -254,8 +267,8 @@ public class NewJobActivity extends AppCompatActivity
             isInputValid = false;
         }
         // check number_of_payments validation
-        if(mPaymentDateView.getText().toString().trim().equals("")){
-            mPaymentDateView.setError("Must enter a date");
+        if(mJobPaymentDateView.getText().toString().trim().equals("")){
+            mJobPaymentDateView.setError("Must enter a date");
             isInputValid = false;
         }
         // check payment_date validation
