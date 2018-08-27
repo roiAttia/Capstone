@@ -8,6 +8,7 @@ import roiattia.com.capstone.ui.calendar.CalendarRepository;
 import roiattia.com.capstone.ui.finances.FinancesRepository;
 import roiattia.com.capstone.ui.finances.FinancesViewModelFactory;
 import roiattia.com.capstone.ui.newexpense.ExpenseRepository;
+import roiattia.com.capstone.ui.newexpense.ExpenseViewModelFactory;
 import roiattia.com.capstone.ui.newjob.JobRepository;
 import roiattia.com.capstone.ui.calendar.CalendarViewModelFactory;
 import roiattia.com.capstone.ui.newjob.NewJobViewModelFactory;
@@ -39,6 +40,7 @@ public class InjectorUtils {
                 database.expenseDao(), executors);
     }
 
+    /* FACTORIES */
     public static FinancesViewModelFactory provideFinancesViewModelFactory(Context context) {
         return new FinancesViewModelFactory(context);
     }
@@ -48,8 +50,14 @@ public class InjectorUtils {
         return new CalendarViewModelFactory(repository);
     }
 
-    public static NewJobViewModelFactory provideExpenseViewModelFactory(Context context){
+    public static NewJobViewModelFactory provideNewJobViewModelFactory(Context context){
         return new NewJobViewModelFactory(context);
+    }
+
+    public static ExpenseViewModelFactory provideExpenseViewModelFactory(Context context, Long expenseId,
+                                                                         ExpenseRepository.GetIdHandler handler){
+        ExpenseRepository expenseRepository = provideExpenseRepository(context);
+        return new ExpenseViewModelFactory(expenseRepository, expenseId, handler);
     }
 
     public static JobEntry provideJobEntry(){

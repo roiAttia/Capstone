@@ -38,7 +38,7 @@ import roiattia.com.capstone.utils.InjectorUtils;
 import static roiattia.com.capstone.ui.newjob.NewJobActivity.JOB_DATE;
 import static roiattia.com.capstone.ui.newjob.NewJobActivity.JOB_PAYMENT_DATE;
 
-public class NewJobFragment extends BaseJobFragment {
+public class JobDetailsFragment extends BaseJobFragment {
 
     @BindView(R.id.et_date) EditText mJobDateView;
     @BindView(R.id.et_date_of_payment)EditText mPaymentDateView;
@@ -54,12 +54,12 @@ public class NewJobFragment extends BaseJobFragment {
     @BindView(R.id.rb_new_category) RadioButton mNewCategoryButton;
     @BindView(R.id.cardview_summary) CardView mSummaryCardView;
 
-    private NewJobViewModel mViewModel;
     private LocalDate mJobDate;
     private LocalDate mJobPaymentDate;
     private int mJobIncome;
     private int mJobExpense;
     private int mJobProfit;
+    private List<CategoryEntry> mCategories;
 
     @Nullable
     @Override
@@ -70,24 +70,12 @@ public class NewJobFragment extends BaseJobFragment {
         mCategorySpinner.setEnabled(false);
         mJobCategoryView.setEnabled(false);
 
-        // setup view_model
-        NewJobViewModelFactory factory = InjectorUtils
-                .provideExpenseViewModelFactory(mListener);
-        mViewModel = ViewModelProviders.of(mListener, factory)
-                .get(NewJobViewModel.class);
-        mViewModel.getCategories(CategoryEntry.Type.JOB).observe(this, new Observer<List<CategoryEntry>>() {
-            @Override
-            public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
-                if(categoryEntries != null) {
-                    mViewModel.setCategories(categoryEntries);
-                    NewJobFragment.super.setupCategoriesSpinner(mCategorySpinner, categoryEntries);
-                }
-            }
-        });
 
         DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
-        mJobDateView.setText(fmt.print(mViewModel.getJobDate()));
-        mJobDate = mViewModel.getJobDate();
+        if(mJobDate == null){
+            mJobDate = new LocalDate();
+        }
+        mJobDateView.setText(fmt.print(mJobDate));
 
         // setup job_date and payment_date with on_click_listeners
         mJobDateView.setFocusable(false);
@@ -167,7 +155,7 @@ public class NewJobFragment extends BaseJobFragment {
      */
     private void setupDatePicker(final EditText jobDateView, final String dateType) {
         Calendar calendar = Calendar.getInstance();
-        final DatePickerDialog datePickerDialog = new DatePickerDialog(mListener,
+        final DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -187,18 +175,7 @@ public class NewJobFragment extends BaseJobFragment {
      * and start insert new job sequence
      */
     public void insertJobSequence() {
-        String jobDescription = mJobDescriptionView.getText().toString();
-        mViewModel.updateJobDetails(mJobDate, mJobPaymentDate, mJobIncome,
-                mJobExpense, mJobProfit, jobDescription);
-        if(mNewCategoryButton.isChecked()){
-            String categoryName = mJobCategoryView.getText().toString();
-            mViewModel.insertNewCategory(categoryName, CategoryEntry.Type.JOB);
-        } else if(mExistedCategoryButton.isChecked()){
-            int categoryPosition = mCategorySpinner.getSelectedItemPosition();
-            long categoryId = mViewModel.getCategoryId(categoryPosition);
-            mViewModel.updateJobCategoryId(categoryId);
-            mViewModel.insertNewJob();
-        }
+
     }
 
     /**
@@ -209,7 +186,6 @@ public class NewJobFragment extends BaseJobFragment {
         // check category validation
         if(!mNewCategoryButton.isChecked() && !mExistedCategoryButton.isChecked()
                 && mCategorySpinner.getSelectedItemPosition() == 0){
-            Toast.makeText(mListener, "Invalid category", Toast.LENGTH_SHORT).show();
             isInputValid = false;
         }
         // check cost validation
@@ -234,13 +210,7 @@ public class NewJobFragment extends BaseJobFragment {
      * Update expenses with new data
      */
     public void updateExpenses() {
-        mJobExpense = 0;
-        for(ExpenseEntry expenseEntry : mViewModel.getExpensesList()){
-            mJobExpense += expenseEntry.getExpenseCost();
-            TextView textView = new TextView(mListener);
-            textView.setText(String.valueOf(expenseEntry.getExpenseCost()));
-            mExpensesListView.addView(textView);
-        }
+
     }
 
     @Override
@@ -248,5 +218,13 @@ public class NewJobFragment extends BaseJobFragment {
         super.onResume();
         updateExpenses();
         updateSummaryCard();
+    }
+
+    public void setCategories(List<CategoryEntry> categories, String choseCategorySpinnerOption) {
+        mCategories = categories;
+    }
+
+    public void setJobDate(LocalDate jobDate){
+        mJobDate = jobDate;
     }
 }

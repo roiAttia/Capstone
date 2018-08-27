@@ -23,7 +23,7 @@ public interface ExpenseDao {
     List<ExpenseEntry> debugLoadAllExpenses();
 
     @Insert
-    void insertExpense(ExpenseEntry expenseEntry);
+    long insertExpense(ExpenseEntry expenseEntry);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateExpense(ExpenseEntry expenseEntry);

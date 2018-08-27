@@ -28,7 +28,8 @@
             <!-- <category android:categoryName="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".ui.newexpense.ExpenseActivity"></activity>
+        <activity android:name=".ui.newexpense.ExpenseActivity" />
+        <activity android:name=".ui.ExpenseActivity"></activity>
     </application>
 
 </manifest>

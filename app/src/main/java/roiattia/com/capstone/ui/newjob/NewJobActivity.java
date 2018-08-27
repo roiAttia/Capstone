@@ -1,18 +1,24 @@
 package roiattia.com.capstone.ui.newjob;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import org.joda.time.LocalDate;
 
+import java.util.List;
+
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
+import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.ExpenseEntry;
 import roiattia.com.capstone.ui.calendar.CalendarActivity;
 import roiattia.com.capstone.utils.InjectorUtils;
@@ -27,8 +33,9 @@ public class NewJobActivity extends AppCompatActivity
 
     private NewJobViewModel mViewModel;
     private FragmentManager mFragmentManager;
-    private ExpenseFragment mJobExpensesFragment;
-    private NewJobFragment mNewJobFragment;
+    private ExpenseFragment mExpenseFragment;
+    private JobDetailsFragment mJobDetailsFragment;
+    private String choseCategorySpinnerOption;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,63 +43,73 @@ public class NewJobActivity extends AppCompatActivity
         setContentView(R.layout.activity_new_job);
         ButterKnife.bind(this);
 
+        // create new fragments when there is no previously saved state
+        if (savedInstanceState == null) {
+            mFragmentManager = getSupportFragmentManager();
+            mJobDetailsFragment = new JobDetailsFragment();
+        }
+
+        choseCategorySpinnerOption = getString(R.string.spinner_category_default_value);
+
         // setup view_model
         NewJobViewModelFactory factory = InjectorUtils
-                .provideExpenseViewModelFactory(this);
+                .provideNewJobViewModelFactory(this);
         mViewModel = ViewModelProviders.of(this, factory)
                 .get(NewJobViewModel.class);
+        mViewModel.getJobCategories().observe(this, new Observer<List<CategoryEntry>>() {
+            @Override
+            public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
+                if(categoryEntries != null) {
+                    mJobDetailsFragment.setCategories(categoryEntries, choseCategorySpinnerOption);
+                    for (CategoryEntry categoryEntry : categoryEntries) {
+                        Log.i(TAG, categoryEntry.toString());
+                    }
+                }
+            }
+        });
         mViewModel.debugPrint();
+
         // get date selected for job from calendar activity
         Intent intent = getIntent();
         String dateAsString = intent.getStringExtra(CalendarActivity.DATE);
         LocalDate localDate = new LocalDate(dateAsString);
+        mJobDetailsFragment.setJobDate(localDate);
         // set the date as the date of the job via view model
-        mViewModel.setJobDate(localDate);
 
-        // create new fragments when there is no previously saved state
-        if (savedInstanceState == null) {
-            mFragmentManager = getSupportFragmentManager();
-            mNewJobFragment = new NewJobFragment();
-            mJobExpensesFragment = new ExpenseFragment();
-            mFragmentManager.beginTransaction()
-                    .add(R.id.fl_fragment_placeholder, mNewJobFragment)
-                    .commit();
-        }
+        mFragmentManager.beginTransaction()
+                .add(R.id.fl_fragment_placeholder, mJobDetailsFragment)
+                .commit();
     }
 
     /**
      * Handles the "add expense" of job details fragment's button click event
      */
     public void addExpense(View view){
+        mExpenseFragment = new ExpenseFragment();
         mFragmentManager.beginTransaction()
-                .replace(R.id.fl_fragment_placeholder, mJobExpensesFragment)
+                .replace(R.id.fl_fragment_placeholder, mExpenseFragment)
                 .commit();
+
+        mViewModel.getExpenseCategories().observe(this, new Observer<List<CategoryEntry>>() {
+            @Override
+            public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
+                if(categoryEntries != null) {
+                    mExpenseFragment.setCategoriesData(categoryEntries);
+                    for (CategoryEntry categoryEntry : categoryEntries) {
+                        Log.i(TAG, categoryEntry.toString());
+                    }
+                }
+            }
+        });
     }
 
     /**
      * Handles the "cancel expense" of job expense fragment's button click event
      */
     public void cancelExpense(View view){
-        mJobExpensesFragment = new ExpenseFragment();
         mFragmentManager.beginTransaction()
-                .replace(R.id.fl_fragment_placeholder, mNewJobFragment)
+                .replace(R.id.fl_fragment_placeholder, mJobDetailsFragment)
                 .commit();
-    }
-
-    /**
-     * Handles the "confirm expense" of job expense fragment's button click event
-     */
-    public void confirmExpense(View view){
-        if(mJobExpensesFragment.checkInputValidation()) {
-            mJobExpensesFragment.setExpenseDetails();
-            mViewModel.updateExpenses();
-            mViewModel.calculateProfit();
-            // add new Expenses to view_model
-            mFragmentManager.beginTransaction()
-                    .replace(R.id.fl_fragment_placeholder, mNewJobFragment)
-                    .commit();
-            mJobExpensesFragment = new ExpenseFragment();
-        }
     }
 
     @Override
@@ -105,8 +122,8 @@ public class NewJobActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         // Confirm new Job
         if(item.getItemId() == R.id.mi_done){
-            if(mNewJobFragment.checkInputValidation()) {
-                mNewJobFragment.insertJobSequence();
+            if(mJobDetailsFragment.checkInputValidation()) {
+                mJobDetailsFragment.insertJobSequence();
                 finish();
             }
         }
@@ -115,6 +132,39 @@ public class NewJobActivity extends AppCompatActivity
 
     @Override
     public void onConfirmExpenseClick(ExpenseEntry expenseEntry, String newCategoryName) {
+        Log.i(TAG, expenseEntry.toString() + "   " + newCategoryName);
+        // Insert new category
+        if(expenseEntry.getCategoryId() == null){
+            mViewModel.setExpense(expenseEntry);
+            mViewModel.insertNewCategory(newCategoryName, CategoryEntry.Type.EXPENSE);
+        }
+        // Existed category selected
+        else{
+            mViewModel.insertNewExpense(expenseEntry);
+        }
+        debugPrintExpenses();
+        mExpenseFragment = new ExpenseFragment();
+        mFragmentManager.beginTransaction()
+                .replace(R.id.fl_fragment_placeholder, mJobDetailsFragment)
+                .commit();
+    }
 
+    private void debugPrintExpenses() {
+        for(ExpenseEntry expenseEntry : mViewModel.getExpensesList()){
+            Log.i(TAG, expenseEntry.toString());
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkForExpenses();
+    }
+
+    private void checkForExpenses() {
+        if(mViewModel.getExpensesList().size() > 0){
+            Log.i(TAG, "expenses size: " + mViewModel.getExpensesList().size());
+//            mJobDetailsFragment.updateUiWithExpenses(mViewModel.getExpensesList());
+        }
     }
 }

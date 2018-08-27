@@ -7,10 +7,12 @@ import android.support.annotation.NonNull;
 public class ExpenseViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
     private ExpenseRepository mRepository;
-    private long mExpenseId;
+    private Long mExpenseId;
 
-    public ExpenseViewModelFactory(ExpenseRepository repository, long expenseId) {
+    public ExpenseViewModelFactory(ExpenseRepository repository, Long expenseId,
+                                   ExpenseRepository.GetIdHandler handler) {
         mRepository = repository;
+        mRepository.setCallbackListener(handler);
         mExpenseId = expenseId;
     }
 

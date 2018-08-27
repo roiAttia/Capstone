@@ -44,7 +44,17 @@ public class ExpenseRepository {
      * The interface that receives onClick messages.
      */
     public interface GetIdHandler {
-        void onCategoryInserted(long categoryId);
+        void onCategoryInserted(Long categoryId);
+        void onExpenseInserted(Long expenseId);
+    }
+
+    public void updateExpense(final ExpenseEntry expenseEntry) {
+        mExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mExpenseDao.updateExpense(expenseEntry);
+            }
+        });
     }
 
     public void setCallbackListener(GetIdHandler getIdCallback){
@@ -73,7 +83,8 @@ public class ExpenseRepository {
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                mExpenseDao.insertExpense(expenseEntry);
+                long expenseId = mExpenseDao.insertExpense(expenseEntry);
+                mGetIdCallback.onExpenseInserted(expenseId);
             }
         });
     }

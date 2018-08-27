@@ -21,36 +21,48 @@ public class NewJobViewModel extends ViewModel
 
     private JobEntry mJobEntry;
     private List<ExpenseEntry> mExpenses;
-    private List<CategoryEntry> mCategories;
+    private LiveData<List<CategoryEntry>> mJobCategories;
+    private LiveData<List<CategoryEntry>> mExpenseCategories;
     private JobRepository mRepository;
+    private ExpenseEntry mExpense;
 
     NewJobViewModel(Context context) {
         mRepository = InjectorUtils.provideJobRepository(context, this);
         mJobEntry = InjectorUtils.provideJobEntry();
         mExpenses = new ArrayList<>();
+        mJobCategories = mRepository.getCategories(CategoryEntry.Type.JOB);
+        mExpenseCategories = mRepository.getCategories(CategoryEntry.Type.EXPENSE);
     }
 
     /**
      * Handle categories retrieval from db
-     * @param type the type of categories needed - JOB or EXPENSE
      * @return categories wrapped with live_data
      */
-    public LiveData<List<CategoryEntry>> getCategories(CategoryEntry.Type type) {
-        return mRepository.getCategories(type);
+    public LiveData<List<CategoryEntry>> getJobCategories() {
+        return mJobCategories;
+    }
+
+    /**
+     * Handle categories retrieval from db
+     * @return categories wrapped with live_data
+     */
+    public LiveData<List<CategoryEntry>> getExpenseCategories() {
+        return mExpenseCategories;
     }
 
     @Override
-    public void onCategoryInserted(long categoryId, CategoryEntry.Type type) {
+    public void onCategoryInserted(Long categoryId, CategoryEntry.Type type) {
         if(type.equals(CategoryEntry.Type.JOB)){
             updateJobCategoryId(categoryId);
             insertNewJob();
         } else if(type.equals(CategoryEntry.Type.EXPENSE)){
-            insertExpensesWithNewCategoryId(categoryId);
+            mExpense.setCategoryId(categoryId);
+            mExpenses.add(mExpense);
         }
     }
 
     @Override
-    public void onJobInserted(long jobId) {
+    public void onJobInserted(Long jobId) {
         insertExpensesWithJobId(jobId);
     }
 
@@ -90,12 +102,6 @@ public class NewJobViewModel extends ViewModel
         }
     }
 
-    public void updateJobDetails(LocalDate jobDate, LocalDate jobPaymentDate,
-                                 int jobIncome, int jobExpense, int jobProfit, String jobDescription) {
-        mJobEntry = new JobEntry(jobDescription, jobDate, jobPaymentDate,
-                jobIncome, jobExpense, jobProfit);
-    }
-
     public void updateJobCategoryId(long categoryId) {
         mJobEntry.setCategoryId(categoryId);
     }
@@ -116,22 +122,16 @@ public class NewJobViewModel extends ViewModel
         mJobEntry.setJobExpenses(totalExpenses);
     }
 
-    public void setCategories(List<CategoryEntry> categoryEntries) {
-        mCategories = categoryEntries;
-    }
-
-    public long getCategoryId(int categoryPosition) {
-        return mCategories.get(categoryPosition).getCategoryId();
-    }
-
-    public void setExpenseDetails(long categoryId, int cost, int numberOfPayments, LocalDate paymentDate) {
-        ExpenseEntry expenseEntry = new ExpenseEntry(categoryId, cost, numberOfPayments, paymentDate);
+    public void insertNewExpense(ExpenseEntry expenseEntry) {
         mExpenses.add(expenseEntry);
+    }
+
+    public void setExpense(ExpenseEntry expense) {
+        mExpense = expense;
     }
 
     public void debugPrint(){
         mRepository.debugPrint();
     }
-
 
 }

@@ -51,8 +51,8 @@ public class JobRepository {
      * The interface that receives onClick messages.
      */
     public interface GetIdHandler {
-        void onCategoryInserted(long categoryId , CategoryEntry.Type type);
-        void onJobInserted(long jobId);
+        void onCategoryInserted(Long categoryId , CategoryEntry.Type type);
+        void onJobInserted(Long jobId);
     }
 
     public void insertJob(final JobEntry jobEntry){
@@ -74,7 +74,7 @@ public class JobRepository {
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                long id = mCategoryDao.insertCategory(categoryEntry);
+                Long id = mCategoryDao.insertCategory(categoryEntry);
                 mGetIdInBackground.onCategoryInserted(id, type);
             }
         });

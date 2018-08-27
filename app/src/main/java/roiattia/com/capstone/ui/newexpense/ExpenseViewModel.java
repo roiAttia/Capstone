@@ -10,20 +10,18 @@ import java.util.List;
 import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.ExpenseEntry;
 
-public class ExpenseViewModel extends ViewModel
-    implements ExpenseRepository.GetIdHandler{
+public class ExpenseViewModel extends ViewModel {
 
     private static final String TAG = ExpenseViewModel.class.getSimpleName();
 
     private LiveData<List<CategoryEntry>> mCategories;
     private LiveData<ExpenseEntry> mExpense;
-    private ExpenseEntry mExpenseEntry;
     private ExpenseRepository mRepository;
 
-    ExpenseViewModel(ExpenseRepository repository, long expensesId) {
+    ExpenseViewModel(ExpenseRepository repository, Long expensesId) {
         mRepository = repository;
-        mCategories = repository.getCategories(CategoryEntry.Type.EXPENSE);
-        if(expensesId != -1) {
+        mCategories = mRepository.getCategories(CategoryEntry.Type.EXPENSE);
+        if(expensesId != null) {
             mExpense = repository.loadExpenseById(expensesId);
         }
     }
@@ -43,7 +41,6 @@ public class ExpenseViewModel extends ViewModel
 
     public void insertNewCategory(String newCategoryName) {
         CategoryEntry categoryEntry = new CategoryEntry(newCategoryName, CategoryEntry.Type.EXPENSE);
-        mRepository.setCallbackListener(this);
         mRepository.insertCategory(categoryEntry);
     }
 
@@ -59,17 +56,18 @@ public class ExpenseViewModel extends ViewModel
                 expenseEntry.setExpenseCost(monthlyCost);
                 mRepository.insertExpense(expenseEntry);
             }
-
         }
     }
 
-    @Override
-    public void onCategoryInserted(long categoryId) {
-        mExpenseEntry.setCategoryId(categoryId);
-        mRepository.insertExpense(mExpenseEntry);
+    public void insertNewExpense(Long categoryId, int cost, int numberOfPayments, LocalDate paymentDate) {
+        ExpenseEntry expenseEntry = new ExpenseEntry(categoryId, cost, numberOfPayments, paymentDate);
+        insertNewExpense(expenseEntry);
     }
 
-    public void setExpense(ExpenseEntry expense) {
-        mExpenseEntry = expense;
+    public void updateExpense(Long expenseId, Long categoryId,
+                              int cost, int numberOfPayments, LocalDate paymentDate) {
+        ExpenseEntry expenseEntry = new ExpenseEntry(expenseId, categoryId, cost, numberOfPayments, paymentDate);
+        mRepository.updateExpense(expenseEntry);
+
     }
 }
