@@ -48,8 +48,9 @@ public class JobEntry {
     }
 
     @Ignore
-    public JobEntry(String description, LocalDate jobDate,
+    public JobEntry(Long categoryId, String description, LocalDate jobDate,
                     LocalDate dateOfPayment, double income, double expenses, double profit) {
+        mCategoryId = categoryId;
         mJobDescription = description;
         mJobDate = jobDate;
         mJobDateOfPayment = dateOfPayment;

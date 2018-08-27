@@ -19,11 +19,9 @@ import java.util.List;
 
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.CategoryEntry;
-import roiattia.com.capstone.database.ExpenseEntry;
 import roiattia.com.capstone.model.ExpensesModel;
 import roiattia.com.capstone.model.IncomeModel;
 import roiattia.com.capstone.ui.newexpense.ExpenseActivity;
-import roiattia.com.capstone.ui.newexpense.ExpenseRepository;
 import roiattia.com.capstone.utils.InjectorUtils;
 
 public class FinancesActivity extends AppCompatActivity
@@ -195,7 +193,7 @@ public class FinancesActivity extends AppCompatActivity
 //    }
 
     public void addExpense(View view){
-        Intent intent = new Intent(this, roiattia.com.capstone.ui.ExpenseActivity.class);
+        Intent intent = new Intent(this, ExpenseActivity.class);
         startActivity(intent);
     }
 

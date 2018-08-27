@@ -15,11 +15,11 @@ import roiattia.com.capstone.ui.newjob.NewJobViewModelFactory;
 
 public class InjectorUtils {
 
-    public static JobRepository provideJobRepository(Context context, JobRepository.GetIdHandler getIdHandler) {
+    public static JobRepository provideJobRepository(Context context) {
         AppDatabase database = AppDatabase.getsInstance(context.getApplicationContext());
         AppExecutors executors = AppExecutors.getInstance();
         return JobRepository.getInstance(database.jobDao(), database.categoryDao(),
-                database.expenseDao(), executors, getIdHandler);
+                database.expenseDao(), executors);
     }
 
     public static CalendarRepository provideCalendarRepository(Context context){
@@ -50,8 +50,10 @@ public class InjectorUtils {
         return new CalendarViewModelFactory(repository);
     }
 
-    public static NewJobViewModelFactory provideNewJobViewModelFactory(Context context){
-        return new NewJobViewModelFactory(context);
+    public static NewJobViewModelFactory provideNewJobViewModelFactory(Context context, Long jobId,
+                                                                       JobRepository.GetJobIdHandler callback){
+        JobRepository jobRepository = provideJobRepository(context);
+        return new NewJobViewModelFactory(jobRepository, jobId, callback);
     }
 
     public static ExpenseViewModelFactory provideExpenseViewModelFactory(Context context, Long expenseId,

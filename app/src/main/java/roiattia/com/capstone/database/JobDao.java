@@ -64,4 +64,6 @@ public interface JobDao {
             "WHERE job_date=:date")
     LiveData<List<JobCalendarModel>> loadJobsAtDate(LocalDate date);
 
+    @Query("SELECT * FROM job WHERE job_id=:jobId")
+    LiveData<JobEntry> loadJobById(Long jobId);
 }

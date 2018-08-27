@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModel;
 
 import org.joda.time.LocalDate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import roiattia.com.capstone.database.CategoryEntry;
@@ -46,6 +47,7 @@ public class ExpenseViewModel extends ViewModel {
 
     public void insertNewExpense(ExpenseEntry expenseEntry) {
         int paymentsNumber = expenseEntry.getNumberOfPayments();
+        List<ExpenseEntry> expenseEntries = new ArrayList<>();
         if(paymentsNumber > 1){
             double monthlyCost = expenseEntry.getExpenseCost()/paymentsNumber;
             LocalDate paymentDate = expenseEntry.getExpensePaymentDate();
@@ -54,9 +56,12 @@ public class ExpenseViewModel extends ViewModel {
                 expenseEntry.setExpensePaymentDate(localDate);
                 expenseEntry.setNumberOfPayments(1);
                 expenseEntry.setExpenseCost(monthlyCost);
-                mRepository.insertExpense(expenseEntry);
+                expenseEntries.add(expenseEntry);
             }
+        } else {
+            expenseEntries.add(expenseEntry);
         }
+        mRepository.insertExpenses(expenseEntries);
     }
 
     public void insertNewExpense(Long categoryId, int cost, int numberOfPayments, LocalDate paymentDate) {

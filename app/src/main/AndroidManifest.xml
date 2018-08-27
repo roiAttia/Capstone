@@ -29,7 +29,7 @@
             <!-- </intent-filter> -->
         </activity>
         <activity android:name=".ui.newexpense.ExpenseActivity" />
-        <activity android:name=".ui.ExpenseActivity"></activity>
+        <activity android:name=".ui.newexpense.ExpenseActivity"></activity>
     </application>
 
 </manifest>

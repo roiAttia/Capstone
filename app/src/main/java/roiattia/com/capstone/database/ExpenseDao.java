@@ -16,6 +16,7 @@ import roiattia.com.capstone.model.ExpensesModel;
 
 @Dao
 public interface ExpenseDao {
+
     @Query("SELECT * FROM expense")
     LiveData<List<ExpenseEntry>> loadAllExpenses();
 
@@ -23,7 +24,7 @@ public interface ExpenseDao {
     List<ExpenseEntry> debugLoadAllExpenses();
 
     @Insert
-    long insertExpense(ExpenseEntry expenseEntry);
+    long[] insertExpenses(List<ExpenseEntry> expenseEntries);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateExpense(ExpenseEntry expenseEntry);
@@ -40,5 +41,11 @@ public interface ExpenseDao {
                                                            CategoryEntry.Type type);
 
     @Query("SELECT * FROM expense WHERE expense_id=:expenseId")
-    LiveData<ExpenseEntry> loadExpense(long expenseId);
+    LiveData<ExpenseEntry> loadExpenseById(Long expenseId);
+
+    @Query("SELECT * FROM expense WHERE expense_id IN (:ids) ")
+    LiveData<List<ExpenseEntry>> loadExpensesById(long[] ids);
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    void updateExpenses(List<ExpenseEntry> expensesList);
 }

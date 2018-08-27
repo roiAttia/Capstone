@@ -1,18 +1,20 @@
-package roiattia.com.capstone.ui.newjob;
+package roiattia.com.capstone.ui.newexpense;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.content.Context;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -24,6 +26,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -32,10 +35,24 @@ import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.ExpenseEntry;
+import roiattia.com.capstone.utils.InjectorUtils;
 
-public class ExpenseFragment extends BaseJobFragment {
+public class ExpenseActivity extends AppCompatActivity
+    implements ExpenseRepository.GetIdHandler{
 
-    private static final String TAG = ExpenseFragment.class.getSimpleName();
+    private static final String TAG = ExpenseActivity.class.getSimpleName();
+
+    public static final String EXTRA_EXPENSE_ID = "expense_id";
+    public static final String EXPENSE_FOR_RESULT = "expense_for_result";
+    private static final long DEFAULT_EXPENSE_ID = -1;
+    private long mExpenseId = DEFAULT_EXPENSE_ID;
+
+    private ExpenseViewModel mViewModel;
+
+    private int mCost;
+    private int mNumberOfPayments;
+    private LocalDate mPaymentDate;
+    private List<CategoryEntry> mCategoriesList;
 
     @BindView(R.id.spinner_expense_category) Spinner mCategoriesSpinner;
     @BindView(R.id.et_expense_cost) EditText mCostView;
@@ -45,29 +62,51 @@ public class ExpenseFragment extends BaseJobFragment {
     @BindView(R.id.et_expense_category) EditText mCategoryView;
     @BindView(R.id.rb_existed_category) RadioButton mExistedCategoryButton;
     @BindView(R.id.rb_new_category) RadioButton mNewCategoryButton;
-    @BindView(R.id.btn_confirm) Button mConfirmExpenseButton;
 
-    public static final long NEW_CATEGORY_ID_INDICATOR = 0;
-    private int mCost;
-    private int mNumberOfPayments;
-    private LocalDate mPaymentDate;
-    private List<CategoryEntry> mCategoriesList;
-    private ExpenseEntry mExpense;
-    private long mCategoryId = NEW_CATEGORY_ID_INDICATOR;
-    private String mCategoryName;
-    private ConfirmExpenseHandler mCallback;
-
-    public interface ConfirmExpenseHandler {
-        void onConfirmExpenseClick(ExpenseEntry expenseEntry, String newCategoryName);
-    }
-
-    public ExpenseFragment(){}
-
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_expense, container, false);
-        ButterKnife.bind(this, rootView);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_expense);
+        ButterKnife.bind(this);
+
+        // check for intent extra in case of expense update operation
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra(EXTRA_EXPENSE_ID)) {
+            mExpenseId = intent.getLongExtra(EXTRA_EXPENSE_ID, DEFAULT_EXPENSE_ID);
+        }
+
+        // create view_model
+        ExpenseViewModelFactory factory = InjectorUtils
+                .provideExpenseViewModelFactory(this, mExpenseId, this);
+        mViewModel = ViewModelProviders.of(this, factory).get(ExpenseViewModel.class);
+
+        // if it's an update then load expense_entry by it's id and call for
+        // update ui with it's details
+        if(mExpenseId != DEFAULT_EXPENSE_ID){
+            mViewModel.getExpense().observe(this, new Observer<ExpenseEntry>() {
+                @Override
+                public void onChanged(@Nullable ExpenseEntry expenseEntry) {
+                    mViewModel.getExpense().removeObserver(this);
+                    if(expenseEntry != null) {
+                        updateUiWithExpenseDetails(expenseEntry);
+                    } else Log.i(TAG, "expenseEntry is null");
+                }
+            });
+        }
+
+        // load categories for spinner
+        mViewModel.getCategories().observe(this, new Observer<List<CategoryEntry>>() {
+            @Override
+            public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
+                if(categoryEntries != null){
+                    mCategoriesList = categoryEntries;
+                    setupSpinner(categoryEntries);
+                    for(CategoryEntry categoryEntry : categoryEntries){
+                        Log.i(TAG, categoryEntry.toString());
+                    }
+                }
+            }
+        });
 
         // set_enabled false for category spinner and edit_text to be able
         // to interact via radio buttons
@@ -128,45 +167,23 @@ public class ExpenseFragment extends BaseJobFragment {
                 }
             }
         });
+    }
 
-        // check if it's an update operation, if so then update UI
-        if(mExpense != null){
-            updateUiWithDetails();
-        } else {
-            mExpense = new ExpenseEntry();
-        }
-
-        // setup "confirm expense" button listener
-        mConfirmExpenseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(checkInputValidation()) {
-                    setExpenseDetails();
-                    mCallback.onConfirmExpenseClick(mExpense, mCategoryName);
-                }
+    private void setupSpinner(List<CategoryEntry> categoryEntries) {
+        List<String> categoriesNames = new ArrayList<>();
+        categoriesNames.add(this.getString(R.string.spinner_category_default_value));
+        if(categoryEntries != null) {
+            for (CategoryEntry categoryEntry : categoryEntries) {
+                categoriesNames.add(categoryEntry.getCategoryName());
             }
-        });
-
-        setupCategoriesSpinner(mCategoriesSpinner, mCategoriesList);
-
-        return rootView;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            mCallback = (ConfirmExpenseHandler) context;
-        } catch (ClassCastException e) {
-            // The activity doesn't implement the interface, throw exception
-            Log.i(TAG, " must implement ConfirmExpenseHandler");
+            // Creating adapter for spinner
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(
+                    this, android.R.layout.simple_spinner_item, categoriesNames);
+            // attaching data adapter to spinner
+            mCategoriesSpinner.setAdapter(dataAdapter);
         }
     }
 
-    /**
-     * Handle UI update of payments details
-     * @param paymentDate
-     */
     private void updateUiWithPayments(LocalDate paymentDate) {
         double monthlyCost = mCost / mNumberOfPayments;
         for(int i = 0; i<mNumberOfPayments; i++){
@@ -177,12 +194,9 @@ public class ExpenseFragment extends BaseJobFragment {
         }
     }
 
-    /**
-     * Handle date picker dialog click
-     */
-    private void pickDate(){
+    private void pickDate() {
         final Calendar calendar = Calendar.getInstance();
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -225,48 +239,56 @@ public class ExpenseFragment extends BaseJobFragment {
         return isInputValid;
     }
 
-    /**
-     * Handle expenses details update and insertion as new expense
-     */
-    public void setExpenseDetails() {
-        mExpense.setExpenseCost(mCost);
-        mExpense.setNumberOfPayments(mNumberOfPayments);
-        mExpense.setExpensePaymentDate(mPaymentDate);
-        if(mNewCategoryButton.isChecked()){
-            if(mCategoryId != NEW_CATEGORY_ID_INDICATOR){
-                mExpense.setCategoryId(mCategoryId);
+    private void updateUiWithExpenseDetails(ExpenseEntry expenseEntry) {
+        mCostView.setText(String.valueOf(expenseEntry.getExpenseCost()));
+        mPaymentDateView.setText(String.valueOf(expenseEntry.getExpensePaymentDate()));
+        mExistedCategoryButton.setChecked(true);
+    }
+
+    public void confirmExpense(View view){
+        // check if all needed input exists
+        if(checkInputValidation()) {
+            // check if a new category needs to insert
+            if(mNewCategoryButton.isChecked()){
+                String categoryName = mCategoryView.getText().toString();
+                mViewModel.insertNewCategory(categoryName);
+            } else {
+                int categoryPosition = mCategoriesSpinner.getSelectedItemPosition() - 1;
+                Long categoryId = mCategoriesList.get(categoryPosition).getCategoryId();
+                confirmExpenseWithCategoryId(categoryId);
             }
-            mCategoryName = mCategoryView.getText().toString();
-        } else if(mExistedCategoryButton.isChecked()){
-            int categoryPosition = mCategoriesSpinner.getSelectedItemPosition() - 1;
-            long categoryId = mCategoriesList.get(categoryPosition).getCategoryId();
-            mExpense.setCategoryId(categoryId);
         }
     }
 
-    /**
-     * Set categories list for spinner selection
-     * @param categoryEntries list of categories
-     *
-     */
-    public void setCategoriesData(List<CategoryEntry> categoryEntries) {
-        mCategoriesList = categoryEntries;
+    private void confirmExpenseWithCategoryId(Long categoryId) {
+        // confirm new expense
+        if (mExpenseId == DEFAULT_EXPENSE_ID) {
+            mViewModel.insertNewExpense(categoryId, mCost, mNumberOfPayments, mPaymentDate);
+        }
+        // update expense
+        else {
+            mViewModel.updateExpense(mExpenseId, categoryId, mCost, mNumberOfPayments, mPaymentDate);
+        }
     }
 
-    /**
-     * Set expense for update operation
-     * @param expenseEntry expense entry to update
-     */
-    public void setExpense(ExpenseEntry expenseEntry) {
-        mExpense = expenseEntry;
+    public void cancelExpense(View view){
+        finish();
     }
 
-    /**
-     * Update ui with expense details
-     */
-    private void updateUiWithDetails() {
-        mCostView.setText(String.valueOf(mExpense.getExpenseCost()));
-        mPaymentDateView.setText(mPaymentDate.toString());
-        mExistedCategoryButton.setChecked(true);
+    @Override
+    public void onCategoryInserted(Long categoryId) {
+        Log.i(TAG, "new category id: " + categoryId);
+        confirmExpenseWithCategoryId(categoryId);
+    }
+
+    @Override
+    public void onExpensesInserted(long[] expensesId) {
+        Log.i(TAG, "new expenses ids array length: " + expensesId.length);
+        if(getCallingActivity() != null){
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra(EXPENSE_FOR_RESULT, expensesId);
+            setResult(Activity.RESULT_OK, resultIntent);
+        }
+        finish();
     }
 }

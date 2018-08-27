@@ -21,8 +21,8 @@ public class DummyData {
 
     public static void insertJob(Context context){
         LocalDate localDate = new LocalDate("2018-08-23");
-        JobEntry jobEntry = new JobEntry(
-                "Sarah", localDate, localDate, 1000, 300, 700);
+//        JobEntry jobEntry = new JobEntry(
+//                "Sarah", localDate, localDate, 1000, 300, 700);
 //        JobRepository repository = InjectorUtils.provideJobRepository(context);
 //        repository.insertJob(jobEntry);
     }

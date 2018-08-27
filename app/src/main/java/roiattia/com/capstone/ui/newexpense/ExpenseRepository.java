@@ -1,6 +1,7 @@
 package roiattia.com.capstone.ui.newexpense;
 
 import android.arch.lifecycle.LiveData;
+import android.util.Log;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import roiattia.com.capstone.ui.newjob.JobRepository;
 import roiattia.com.capstone.utils.AppExecutors;
 
 public class ExpenseRepository {
+    private static final String TAG = ExpenseRepository.class.getSimpleName();
 
     // For Singleton instantiation
     private static final Object LOCK = new Object();
@@ -45,7 +47,7 @@ public class ExpenseRepository {
      */
     public interface GetIdHandler {
         void onCategoryInserted(Long categoryId);
-        void onExpenseInserted(Long expenseId);
+        void onExpensesInserted(long[] expensesId);
     }
 
     public void updateExpense(final ExpenseEntry expenseEntry) {
@@ -66,7 +68,7 @@ public class ExpenseRepository {
     }
 
     public LiveData<ExpenseEntry> loadExpenseById(long expensesId) {
-        return mExpenseDao.loadExpense(expensesId);
+        return mExpenseDao.loadExpenseById(expensesId);
     }
 
     public void insertCategory(final CategoryEntry categoryEntry){
@@ -79,12 +81,14 @@ public class ExpenseRepository {
         });
     }
 
-    public void insertExpense(final ExpenseEntry expenseEntry){
+    public void insertExpenses(final List<ExpenseEntry> expenseEntries) {
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                long expenseId = mExpenseDao.insertExpense(expenseEntry);
-                mGetIdCallback.onExpenseInserted(expenseId);
+                long[] expensesIds = mExpenseDao.insertExpenses(expenseEntries);
+                mGetIdCallback.onExpensesInserted(expensesIds);
+                for(Long id : expensesIds)
+                    Log.i(TAG, String.valueOf(id));
             }
         });
     }
