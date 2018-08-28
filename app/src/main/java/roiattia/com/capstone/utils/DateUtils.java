@@ -1,6 +1,8 @@
 package roiattia.com.capstone.utils;
 
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class DateUtils {
 
@@ -38,5 +40,10 @@ public class DateUtils {
         LocalDate date = new LocalDate();
         date = date.plusYears(1).plusMonths(0).withDayOfYear(1);
         return date;
+    }
+
+    public static String getDateStringFormat(LocalDate date){
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
+        return fmt.print(date);
     }
 }

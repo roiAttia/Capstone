@@ -48,7 +48,7 @@ public class ExpenseActivity extends AppCompatActivity
 
     private ExpenseViewModel mViewModel;
 
-    private int mCost;
+    private double mCost;
     private int mNumberOfPayments;
     private LocalDate mPaymentDate;
     private List<CategoryEntry> mCategoriesList;
@@ -134,7 +134,7 @@ public class ExpenseActivity extends AppCompatActivity
                 if(!mNumPayments.getText().toString().equals("") &&
                         !mPaymentDateView.getText().toString().equals("") &&
                         !mCostView.getText().toString().equals("") ) {
-                    mCost = Integer.parseInt(mCostView.getText().toString());
+                    mCost = Double.parseDouble((mCostView.getText().toString()));
                     mNumberOfPayments = Integer.parseInt(mNumPayments.getText().toString());
                     if (mNumberOfPayments > 0) {
                         updateUiWithPayments(mPaymentDate);

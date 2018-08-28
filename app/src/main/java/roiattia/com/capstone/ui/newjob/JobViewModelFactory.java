@@ -2,16 +2,15 @@ package roiattia.com.capstone.ui.newjob;
 
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
-import android.content.Context;
 import android.support.annotation.NonNull;
 
-public class NewJobViewModelFactory extends ViewModelProvider.NewInstanceFactory {
+public class JobViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
     private JobRepository mJobRepository;
     private Long mJobId;
 
-    public NewJobViewModelFactory(JobRepository jobRepository, Long jobId,
-                                  JobRepository.GetJobIdHandler callback) {
+    public JobViewModelFactory(JobRepository jobRepository, Long jobId,
+                               JobRepository.GetJobIdHandler callback) {
         mJobRepository = jobRepository;
         mJobRepository.setCallbackListener(callback);
         mJobId = jobId;
@@ -21,6 +20,6 @@ public class NewJobViewModelFactory extends ViewModelProvider.NewInstanceFactory
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         //noinspection unchecked
-        return (T) new NewJobViewModel(mJobRepository, mJobId);
+        return (T) new JobViewModel(mJobRepository, mJobId);
     }
 }

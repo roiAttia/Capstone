@@ -34,7 +34,7 @@ public class FinanceExpensesFragment extends BaseFinancialFragment {
         View rootView = inflater.inflate(R.layout.fragment_finances_expenses, container, false);
         ButterKnife.bind(this, rootView);
 
-        mExpensesAdapter = new ExpensesAdapter(mListener);
+        mExpensesAdapter = new ExpensesAdapter(mListener, (ExpensesAdapter.OnExpenseClickHandler) getActivity());
         mExpensesListView.setHasFixedSize(true);
         mExpensesListView.setAdapter(mExpensesAdapter);
         mExpensesListView.setLayoutManager(new LinearLayoutManager(mListener));

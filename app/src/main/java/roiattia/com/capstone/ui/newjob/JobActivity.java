@@ -43,10 +43,10 @@ import roiattia.com.capstone.utils.InjectorUtils;
 
 import static roiattia.com.capstone.ui.newexpense.ExpenseActivity.EXPENSE_FOR_RESULT;
 
-public class NewJobActivity extends AppCompatActivity
+public class JobActivity extends AppCompatActivity
     implements JobRepository.GetJobIdHandler{
 
-    public static final String TAG = NewJobActivity.class.getSimpleName();
+    public static final String TAG = JobActivity.class.getSimpleName();
 
     static final int EXPENSE_ID_REQUEST = 1;  // The request code
     public static final String JOB_DATE = "job_date";
@@ -55,7 +55,7 @@ public class NewJobActivity extends AppCompatActivity
     private static final long DEFAULT_JOB_ID = -1;
     private long mJobId = DEFAULT_JOB_ID;
 
-    private NewJobViewModel mViewModel;
+    private JobViewModel mViewModel;
 
     private LocalDate mJobDate;
     private LocalDate mJobPaymentDate;
@@ -102,10 +102,10 @@ public class NewJobActivity extends AppCompatActivity
         }
 
         // setup view_model
-        NewJobViewModelFactory factory = InjectorUtils
+        JobViewModelFactory factory = InjectorUtils
                 .provideNewJobViewModelFactory(this, mJobId, this);
         mViewModel = ViewModelProviders.of(this, factory)
-                .get(NewJobViewModel.class);
+                .get(JobViewModel.class);
         // if it's an update then load expense_entry by it's id and call for
         // update ui with it's details
         if(mJobId != DEFAULT_JOB_ID){

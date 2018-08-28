@@ -17,19 +17,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.newjob.NewJobActivity" />
-        <activity android:name=".ui.joblist.JobsListActivity" />
-        <activity android:name=".ui.finances.FinancesActivity">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:categoryName="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:categoryName="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
+        <activity android:name=".ui.newjob.JobActivity" />
+        <activity android:name=".ui.category.CategoryDetailsActivity" />
+        <activity android:name=".ui.finances.FinancesActivity"/>
         <activity android:name=".ui.newexpense.ExpenseActivity" />
-        <activity android:name=".ui.newexpense.ExpenseActivity"></activity>
     </application>
 
 </manifest>

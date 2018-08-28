@@ -14,15 +14,20 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.model.ExpensesModel;
-import roiattia.com.capstone.model.IncomeModel;
 
 public class ExpensesAdapter extends RecyclerView.Adapter<ExpensesAdapter.ExpensesViewHolder> {
 
     private Context mContext;
     private List<ExpensesModel> mExpensesList;
+    private OnExpenseClickHandler mClickCallback;
 
-    ExpensesAdapter(Context context) {
+    ExpensesAdapter(Context context, OnExpenseClickHandler clickCallback) {
         mContext = context;
+        mClickCallback = clickCallback;
+    }
+
+    public interface OnExpenseClickHandler{
+        void onClick(long categoryId, String categoryName);
     }
 
     public void setData(List<ExpensesModel> expensesList){
@@ -54,7 +59,8 @@ public class ExpensesAdapter extends RecyclerView.Adapter<ExpensesAdapter.Expens
         return mExpensesList == null ? 0 : mExpensesList.size();
     }
 
-    class ExpensesViewHolder extends RecyclerView.ViewHolder{
+    class ExpensesViewHolder extends RecyclerView.ViewHolder
+        implements View.OnClickListener{
 
         @BindView(R.id.tv_expense_category_name) TextView mCategoryNameView;
         @BindView(R.id.tv_expense_category_number_of_transactions) TextView mNumberOfTransactionsView;
@@ -63,6 +69,14 @@ public class ExpensesAdapter extends RecyclerView.Adapter<ExpensesAdapter.Expens
         ExpensesViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            long categoryId = mExpensesList.get(getAdapterPosition()).getCategoryId();
+            String categoryName = mExpensesList.get(getAdapterPosition()).getName();
+            mClickCallback.onClick(categoryId, categoryName);
         }
     }
 }

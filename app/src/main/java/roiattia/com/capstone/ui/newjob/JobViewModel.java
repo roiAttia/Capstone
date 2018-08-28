@@ -12,9 +12,9 @@ import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.ExpenseEntry;
 import roiattia.com.capstone.database.JobEntry;
 
-public class NewJobViewModel extends ViewModel {
+public class JobViewModel extends ViewModel {
 
-    private static final String TAG = NewJobViewModel.class.getSimpleName();
+    private static final String TAG = JobViewModel.class.getSimpleName();
 
     private LiveData<List<CategoryEntry>> mJobCategories;
     private LiveData<JobEntry> mJob;
@@ -22,7 +22,7 @@ public class NewJobViewModel extends ViewModel {
     private JobRepository mRepository;
 
 
-    NewJobViewModel(JobRepository jobRepository, Long jobId) {
+    JobViewModel(JobRepository jobRepository, Long jobId) {
         mRepository = jobRepository;
         mExpensesList = new ArrayList<>();
         mJobCategories = mRepository.getCategories(CategoryEntry.Type.JOB);

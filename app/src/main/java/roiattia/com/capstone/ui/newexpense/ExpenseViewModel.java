@@ -64,13 +64,13 @@ public class ExpenseViewModel extends ViewModel {
         mRepository.insertExpenses(expenseEntries);
     }
 
-    public void insertNewExpense(Long categoryId, int cost, int numberOfPayments, LocalDate paymentDate) {
+    public void insertNewExpense(Long categoryId, double cost, int numberOfPayments, LocalDate paymentDate) {
         ExpenseEntry expenseEntry = new ExpenseEntry(categoryId, cost, numberOfPayments, paymentDate);
         insertNewExpense(expenseEntry);
     }
 
     public void updateExpense(Long expenseId, Long categoryId,
-                              int cost, int numberOfPayments, LocalDate paymentDate) {
+                              double cost, int numberOfPayments, LocalDate paymentDate) {
         ExpenseEntry expenseEntry = new ExpenseEntry(expenseId, categoryId, cost, numberOfPayments, paymentDate);
         mRepository.updateExpense(expenseEntry);
 

@@ -35,7 +35,8 @@ public class OverallFragment extends BaseFinancialFragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_overall, container, false);
         ButterKnife.bind(this, rootView);
 
@@ -44,10 +45,7 @@ public class OverallFragment extends BaseFinancialFragment {
         LocalDate finishDate = new LocalDate();
 
         // setup view_model
-        FinancesViewModelFactory factory = InjectorUtils
-                .provideFinancesViewModelFactory(mListener);
-        mViewModel = ViewModelProviders.of(mListener, factory)
-                .get(FinancesViewModel.class);
+        mViewModel = ViewModelProviders.of(mListener).get(FinancesViewModel.class);
         final LocalDate finalStartDate = startDate;
         final LocalDate finalFinishDate = finishDate;
         mViewModel.getFinancialReport(startDate, finishDate)
