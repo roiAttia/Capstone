@@ -15,6 +15,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.ExpenseEntry;
+import roiattia.com.capstone.utils.AmountUtils;
 import roiattia.com.capstone.utils.DateUtils;
 
 public class CategoryDetailsAdapter extends RecyclerView
@@ -65,7 +66,8 @@ public class CategoryDetailsAdapter extends RecyclerView
         final ExpenseEntry expenseEntry = mExpensesList.get(position);
         holder.mPaymentDate.setText(String.format(
                 "Payment date: %s", DateUtils.getDateStringFormat(expenseEntry.getExpensePaymentDate())));
-        holder.mCost.setText(String.format("Cost: %s", String.valueOf(expenseEntry.getExpenseCost())));
+        holder.mCost.setText(String.format("Cost: %s", AmountUtils.getStringFormatFromDouble(
+                expenseEntry.getExpenseCost())));
         holder.mDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

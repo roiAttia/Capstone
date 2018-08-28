@@ -7,11 +7,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.widget.TextView;
 
 import org.joda.time.LocalDate;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import butterknife.BindView;
@@ -60,10 +62,10 @@ public class CategoryDetailsActivity extends AppCompatActivity
             LocalDate endDate = new LocalDate(
                     categoryDataBundle.getString(FinancesActivity.BUNDLE_END_DATE));
 
-            // set head_line as follows: *category_name* transactions - between *start_date*
-            // and *end_date* - example: Fuel transactions - between 20/08/2018 and 26/08/2018
-            mCategoryHeader.setText(String.format("%s transactions - between %s and %s",
-                    categoryName, DateUtils.getDateStringFormat(startDate),
+            // set head_line as follows: *category_name* transactions <br> *start_date*
+            // - *end_date*. example: Fuel transactions <br> 20/08/2018 - 26/08/2018
+            mCategoryHeader.setText(Html.fromHtml(categoryName + " transactions"
+                    + "<br>" + DateUtils.getDateStringFormat(startDate) + " - " +
                     DateUtils.getDateStringFormat(endDate)));
 
             // setup factory and view model
