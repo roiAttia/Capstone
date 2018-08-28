@@ -2,7 +2,9 @@ package roiattia.com.capstone.ui.category;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -86,8 +88,26 @@ public class CategoryDetailsActivity extends AppCompatActivity
     }
 
     @Override
-    public void onDeleteClick(ExpenseEntry expenseEntry) {
-        mViewModel.deleteExpense(expenseEntry);
+    public void onDeleteClick(final ExpenseEntry expenseEntry) {
+        // create alert dialog for delete operation
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // 2. Chain together various setter methods to set the dialog characteristics
+        builder.setTitle("Are you sure you want to delete?")
+                .setMessage(expenseEntry.toString())
+                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        mViewModel.deleteExpense(expenseEntry);
+                    }
+                })
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                });
+
+        // Create the AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     @Override
