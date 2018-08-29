@@ -14,6 +14,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.model.IncomeModel;
+import roiattia.com.capstone.utils.AmountUtils;
 
 public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeJobsViewHolder> {
 
@@ -43,9 +44,16 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeJobs
         IncomeModel incomeModel = mIncomeList.get(position);
         if(incomeModel != null){
             holder.mCategoryNameView.setText(incomeModel.getName());
-            holder.mNumberOfJobsView.setText(String.valueOf(incomeModel.getCount()));
-            holder.mTotalIncomeView.setText(String.valueOf(incomeModel.getIncome()));
-            holder.mTotalProfitsView.setText(String.valueOf(incomeModel.getProfit()));
+            holder.mNumberOfJobsView.setText(String.format(
+                    "%s %s", mContext.getString(R.string.job_category_number_of_jobs),
+                    String.valueOf(incomeModel.getCount())));
+            holder.mTotalIncomeView.setText(
+                    String.format("%s %s",
+                            mContext.getString(R.string.job_category_total_income),
+                            AmountUtils.getStringFormatFromDouble(incomeModel.getIncome())));
+            holder.mTotalProfitsView.setText(String.format("%s %s",
+                    mContext.getString(R.string.job_category_total_profits),
+                    AmountUtils.getStringFormatFromDouble(incomeModel.getProfit())));
         }
     }
 

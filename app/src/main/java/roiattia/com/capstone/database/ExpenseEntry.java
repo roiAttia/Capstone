@@ -60,8 +60,8 @@ public class ExpenseEntry {
     @Ignore
     public ExpenseEntry(){}
 
-    ExpenseEntry(Long expenseId, Long jobId, Long categoryId, double expenseCost,
-                 int numberOfPayments, LocalDate expensePaymentDate) {
+    public ExpenseEntry(Long expenseId, Long jobId, Long categoryId, double expenseCost,
+                        int numberOfPayments, LocalDate expensePaymentDate) {
         this.mExpenseId = expenseId;
         this.mJobId = jobId;
         this.mCategoryId = categoryId;

@@ -37,4 +37,8 @@ public class ExpensesModel {
     public double getCost() {
         return mCost;
     }
+
+    public void setCost(double cost) {
+        mCost = cost;
+    }
 }

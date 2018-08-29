@@ -50,7 +50,7 @@ public class PickPeriodDialog extends DialogFragment {
                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDialogFinishClick(mWhichSelected);
+                        onCancel(dialog);
                     }
                 });
         return dialog.create();

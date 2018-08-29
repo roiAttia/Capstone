@@ -3,8 +3,6 @@ package roiattia.com.capstone.ui.finances;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModel;
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -15,7 +13,8 @@ import java.util.List;
 import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.ExpenseEntry;
 import roiattia.com.capstone.model.ExpensesModel;
-import roiattia.com.capstone.model.FinancialModel;
+import roiattia.com.capstone.model.OverallExpensesModel;
+import roiattia.com.capstone.model.OverallIncomeModel;
 import roiattia.com.capstone.model.IncomeModel;
 import roiattia.com.capstone.utils.InjectorUtils;
 
@@ -31,14 +30,25 @@ public class FinancesViewModel extends AndroidViewModel {
         super(application);
         mRepository = InjectorUtils.provideFinancesRepository(this.getApplication());
         mStartDate = new LocalDate();
-        mStartDate = mStartDate.plusMonths(0).withDayOfMonth(1);
         mEndDate = new LocalDate();
-        mEndDate = mEndDate.plusMonths(1).withDayOfMonth(1);
     }
 
-    public LiveData<List<FinancialModel>> getFinancialReport(LocalDate startDate, LocalDate endDate) {
-        return mRepository.getJobsBetweenDates(startDate, endDate);
+    public LiveData<OverallIncomeModel> getCurrentOverallReport() {
+        return mRepository.getJobsBetweenDates(mStartDate, new LocalDate());
     }
+
+    public LiveData<OverallIncomeModel> getExpectedOverallReport() {
+        return mRepository.getJobsBetweenDates(new LocalDate(), mEndDate);
+    }
+
+    public LiveData<OverallExpensesModel> getCurrentExpensesReport() {
+        return mRepository.getExpensesBetweenDates(mStartDate, new LocalDate());
+    }
+
+    public LiveData<OverallExpensesModel> getExpectedExpensesReport() {
+        return mRepository.getExpensesBetweenDates(new LocalDate(), mEndDate);
+    }
+
 
     public LiveData<List<IncomeModel>> getIncomeReport(CategoryEntry.Type type) {
         Log.i(TAG, "get income report start date: " + mStartDate + ", end date: " + mEndDate);

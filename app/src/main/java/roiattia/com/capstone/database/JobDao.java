@@ -6,14 +6,13 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Transaction;
 import android.arch.persistence.room.Update;
 
 import org.joda.time.LocalDate;
 
 import java.util.List;
 
-import roiattia.com.capstone.model.FinancialModel;
+import roiattia.com.capstone.model.OverallIncomeModel;
 import roiattia.com.capstone.model.IncomeModel;
 import roiattia.com.capstone.model.JobCalendarModel;
 
@@ -35,12 +34,13 @@ public interface JobDao {
     @Delete
     void deleteJob(JobEntry jobEntry);
 
-//    @Query("SELECT * FROM job WHERE job_date=:localDate ORDER BY job_income")
-//    LiveData<List<JobEntry>> loadJobsAtDate(LocalDate localDate);
+    @Query("SELECT * FROM job WHERE job_id=:jobId")
+    LiveData<JobEntry> loadJobById(Long jobId);
 
-    @Query("SELECT SUM(job_income) as mIncome, SUM(job_expenses) as mExpenses," +
-            " SUM(job_profits) as mProfit FROM job WHERE job_payment_date BETWEEN :from AND :to")
-    LiveData<List<FinancialModel>> loadJobsBetweenDates(LocalDate from, LocalDate to);
+
+    @Query("SELECT SUM(job_income) as mIncome, SUM(job_profits) as mProfit " +
+            "FROM job WHERE job_payment_date BETWEEN :from AND :to")
+    LiveData<OverallIncomeModel> loadJobsBetweenDates(LocalDate from, LocalDate to);
 
     /**
      * Get income and profits form jobs data based on payment_date between a specific range
@@ -64,6 +64,4 @@ public interface JobDao {
             "WHERE job_date=:date")
     LiveData<List<JobCalendarModel>> loadJobsAtDate(LocalDate date);
 
-    @Query("SELECT * FROM job WHERE job_id=:jobId")
-    LiveData<JobEntry> loadJobById(Long jobId);
 }

@@ -32,6 +32,7 @@
         android:layout_height="wrap_content"
         android:onClick="confirmExpense"
         android:text="cofirm"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_cancel"
         app:layout_constraintStart_toStartOf="parent" />
@@ -42,6 +43,7 @@
         android:layout_height="wrap_content"
         android:onClick="cancelExpense"
         android:text="cancel"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btn_confirm" />
@@ -163,7 +165,8 @@
             <TextView
                 android:id="@+id/tv_payments_details"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:textSize="16sp" />
         </FrameLayout>
     </ScrollView>
 

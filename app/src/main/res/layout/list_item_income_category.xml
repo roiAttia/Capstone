@@ -9,12 +9,15 @@
         android:id="@+id/tv_income_category_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:textSize="16sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_income_category_total_profits"
+        app:layout_constraintEnd_toStartOf="@+id/tv_income_category_total_income"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_income_category_number_of_jobs"
         tools:text="Birthday" />
 
     <TextView

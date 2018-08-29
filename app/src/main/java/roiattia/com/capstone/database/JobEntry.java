@@ -60,6 +60,12 @@ public class JobEntry {
     }
 
     @Ignore
+    public JobEntry(double jobIncome, double jobProfits) {
+        mJobIncome = jobIncome;
+        mJobProfits = jobProfits;
+    }
+
+    @Ignore
     public JobEntry() {
     }
 

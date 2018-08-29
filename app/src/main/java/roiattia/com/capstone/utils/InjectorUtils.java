@@ -37,8 +37,7 @@ public class InjectorUtils {
     public static FinancesRepository provideFinancesRepository(Context context){
         AppDatabase database = AppDatabase.getsInstance(context.getApplicationContext());
         AppExecutors executors = AppExecutors.getInstance();
-        return FinancesRepository.getInstance(database.jobDao(), database.categoryDao(),
-                database.expenseDao(), executors);
+        return FinancesRepository.getInstance(database.jobDao(), database.expenseDao(), executors);
     }
 
     public static CategoryDetailsRepository provideCategoryDetailsRepository(Context context){

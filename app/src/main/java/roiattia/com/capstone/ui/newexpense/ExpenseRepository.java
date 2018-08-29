@@ -54,7 +54,9 @@ public class ExpenseRepository {
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                mExpenseDao.updateExpense(expenseEntry);
+                Log.i(TAG, "expenseId: " + expenseEntry.getExpenseId());
+                int rows = mExpenseDao.updateExpense(expenseEntry);
+                Log.i(TAG, "rows: " + rows);
             }
         });
     }

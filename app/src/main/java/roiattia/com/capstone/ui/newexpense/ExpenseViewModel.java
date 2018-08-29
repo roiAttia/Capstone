@@ -69,9 +69,10 @@ public class ExpenseViewModel extends ViewModel {
         insertNewExpense(expenseEntry);
     }
 
-    public void updateExpense(Long expenseId, Long categoryId,
-                              double cost, int numberOfPayments, LocalDate paymentDate) {
-        ExpenseEntry expenseEntry = new ExpenseEntry(expenseId, categoryId, cost, numberOfPayments, paymentDate);
+    public void updateExpense(long expenseId, Long jobId,
+                              long categoryId, double cost, int numberOfPayments, LocalDate paymentDate) {
+        ExpenseEntry expenseEntry = new ExpenseEntry(expenseId, jobId, categoryId,
+                cost, numberOfPayments, paymentDate);
         mRepository.updateExpense(expenseEntry);
 
     }

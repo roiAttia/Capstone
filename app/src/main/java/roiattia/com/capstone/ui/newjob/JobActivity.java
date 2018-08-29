@@ -281,7 +281,7 @@ public class JobActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.job_menu, menu);
+        getMenuInflater().inflate(R.menu.menu_confirm_job_expense, menu);
         return true;
     }
 

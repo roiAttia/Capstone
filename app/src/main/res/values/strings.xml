@@ -37,11 +37,14 @@
         <item>Month</item>
         <item>Year</item>
     </string-array>
-    <string name="title_activity_drawer">DrawerActivity</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
+
+    <!-- DELETE EXPENSE ALERT DIALOG -->
+    <string name="alert_dialog_delete_title">Are you sure you want to delete?</string>
+    <string name="alert_dialog_ok">OK</string>
+    <string name="alert_dialog_cancel">Cancel</string>
+
+    <!-- INCOME REPORT -->
+    <string name="job_category_number_of_jobs">Number of jobs:</string>
+    <string name="job_category_total_income">Total income:</string>
+    <string name="job_category_total_profits">Total profits:</string>
 </resources>

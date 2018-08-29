@@ -89,23 +89,20 @@ public class CategoryDetailsActivity extends AppCompatActivity
 
     @Override
     public void onDeleteClick(final ExpenseEntry expenseEntry) {
-        // create alert dialog for delete operation
+        // create alert dialog to confirm delete operation
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        // 2. Chain together various setter methods to set the dialog characteristics
-        builder.setTitle("Are you sure you want to delete?")
+        builder.setTitle(R.string.alert_dialog_delete_title)
                 .setMessage(expenseEntry.toString())
-                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.alert_dialog_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         mViewModel.deleteExpense(expenseEntry);
                     }
                 })
-                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.alert_dialog_cancel, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             dialog.dismiss();
                         }
                 });
-
-        // Create the AlertDialog
         AlertDialog dialog = builder.create();
         dialog.show();
     }

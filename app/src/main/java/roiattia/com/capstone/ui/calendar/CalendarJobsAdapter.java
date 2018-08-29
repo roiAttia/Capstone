@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.util.List;
 
@@ -18,6 +16,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.model.JobCalendarModel;
+import roiattia.com.capstone.utils.AmountUtils;
+import roiattia.com.capstone.utils.DateUtils;
 
 public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapter.CalendarJobViewHolder> {
 
@@ -46,11 +46,17 @@ public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapte
     @Override
     public void onBindViewHolder(@NonNull final CalendarJobViewHolder holder, int position) {
         final JobCalendarModel jobEntry = mJobEntries.get(position);
-        holder.jobIncome.setText(String.format("%s", jobEntry.getJobIncome()));
-        holder.jobCategoryName.setText(jobEntry.getCategoryName());
-        LocalDate localDate = new LocalDate(jobEntry.getJobDate());
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
-        holder.jobDate.setText(fmt.print(localDate));
+        // check if job has a description to show
+        if(jobEntry.getJobDescription() != null){
+            holder.jobCategoryNameView.setText(String.format("%s - %s",
+                    jobEntry.getCategoryName(), jobEntry.getJobDescription()));
+        } else {
+            holder.jobCategoryNameView.setText(jobEntry.getCategoryName());
+        }
+        holder.jobIncomeView.setText(String.format("%s",
+                AmountUtils.getStringFormatFromDouble(jobEntry.getJobIncome())));
+        LocalDate jobDate = new LocalDate(jobEntry.getJobDate());
+        holder.jobDateView.setText(DateUtils.getDateStringFormat(jobDate));
     }
 
     @Override
@@ -62,9 +68,9 @@ public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapte
     public class CalendarJobViewHolder extends RecyclerView.ViewHolder
         implements View.OnClickListener{
 
-        @BindView(R.id.tv_category_name) TextView jobCategoryName;
-        @BindView(R.id.tv_date) TextView jobDate;
-        @BindView(R.id.tv_income) TextView jobIncome;
+        @BindView(R.id.tv_category_name) TextView jobCategoryNameView;
+        @BindView(R.id.tv_date) TextView jobDateView;
+        @BindView(R.id.tv_income) TextView jobIncomeView;
 
         CalendarJobViewHolder(View itemView) {
             super(itemView);

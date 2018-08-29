@@ -12,6 +12,8 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
@@ -22,8 +24,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,6 +34,8 @@ import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.ExpenseEntry;
+import roiattia.com.capstone.utils.AmountUtils;
+import roiattia.com.capstone.utils.DateUtils;
 import roiattia.com.capstone.utils.InjectorUtils;
 
 public class ExpenseActivity extends AppCompatActivity
@@ -52,10 +54,12 @@ public class ExpenseActivity extends AppCompatActivity
     private int mNumberOfPayments;
     private LocalDate mPaymentDate;
     private List<CategoryEntry> mCategoriesList;
+    private long mCategoryId;
+    private Long mJobId;
 
     @BindView(R.id.spinner_expense_category) Spinner mCategoriesSpinner;
     @BindView(R.id.et_expense_cost) EditText mCostView;
-    @BindView(R.id.et_num_of_payments) EditText mNumPayments;
+    @BindView(R.id.et_num_of_payments) EditText mNumPaymentsView;
     @BindView(R.id.et_payment_date) EditText mPaymentDateView;
     @BindView(R.id.tv_payments_details) TextView mPaymentsDetailsView;
     @BindView(R.id.et_expense_category) EditText mCategoryView;
@@ -131,11 +135,11 @@ public class ExpenseActivity extends AppCompatActivity
             @Override
             public void afterTextChanged(Editable s) {
                 // check if all needed details for payments calculations are inserted
-                if(!mNumPayments.getText().toString().equals("") &&
+                if(!mNumPaymentsView.getText().toString().equals("") &&
                         !mPaymentDateView.getText().toString().equals("") &&
                         !mCostView.getText().toString().equals("") ) {
                     mCost = Double.parseDouble((mCostView.getText().toString()));
-                    mNumberOfPayments = Integer.parseInt(mNumPayments.getText().toString());
+                    mNumberOfPayments = Integer.parseInt(mNumPaymentsView.getText().toString());
                     if (mNumberOfPayments > 0) {
                         updateUiWithPayments(mPaymentDate);
                     }
@@ -143,7 +147,7 @@ public class ExpenseActivity extends AppCompatActivity
             }
         };
         mCostView.addTextChangedListener(textWatcher);
-        mNumPayments.addTextChangedListener(textWatcher);
+        mNumPaymentsView.addTextChangedListener(textWatcher);
         mPaymentDateView.addTextChangedListener(textWatcher);
 
         // setup category radio buttons
@@ -184,11 +188,12 @@ public class ExpenseActivity extends AppCompatActivity
     }
 
     private void updateUiWithPayments(LocalDate paymentDate) {
+        mPaymentsDetailsView.setText("");
         double monthlyCost = mCost / mNumberOfPayments;
         for(int i = 0; i<mNumberOfPayments; i++){
             mPaymentsDetailsView.append(Html.fromHtml("<br>" + (i+1) + " payment: "
-                    + monthlyCost +
-                    ", payment date: " + paymentDate));
+                    + AmountUtils.getStringFormatFromDouble(monthlyCost) +
+                    ", payment date: " + DateUtils.getDateStringFormat(paymentDate)));
             paymentDate = paymentDate.plusMonths(1);
         }
     }
@@ -201,8 +206,7 @@ public class ExpenseActivity extends AppCompatActivity
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         String dateString = year + "-" + (month+1) + "-" + dayOfMonth;
                         mPaymentDate = LocalDate.parse(dateString);
-                        DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
-                        mPaymentDateView.setText(fmt.print(mPaymentDate));
+                        mPaymentDateView.setText(DateUtils.getDateStringFormat(mPaymentDate));
                     }
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
 
@@ -226,8 +230,8 @@ public class ExpenseActivity extends AppCompatActivity
             isInputValid = false;
         }
         // check number_of_payments validation
-        if(mNumPayments.getText().toString().trim().equals("")){
-            mNumPayments.setError("Must enter number of payments");
+        if(mNumPaymentsView.getText().toString().trim().equals("")){
+            mNumPaymentsView.setError("Must enter number of payments");
             isInputValid = false;
         }
         // check payment_date validation
@@ -239,24 +243,16 @@ public class ExpenseActivity extends AppCompatActivity
     }
 
     private void updateUiWithExpenseDetails(ExpenseEntry expenseEntry) {
-        mCostView.setText(String.valueOf(expenseEntry.getExpenseCost()));
-        mPaymentDateView.setText(String.valueOf(expenseEntry.getExpensePaymentDate()));
+        mExpenseId = expenseEntry.getExpenseId();
+        mCategoryId = expenseEntry.getCategoryId();
+        if(expenseEntry.getJobId() != null) mJobId = expenseEntry.getJobId();
+        mCost = expenseEntry.getExpenseCost();
+        mCostView.setText(AmountUtils.getStringFormatFromDouble(expenseEntry.getExpenseCost()));
+        mNumberOfPayments = 1;
+        mNumPaymentsView.setText(String.valueOf(1));
+        mPaymentDate = expenseEntry.getExpensePaymentDate();
+        mPaymentDateView.setText(DateUtils.getDateStringFormat(mPaymentDate));
         mExistedCategoryButton.setChecked(true);
-    }
-
-    public void confirmExpense(View view){
-        // check if all needed input exists
-        if(checkInputValidation()) {
-            // check if a new category needs to insert
-            if(mNewCategoryButton.isChecked()){
-                String categoryName = mCategoryView.getText().toString();
-                mViewModel.insertNewCategory(categoryName);
-            } else {
-                int categoryPosition = mCategoriesSpinner.getSelectedItemPosition() - 1;
-                Long categoryId = mCategoriesList.get(categoryPosition).getCategoryId();
-                confirmExpenseWithCategoryId(categoryId);
-            }
-        }
     }
 
     private void confirmExpenseWithCategoryId(Long categoryId) {
@@ -266,12 +262,10 @@ public class ExpenseActivity extends AppCompatActivity
         }
         // update expense
         else {
-            mViewModel.updateExpense(mExpenseId, categoryId, mCost, mNumberOfPayments, mPaymentDate);
+            Log.i(TAG, "UPDATE" + " expenseId: " + mExpenseId);
+            mViewModel.updateExpense(mExpenseId, mJobId, categoryId, mCost, mNumberOfPayments, mPaymentDate);
+            finish();
         }
-    }
-
-    public void cancelExpense(View view){
-        finish();
     }
 
     @Override
@@ -289,5 +283,30 @@ public class ExpenseActivity extends AppCompatActivity
             setResult(Activity.RESULT_OK, resultIntent);
         }
         finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_confirm_job_expense, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.mi_done){
+            // check if all needed input exists
+            if(checkInputValidation()) {
+                // check if a new category needs to insert
+                if(mNewCategoryButton.isChecked()){
+                    String categoryName = mCategoryView.getText().toString();
+                    mViewModel.insertNewCategory(categoryName);
+                } else {
+                    int categoryPosition = mCategoriesSpinner.getSelectedItemPosition() - 1;
+                    Long categoryId = mCategoriesList.get(categoryPosition).getCategoryId();
+                    confirmExpenseWithCategoryId(categoryId);
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

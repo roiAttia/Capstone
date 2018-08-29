@@ -1,14 +1,12 @@
 package roiattia.com.capstone.model;
 
-public class FinancialModel {
+public class OverallIncomeModel {
 
     private double mIncome;
-    private double mExpenses;
     private double mProfit;
 
-    public FinancialModel(double income, double expenses, double profit) {
+    public OverallIncomeModel(double income, double profit) {
         mIncome = income;
-        mExpenses = expenses;
         mProfit = profit;
     }
 
@@ -16,11 +14,15 @@ public class FinancialModel {
         return mIncome;
     }
 
-    public double getExpenses() {
-        return mExpenses;
-    }
-
     public double getProfit() {
         return mProfit;
+    }
+
+    public void setIncome(double income) {
+        mIncome = income;
+    }
+
+    public void setProfit(double profit) {
+        mProfit = profit;
     }
 }

@@ -19,7 +19,8 @@
         </activity>
         <activity android:name=".ui.newjob.JobActivity" />
         <activity android:name=".ui.category.CategoryDetailsActivity" />
-        <activity android:name=".ui.finances.FinancesActivity"/>
+        <activity android:name=".ui.finances.FinancesActivity"
+            android:parentActivityName=".ui.calendar.CalendarActivity" />
         <activity android:name=".ui.newexpense.ExpenseActivity" />
     </application>
 
