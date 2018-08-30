@@ -19,9 +19,21 @@
         </activity>
         <activity android:name=".ui.newjob.JobActivity" />
         <activity android:name=".ui.category.CategoryDetailsActivity" />
-        <activity android:name=".ui.finances.FinancesActivity"
+        <activity
+            android:name=".ui.finances.FinancesActivity"
             android:parentActivityName=".ui.calendar.CalendarActivity" />
         <activity android:name=".ui.newexpense.ExpenseActivity" />
+
+        <receiver android:name=".FinancesWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/finances_widget_provider_info" />
+        </receiver>
+        <service android:name=".FinancesReportService" />
     </application>
 
 </manifest>

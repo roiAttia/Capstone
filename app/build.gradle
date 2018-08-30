@@ -44,7 +44,9 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$lifecycle_version"
     annotationProcessor "android.arch.lifecycle:compiler:$lifecycle_version"
 
-    implementation 'com.android.support:gridlayout-v7:27.1.1'
-
+    // Joda time
     implementation 'joda-time:joda-time:2.10'
+
+    implementation 'com.google.android.gms:play-services-ads:15.0.1'
+
 }

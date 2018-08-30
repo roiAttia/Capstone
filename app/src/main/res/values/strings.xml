@@ -47,4 +47,6 @@
     <string name="job_category_number_of_jobs">Number of jobs:</string>
     <string name="job_category_total_income">Total income:</string>
     <string name="job_category_total_profits">Total profits:</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>

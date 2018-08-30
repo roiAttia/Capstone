@@ -16,6 +16,11 @@ import android.view.View;
 import android.widget.CalendarView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+
 import org.joda.time.LocalDate;
 
 import java.util.List;
@@ -28,6 +33,7 @@ import roiattia.com.capstone.ui.finances.FinancesActivity;
 import roiattia.com.capstone.ui.finances.FinancesViewModel;
 import roiattia.com.capstone.ui.newexpense.ExpenseActivity;
 import roiattia.com.capstone.ui.newjob.JobActivity;
+import roiattia.com.capstone.utils.InjectorUtils;
 
 import static roiattia.com.capstone.ui.newjob.JobActivity.JOB_ID_UPDATE;
 
@@ -40,6 +46,7 @@ public class CalendarActivity extends AppCompatActivity
     private CalendarJobsAdapter mJobsAdapter;
     private CalendarViewModel mViewModel;
     private LocalDate mSelectedDate;
+    private InterstitialAd mInterstitialAd;
 
     @BindView(R.id.rv_job_list) RecyclerView mJobsListView;
     @BindView(R.id.calendarView) CalendarView mCalendarView;
@@ -51,6 +58,7 @@ public class CalendarActivity extends AppCompatActivity
         setContentView(R.layout.activity_calendar);
         ButterKnife.bind(this);
 
+//        initializeAd();
         // initialize view_model
         mViewModel = ViewModelProviders.of(this).get(CalendarViewModel.class);
         // initialize jobs_list and it's adapter
@@ -84,9 +92,9 @@ public class CalendarActivity extends AppCompatActivity
                     @Override
                     public void onChanged(@Nullable List<JobCalendarModel> jobCalendarList) {
                         Log.i(TAG, "onChanged");
+                        Log.i(TAG, jobCalendarList.size() + "");
                         mJobsAdapter.setJobs(jobCalendarList);
                         if(jobCalendarList != null && jobCalendarList.size() > 0) {
-                            Log.i(TAG, jobCalendarList.size() + "");
                             mEmptyListView.setVisibility(View.INVISIBLE);
                         } else mEmptyListView.setVisibility(View.VISIBLE);
                     }
@@ -117,22 +125,47 @@ public class CalendarActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = null;
+        Intent intent;
         switch (item.getItemId()){
             case R.id.mi_finances:
-                intent = new Intent(this, FinancesActivity.class);
+                intent = new Intent(CalendarActivity.this, FinancesActivity.class);
+                startActivity(intent);
+//                if (mInterstitialAd.isLoaded()) {
+//                    mInterstitialAd.show();
+//                } else {
+//                    Log.d(TAG, "The interstitial wasn't loaded yet.");
+//                }
                 break;
             case R.id.mi_new_expense:
                 intent = new Intent(this, ExpenseActivity.class);
+                startActivity(intent);
                 break;
             case R.id.mi_new_job:
                 intent = new Intent(this, JobActivity.class);
+                startActivity(intent);
                 break;
             case R.id.mi_settings:
                 intent = new Intent(this, FinancesActivity.class);
+                startActivity(intent);
                 break;
         }
-        startActivity(intent);
         return super.onOptionsItemSelected(item);
+    }
+
+    private void initializeAd() {
+        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                // Load the next interstitial.
+                mInterstitialAd.loadAd(new AdRequest.Builder().build());
+                Intent intent = new Intent(CalendarActivity.this, FinancesActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
