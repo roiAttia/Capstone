@@ -1,4 +1,4 @@
-package roiattia.com.capstone.ui.category;
+package roiattia.com.capstone.ui.payments;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -6,16 +6,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
-import roiattia.com.capstone.database.ExpenseEntry;
-import roiattia.com.capstone.database.PaymentEntry;
 import roiattia.com.capstone.model.PaymentItemModel;
 import roiattia.com.capstone.utils.AmountUtils;
 import roiattia.com.capstone.utils.DateUtils;
@@ -49,12 +47,13 @@ public class PaymentsAdapter extends RecyclerView
     public void onBindViewHolder(@NonNull CategoryDetailsViewHolder holder, int position) {
         final PaymentItemModel payment = mPaymentsList.get(position);
         holder.mPaymentDate.setText(String.format(
-                "Payment date: %s", DateUtils.getDateStringFormat(payment.getPaymentDate())));
-        holder.mPaymentCost.setText(String.format("Cost: %s", AmountUtils.getStringFormatFromDouble(
+                mContext.getString(R.string.payment_date), DateUtils.getDateStringFormat(payment.getPaymentDate())));
+        holder.mPaymentCost.setText(String.format(mContext.getString(R.string.payment_cost), AmountUtils.getStringFormatFromDouble(
                 payment.getCost())));
         if(payment.getTotalPayments() > 1) {
-            holder.mPaymentNumber.setText("Payment number: " + payment.getPaymentNumber() +
-                    "/" + payment.getTotalPayments());
+            holder.mPaymentNumber.setText(String.format(Locale.getDefault(), "%s%d/%d",
+                    mContext.getString(R.string.payment_number),
+                    payment.getPaymentNumber(), payment.getTotalPayments()));
         }
     }
 

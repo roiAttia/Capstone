@@ -1,4 +1,4 @@
-package roiattia.com.capstone.ui.category;
+package roiattia.com.capstone.ui.expenses_list;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;

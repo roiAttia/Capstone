@@ -52,4 +52,9 @@
 
     <!-- PAYMENTS LIST -->
     <string name="payments_list_headline">payments</string>
+    <string name="payment_date">Payment date: %s</string>
+    <string name="payment_cost">Cost: %s</string>
+    <string name="payment_number">Payment number:</string>
+
+
 </resources>

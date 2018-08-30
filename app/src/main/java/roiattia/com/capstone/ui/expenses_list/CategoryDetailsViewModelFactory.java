@@ -1,13 +1,10 @@
-package roiattia.com.capstone.ui.category;
+package roiattia.com.capstone.ui.expenses_list;
 
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
 import org.joda.time.LocalDate;
-
-import roiattia.com.capstone.ui.newexpense.ExpenseViewModel;
-import roiattia.com.capstone.utils.InjectorUtils;
 
 public class CategoryDetailsViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 

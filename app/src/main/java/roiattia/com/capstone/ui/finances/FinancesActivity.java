@@ -23,7 +23,7 @@ import roiattia.com.capstone.model.ExpensesModel;
 import roiattia.com.capstone.model.OverallExpensesModel;
 import roiattia.com.capstone.model.OverallIncomeModel;
 import roiattia.com.capstone.model.IncomeModel;
-import roiattia.com.capstone.ui.category.CategoryDetailsActivity;
+import roiattia.com.capstone.ui.payments.PaymentsActivity;
 import roiattia.com.capstone.ui.newexpense.ExpenseActivity;
 import roiattia.com.capstone.ui.newjob.JobActivity;
 import roiattia.com.capstone.utils.DateUtils;
@@ -209,7 +209,7 @@ public class FinancesActivity extends AppCompatActivity
         categoryDataBundle.putLong(BUNDLE_CATEGORY_ID, categoryId);
         categoryDataBundle.putString(BUNDLE_START_DATE, mStartDate.toString());
         categoryDataBundle.putString(BUNDLE_END_DATE, mEndDate.toString());
-        Intent intent = new Intent(this, CategoryDetailsActivity.class);
+        Intent intent = new Intent(this, PaymentsActivity.class);
         intent.putExtra(BUNDLE_CATEGORY_DATA, categoryDataBundle);
         startActivity(intent);
     }

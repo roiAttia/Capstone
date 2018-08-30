@@ -1,4 +1,4 @@
-package roiattia.com.capstone.ui.category;
+package roiattia.com.capstone.ui.expenses_list;
 
 import android.arch.lifecycle.LiveData;
 
@@ -29,7 +29,7 @@ public class CategoryDetailsRepository {
     }
 
     public synchronized static CategoryDetailsRepository getInstance(ExpenseDao expenseDao,
-            PaymentDao paymentDao, AppExecutors appExecutors) {
+                                                                     PaymentDao paymentDao, AppExecutors appExecutors) {
         if (sInstance == null) {
             synchronized (LOCK) {
                 sInstance = new CategoryDetailsRepository(expenseDao, paymentDao, appExecutors);

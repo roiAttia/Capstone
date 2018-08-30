@@ -6,8 +6,8 @@ import org.joda.time.LocalDate;
 
 import roiattia.com.capstone.database.AppDatabase;
 import roiattia.com.capstone.ui.calendar.CalendarRepository;
-import roiattia.com.capstone.ui.category.CategoryDetailsRepository;
-import roiattia.com.capstone.ui.category.CategoryDetailsViewModelFactory;
+import roiattia.com.capstone.ui.payments.PaymentsRepository;
+import roiattia.com.capstone.ui.payments.PaymentsViewModelFactory;
 import roiattia.com.capstone.ui.finances.FinancesRepository;
 import roiattia.com.capstone.ui.newexpense.ExpenseRepository;
 import roiattia.com.capstone.ui.newexpense.ExpenseViewModelFactory;
@@ -43,11 +43,9 @@ public class InjectorUtils {
         return FinancesRepository.getInstance(database.jobDao(), database.expenseDao(), executors);
     }
 
-    public static CategoryDetailsRepository provideCategoryDetailsRepository(Context context){
+    public static PaymentsRepository providePaymentsRepository(Context context){
         AppDatabase database = AppDatabase.getsInstance(context.getApplicationContext());
-        AppExecutors executors = AppExecutors.getInstance();
-        return CategoryDetailsRepository.getInstance(
-                database.expenseDao(), database.paymentDao(), executors);
+        return PaymentsRepository.getInstance(database.paymentDao());
     }
 
     /* FACTORIES */
@@ -63,9 +61,9 @@ public class InjectorUtils {
         return new ExpenseViewModelFactory(expenseRepository, expenseId, handler);
     }
 
-    public static CategoryDetailsViewModelFactory provideCategoryDetailsViewModelFactory(
+    public static PaymentsViewModelFactory provideCategoryDetailsViewModelFactory(
             Context context, long categoryId, LocalDate start, LocalDate end){
-        CategoryDetailsRepository repository = provideCategoryDetailsRepository(context);
-        return new CategoryDetailsViewModelFactory(categoryId, start, end, repository);
+        PaymentsRepository repository = providePaymentsRepository(context);
+        return new PaymentsViewModelFactory(categoryId, start, end, repository);
     }
 }
