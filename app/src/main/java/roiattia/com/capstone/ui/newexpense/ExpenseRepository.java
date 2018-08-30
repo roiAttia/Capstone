@@ -10,6 +10,8 @@ import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.ExpenseDao;
 import roiattia.com.capstone.database.ExpenseEntry;
 import roiattia.com.capstone.database.JobDao;
+import roiattia.com.capstone.database.PaymentDao;
+import roiattia.com.capstone.database.PaymentEntry;
 import roiattia.com.capstone.ui.newjob.JobRepository;
 import roiattia.com.capstone.utils.AppExecutors;
 
@@ -21,22 +23,24 @@ public class ExpenseRepository {
     private static ExpenseRepository sInstance;
     private final CategoryDao mCategoryDao;
     private final ExpenseDao mExpenseDao;
+    private final PaymentDao mPaymentDao;
     private final AppExecutors mExecutors;
     private GetIdHandler mGetIdCallback;
 
     private ExpenseRepository(CategoryDao categoryDao, ExpenseDao expenseDao,
-                          AppExecutors appExecutors){
+                           PaymentDao paymentDao, AppExecutors appExecutors){
         mCategoryDao = categoryDao;
         mExpenseDao = expenseDao;
         mExecutors = appExecutors;
+        mPaymentDao = paymentDao;
     }
 
     public synchronized static ExpenseRepository getInstance(
-            CategoryDao categoryDao, ExpenseDao expenseDao,
+            CategoryDao categoryDao, ExpenseDao expenseDao, PaymentDao paymentDao,
             AppExecutors appExecutors) {
         if (sInstance == null) {
             synchronized (LOCK) {
-                sInstance = new ExpenseRepository(categoryDao, expenseDao, appExecutors);
+                sInstance = new ExpenseRepository(categoryDao, expenseDao, paymentDao, appExecutors);
             }
         }
         return sInstance;
@@ -48,6 +52,7 @@ public class ExpenseRepository {
     public interface GetIdHandler {
         void onCategoryInserted(Long categoryId);
         void onExpensesInserted(long[] expensesId);
+        void onExpenseInserted(long expenseId);
     }
 
     public void updateExpense(final ExpenseEntry expenseEntry) {
@@ -91,6 +96,26 @@ public class ExpenseRepository {
                 mGetIdCallback.onExpensesInserted(expensesIds);
                 for(Long id : expensesIds)
                     Log.i(TAG, String.valueOf(id));
+            }
+        });
+    }
+
+    public void insertExpense(final ExpenseEntry expenseEntrie) {
+        mExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                long expenseId = mExpenseDao.insertExpense(expenseEntrie);
+                mGetIdCallback.onExpenseInserted(expenseId);
+                Log.i(TAG, String.valueOf(expenseId));
+            }
+        });
+    }
+
+    public void insertPayments(final List<PaymentEntry> paymentEntryList){
+        mExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mPaymentDao.insertPayments(paymentEntryList);
             }
         });
     }

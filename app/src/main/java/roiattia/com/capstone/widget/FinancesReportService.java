@@ -1,8 +1,7 @@
-package roiattia.com.capstone;
+package roiattia.com.capstone.widget;
 
 import android.app.IntentService;
 import android.appwidget.AppWidgetManager;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,13 +10,9 @@ import android.support.annotation.Nullable;
 import org.joda.time.LocalDate;
 
 import roiattia.com.capstone.database.AppDatabase;
-import roiattia.com.capstone.database.JobDao;
 import roiattia.com.capstone.model.OverallIncomeModel;
-import roiattia.com.capstone.ui.finances.FinancesRepository;
-import roiattia.com.capstone.ui.finances.FinancesViewModel;
 import roiattia.com.capstone.utils.AppExecutors;
 import roiattia.com.capstone.utils.DateUtils;
-import roiattia.com.capstone.utils.InjectorUtils;
 
 public  class FinancesReportService extends IntentService {
 

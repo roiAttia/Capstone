@@ -1,4 +1,4 @@
-package roiattia.com.capstone;
+package roiattia.com.capstone.widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 
+import roiattia.com.capstone.R;
 import roiattia.com.capstone.model.OverallIncomeModel;
 import roiattia.com.capstone.ui.finances.FinancesActivity;
 import roiattia.com.capstone.utils.AmountUtils;

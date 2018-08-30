@@ -55,7 +55,7 @@ public class FinancesRepository {
 
     public LiveData<List<ExpensesModel>> getExpensesBetweenDates(LocalDate from,
                                                                  LocalDate to, CategoryEntry.Type type) {
-        return mExpenseDao.loadExpensesBetweenDates(from, to, type);
+        return mExpenseDao.loadPaymentsBetweenDates(from, to, type);
     }
 
     public LiveData<List<ExpenseEntry>> getExpensesByCategoryId(long categoryId) {
@@ -63,8 +63,13 @@ public class FinancesRepository {
     }
 
     public LiveData<OverallExpensesModel> getExpensesBetweenDates(LocalDate from, LocalDate to){
-        return mExpenseDao.loadExpensesBetweenDates(from, to);
+        return mExpenseDao.loadPaymentsBetweenDates(from, to);
     }
 
+    public LiveData<List<ExpensesModel>> getPaymentsPerCategoryBetweenDates(
+            LocalDate from, LocalDate to){
+        return mExpenseDao.loadPaymentsPerCategoryBetweenDates(from, to);
+
+    }
 
 }

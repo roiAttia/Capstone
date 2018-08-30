@@ -10,6 +10,7 @@ import java.util.List;
 
 import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.database.ExpenseEntry;
+import roiattia.com.capstone.database.PaymentEntry;
 
 public class ExpenseViewModel extends ViewModel {
 
@@ -17,10 +18,12 @@ public class ExpenseViewModel extends ViewModel {
 
     private LiveData<List<CategoryEntry>> mCategories;
     private LiveData<ExpenseEntry> mExpense;
+    private List<PaymentEntry> mPaymentEntryList;
     private ExpenseRepository mRepository;
 
     ExpenseViewModel(ExpenseRepository repository, Long expensesId) {
         mRepository = repository;
+        mPaymentEntryList = new ArrayList<>();
         mCategories = mRepository.getCategories(CategoryEntry.Type.EXPENSE);
         if(expensesId != null) {
             mExpense = repository.loadExpenseById(expensesId);
@@ -45,28 +48,21 @@ public class ExpenseViewModel extends ViewModel {
         mRepository.insertCategory(categoryEntry);
     }
 
-    public void insertNewExpense(ExpenseEntry expenseEntry) {
-        int paymentsNumber = expenseEntry.getNumberOfPayments();
-        List<ExpenseEntry> expenseEntries = new ArrayList<>();
-        if(paymentsNumber > 1){
-            double monthlyCost = expenseEntry.getExpenseCost()/paymentsNumber;
-            LocalDate paymentDate = expenseEntry.getExpensePaymentDate();
-            for(int i = 0 ; i<paymentsNumber; i++) {
-                LocalDate localDate = paymentDate.plusMonths(i);
-                expenseEntry.setExpensePaymentDate(localDate);
-                expenseEntry.setNumberOfPayments(1);
-                expenseEntry.setExpenseCost(monthlyCost);
-                expenseEntries.add(expenseEntry);
-            }
-        } else {
-            expenseEntries.add(expenseEntry);
-        }
-        mRepository.insertExpenses(expenseEntries);
-    }
-
     public void insertNewExpense(Long categoryId, double cost, int numberOfPayments, LocalDate paymentDate) {
         ExpenseEntry expenseEntry = new ExpenseEntry(categoryId, cost, numberOfPayments, paymentDate);
-        insertNewExpense(expenseEntry);
+        createPaymentsFromExpense(expenseEntry);
+        mRepository.insertExpense(expenseEntry);
+    }
+
+    private void createPaymentsFromExpense(ExpenseEntry expenseEntry) {
+        int paymentsNumber = expenseEntry.getNumberOfPayments();
+        double monthlyCost = expenseEntry.getExpenseCost()/paymentsNumber;
+        LocalDate startDate = expenseEntry.getExpensePaymentDate();
+        for(int i = 0 ; i<paymentsNumber; i++) {
+            LocalDate paymentDate = startDate.plusMonths(i);
+            PaymentEntry paymentEntry = new PaymentEntry(monthlyCost, (i+1), paymentDate);
+            mPaymentEntryList.add(paymentEntry);
+        }
     }
 
     public void updateExpense(long expenseId, Long jobId,
@@ -75,5 +71,15 @@ public class ExpenseViewModel extends ViewModel {
                 cost, numberOfPayments, paymentDate);
         mRepository.updateExpense(expenseEntry);
 
+    }
+
+    public void updatePaymentsWithExpenseID(long expenseId) {
+        for(PaymentEntry paymentEntry : mPaymentEntryList){
+            paymentEntry.setExpenseId(expenseId);
+        }
+    }
+
+    public void insertPayments() {
+        mRepository.insertPayments(mPaymentEntryList);
     }
 }

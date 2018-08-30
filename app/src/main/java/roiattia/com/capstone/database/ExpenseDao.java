@@ -28,6 +28,9 @@ public interface ExpenseDao {
     @Insert
     long[] insertExpenses(List<ExpenseEntry> expenseEntries);
 
+    @Insert
+    long insertExpense(ExpenseEntry expenseEntrie);
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     int updateExpense(ExpenseEntry expenseEntry);
 
@@ -40,8 +43,16 @@ public interface ExpenseDao {
             "WHERE expense_payment_date BETWEEN :from AND :to " +
             "AND category_type=:type " +
             "GROUP BY category_name")
-    LiveData<List<ExpensesModel>> loadExpensesBetweenDates(LocalDate from, LocalDate to,
+    LiveData<List<ExpensesModel>> loadPaymentsBetweenDates(LocalDate from, LocalDate to,
                                                            CategoryEntry.Type type);
+
+    @Query("SELECT expense.category_id as mCategoryId, COUNT(category_name) as mCount, " +
+            "category_name as mName, SUM(payment_cost) as mCost " +
+            "FROM category JOIN expense ON category.category_id = expense.category_id " +
+            "JOIN payment ON expense.expense_id = payment.expense_id " +
+            "WHERE payment.payment_date BETWEEN :from AND :to " +
+            "GROUP BY category_name")
+    LiveData<List<ExpensesModel>> loadPaymentsPerCategoryBetweenDates(LocalDate from, LocalDate to);
 
     @Query("SELECT * FROM expense " +
             "WHERE expense_id=:expenseId")
@@ -61,7 +72,7 @@ public interface ExpenseDao {
     LiveData<List<ExpenseEntry>> loadExpensesByCategoryIdAndDates(
             Long categoryId, LocalDate from, LocalDate to);
 
-    @Query("SELECT SUM(expense_cost) as mCost " +
-            "FROM expense WHERE expense_payment_date BETWEEN :from AND :to")
-    LiveData<OverallExpensesModel> loadExpensesBetweenDates(LocalDate from, LocalDate to);
+    @Query("SELECT SUM(payment_cost) as mCost " +
+            "FROM payment WHERE payment_date BETWEEN :from AND :to")
+    LiveData<OverallExpensesModel> loadPaymentsBetweenDates(LocalDate from, LocalDate to);
 }

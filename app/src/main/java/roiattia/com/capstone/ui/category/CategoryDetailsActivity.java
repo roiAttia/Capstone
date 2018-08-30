@@ -22,6 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.ExpenseEntry;
+import roiattia.com.capstone.model.PaymentItemModel;
 import roiattia.com.capstone.ui.finances.FinancesActivity;
 import roiattia.com.capstone.ui.newexpense.ExpenseActivity;
 import roiattia.com.capstone.utils.DateUtils;
@@ -36,6 +37,7 @@ public class CategoryDetailsActivity extends AppCompatActivity
 
     private CategoryDetailsViewModel mViewModel;
     private CategoryDetailsAdapter mAdapter;
+    private PaymentsAdapter mPaymentsAdapter;
 
     @BindView(R.id.tv_header) TextView mCategoryHeader;
     @BindView(R.id.rv_job_list) RecyclerView mDetailsList;
@@ -46,9 +48,11 @@ public class CategoryDetailsActivity extends AppCompatActivity
         setContentView(R.layout.activity_category_details);
         ButterKnife.bind(this);
 
-        mAdapter = new CategoryDetailsAdapter(this, this);
+//        mAdapter = new CategoryDetailsAdapter(this, this);
+        mPaymentsAdapter = new PaymentsAdapter(this);
         // initialize jobs_list and it's adapter
-        mDetailsList.setAdapter(mAdapter);
+//        mDetailsList.setAdapter(mAdapter);
+        mDetailsList.setAdapter(mPaymentsAdapter);
         mDetailsList.setLayoutManager(new LinearLayoutManager(this));
         mDetailsList.setHasFixedSize(true);
 
@@ -66,7 +70,7 @@ public class CategoryDetailsActivity extends AppCompatActivity
 
             // set head_line as follows: *category_name* transactions <br> *start_date*
             // - *end_date*. example: Fuel transactions <br> 20/08/2018 - 26/08/2018
-            mCategoryHeader.setText(Html.fromHtml(categoryName + " transactions"
+            mCategoryHeader.setText(Html.fromHtml(categoryName + getString(R.string.payments_list_headline)
                     + "<br>" + DateUtils.getDateStringFormat(startDate) + " - " +
                     DateUtils.getDateStringFormat(endDate)));
 
@@ -74,13 +78,23 @@ public class CategoryDetailsActivity extends AppCompatActivity
             CategoryDetailsViewModelFactory factory = InjectorUtils
                     .provideCategoryDetailsViewModelFactory(this, categoryId, startDate, endDate);
             mViewModel = ViewModelProviders.of(this, factory).get(CategoryDetailsViewModel.class);
-            // observe on expenses
-            mViewModel.getExpenseDetails().observe(this, new Observer<List<ExpenseEntry>>() {
+//            // observe on expenses
+////            mViewModel.getExpenseDetails().observe(this, new Observer<List<ExpenseEntry>>() {
+////                @Override
+////                public void onChanged(List<ExpenseEntry> expenseEntries) {
+////                    mAdapter.setData(expenseEntries);
+////                    for(ExpenseEntry expenseEntry : expenseEntries){
+////                        Log.i(TAG, expenseEntry.toString());
+////                    }
+////                }
+////            });
+            // observe on payments
+            mViewModel.getPaymentsDetails().observe(this, new Observer<List<PaymentItemModel>>() {
                 @Override
-                public void onChanged(List<ExpenseEntry> expenseEntries) {
-                    mAdapter.setData(expenseEntries);
-                    for(ExpenseEntry expenseEntry : expenseEntries){
-                        Log.i(TAG, expenseEntry.toString());
+                public void onChanged(List<PaymentItemModel> paymentsList) {
+                    mPaymentsAdapter.setData(paymentsList);
+                    for(PaymentItemModel paymentItemModel : paymentsList){
+                        Log.i(TAG, paymentItemModel.toString());
                     }
                 }
             });

@@ -76,7 +76,7 @@ public class FinancesActivity extends AppCompatActivity
         mViewModel.setDatesRange(mStartDate, mEndDate);
 
         loadIncomeReport();
-        loadExpensesReport();
+        loadPaymentsReport();
         loadOverallReport();
     }
 
@@ -112,7 +112,8 @@ public class FinancesActivity extends AppCompatActivity
 
         loadOverallReport();
         loadIncomeReport();
-        loadExpensesReport();
+//        loadExpensesReport();
+        loadPaymentsReport();
     }
 
     private void loadOverallReport() {
@@ -169,6 +170,18 @@ public class FinancesActivity extends AppCompatActivity
 
     private void loadExpensesReport(){
         mViewModel.getExpensesReport(CategoryEntry.Type.EXPENSE)
+                .observe(this, new Observer<List<ExpensesModel>>() {
+                    @Override
+                    public void onChanged(@Nullable List<ExpensesModel> expensesModels) {
+                        if(expensesModels != null) {
+                            mExpensesFragment.setData(expensesModels);
+                        }
+                    }
+                });
+    }
+
+    private void loadPaymentsReport(){
+        mViewModel.getPaymentsReport()
                 .observe(this, new Observer<List<ExpensesModel>>() {
                     @Override
                     public void onChanged(@Nullable List<ExpensesModel> expensesModels) {

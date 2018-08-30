@@ -288,6 +288,13 @@ public class ExpenseActivity extends AppCompatActivity
     }
 
     @Override
+    public void onExpenseInserted(long expenseId) {
+        mViewModel.updatePaymentsWithExpenseID(expenseId);
+        mViewModel.insertPayments();
+        finish();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_confirm_job_expense, menu);
         return true;

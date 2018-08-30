@@ -30,4 +30,7 @@ public class CalendarViewModel extends AndroidViewModel {
         return mRepository.getJobsByDate(datePicked);
     }
 
+    public void debugPrint() {
+        mRepository.debugPrint();
+    }
 }

@@ -148,6 +148,9 @@ public class CalendarActivity extends AppCompatActivity
                 intent = new Intent(this, FinancesActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.mi_debug:
+                mViewModel.debugPrint();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

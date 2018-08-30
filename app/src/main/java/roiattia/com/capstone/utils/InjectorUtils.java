@@ -25,13 +25,16 @@ public class InjectorUtils {
 
     public static CalendarRepository provideCalendarRepository(Context context){
         AppDatabase database = AppDatabase.getsInstance(context.getApplicationContext());
-        return CalendarRepository.getInstance(database.jobDao());
+        AppExecutors executors = AppExecutors.getInstance();
+        return CalendarRepository.getInstance(database.jobDao(), database.categoryDao(),
+                database.expenseDao(), database.paymentDao(), executors);
     }
 
     public static ExpenseRepository provideExpenseRepository(Context context){
         AppDatabase database = AppDatabase.getsInstance(context.getApplicationContext());
         AppExecutors executors = AppExecutors.getInstance();
-        return ExpenseRepository.getInstance(database.categoryDao(), database.expenseDao(), executors);
+        return ExpenseRepository.getInstance(
+                database.categoryDao(), database.expenseDao(), database.paymentDao(), executors);
     }
 
     public static FinancesRepository provideFinancesRepository(Context context){
@@ -43,7 +46,8 @@ public class InjectorUtils {
     public static CategoryDetailsRepository provideCategoryDetailsRepository(Context context){
         AppDatabase database = AppDatabase.getsInstance(context.getApplicationContext());
         AppExecutors executors = AppExecutors.getInstance();
-        return CategoryDetailsRepository.getInstance(database.expenseDao(), executors);
+        return CategoryDetailsRepository.getInstance(
+                database.expenseDao(), database.paymentDao(), executors);
     }
 
     /* FACTORIES */

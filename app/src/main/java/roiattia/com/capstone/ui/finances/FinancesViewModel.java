@@ -68,4 +68,8 @@ public class FinancesViewModel extends AndroidViewModel {
         return mRepository.getExpensesByCategoryId(categoryId);
     }
 
+    public LiveData<List<ExpensesModel>> getPaymentsReport() {
+        return mRepository.getPaymentsPerCategoryBetweenDates(mStartDate, mEndDate);
+    }
+
 }

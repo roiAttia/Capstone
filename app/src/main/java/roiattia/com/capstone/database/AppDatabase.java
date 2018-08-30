@@ -6,8 +6,8 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
-@Database(entities = {JobEntry.class, CategoryEntry.class, ExpenseEntry.class},
-        version = 3, exportSchema = false)
+@Database(entities = {JobEntry.class, CategoryEntry.class, ExpenseEntry.class, PaymentEntry.class},
+        version = 6, exportSchema = false)
 @TypeConverters({DateTypeConverter.class, CategoryTypeConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -32,4 +32,6 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract CategoryDao categoryDao();
 
     public abstract ExpenseDao expenseDao();
+
+    public abstract PaymentDao paymentDao();
 }

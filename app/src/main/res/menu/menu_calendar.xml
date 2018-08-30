@@ -13,4 +13,7 @@
     <item
         android:id="@+id/mi_settings"
         android:title="Settings" />
+    <item
+        android:id="@+id/mi_debug"
+        android:title="Debug print" />
 </menu>
