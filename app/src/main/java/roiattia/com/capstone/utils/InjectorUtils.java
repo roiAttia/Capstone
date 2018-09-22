@@ -6,7 +6,6 @@ import org.joda.time.LocalDate;
 
 import roiattia.com.capstone.database.AppDatabase;
 import roiattia.com.capstone.database.AppExecutors;
-import roiattia.com.capstone.ui.calendar.CalendarRepository;
 import roiattia.com.capstone.ui.expenses_list.ExpensesListRepository;
 import roiattia.com.capstone.ui.expenses_list.ExpensesListViewModelFactory;
 import roiattia.com.capstone.ui.payments.PaymentsRepository;
@@ -24,12 +23,6 @@ public class InjectorUtils {
         AppExecutors executors = AppExecutors.getInstance();
         return JobRepository.getInstance(database.jobDao(), database.categoryDao(),
                 database.expenseDao(), executors, callback);
-    }
-
-    public static CalendarRepository provideCalendarRepository(Context context){
-        AppDatabase database = AppDatabase.getsInstance(context.getApplicationContext());
-        AppExecutors executors = AppExecutors.getInstance();
-        return CalendarRepository.getInstance(database, executors);
     }
 
     public static ExpenseRepository provideExpenseRepository(Context context){

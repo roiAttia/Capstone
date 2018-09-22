@@ -24,7 +24,7 @@ public class CategoryEntry {
         mCategoryType = categoryType;
     }
 
-    public CategoryEntry(Long categoryId, String categoryName, Type categoryType) {
+    public CategoryEntry(long categoryId, String categoryName, Type categoryType) {
         mCategoryId = categoryId;
         mCategoryName = categoryName;
         mCategoryType = categoryType;

@@ -21,14 +21,17 @@ import roiattia.com.capstone.model.JobCalendarModel;
 @Dao
 public interface JobDao {
 
+    @Insert
+    long insertJob(JobEntry jobEntry);
+
+    @Insert
+    void insertJobs(List<JobEntry> jobs);
+
     @Query("SELECT * FROM job ORDER BY job_profits")
     LiveData<List<JobEntry>> loadAllJobs();
 
     @Query("SELECT * FROM job ORDER BY job_profits")
     List<JobEntry> debugLoadAllJobs();
-
-    @Insert
-    long insertJob(JobEntry jobEntry);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateJob(JobEntry jobEntry);
@@ -38,7 +41,6 @@ public interface JobDao {
 
     @Query("SELECT * FROM job WHERE job_id=:jobId")
     LiveData<JobEntry> loadJobById(Long jobId);
-
 
     @Query("SELECT SUM(job_income) as mIncome, SUM(job_profits) as mProfit " +
             "FROM job WHERE job_payment_date BETWEEN :from AND :to")
@@ -64,10 +66,9 @@ public interface JobDao {
             "job_description as mJobDescription, job_date as mJobDate " +
             "FROM job JOIN category ON job.category_id = category.category_id " +
             "WHERE job_date=:date")
-    LiveData<List<JobCalendarModel>> loadJobsAtDate(LocalDate date);
+    List<JobCalendarModel> loadJobsAtDate(LocalDate date);
 
     @Query("SELECT SUM(job_income) as mIncome, SUM(job_profits) as mProfit " +
             "FROM job WHERE job_payment_date BETWEEN :from AND :to")
     OverallIncomeModel loadReportBetweenDates(LocalDate from, LocalDate to);
-
 }

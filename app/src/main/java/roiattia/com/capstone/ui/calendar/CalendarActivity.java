@@ -27,22 +27,24 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.model.JobCalendarModel;
+import roiattia.com.capstone.repositories.CategoriesRepository;
 import roiattia.com.capstone.ui.expenses_list.ExpensesListActivity;
 import roiattia.com.capstone.ui.finances.FinancesActivity;
-import roiattia.com.capstone.ui.finances.FinancesViewModel;
 import roiattia.com.capstone.ui.newexpense.ExpenseActivity;
 import roiattia.com.capstone.ui.newjob.JobActivity;
-import roiattia.com.capstone.utils.InjectorUtils;
+import roiattia.com.capstone.utils.DummyData;
 
-import static roiattia.com.capstone.ui.newjob.JobActivity.JOB_ID_UPDATE;
+import static roiattia.com.capstone.utils.Constants.JOB_DATE;
+import static roiattia.com.capstone.utils.Constants.JOB_ID_UPDATE;
 
 public class CalendarActivity extends AppCompatActivity
     implements CalendarJobsAdapter.OnJobClickHandler{
 
     private static final String TAG = CalendarActivity.class.getSimpleName();
-    public static final String DATE = "date";
+
 
     private CalendarJobsAdapter mJobsAdapter;
     private CalendarViewModel mViewModel;
@@ -53,70 +55,96 @@ public class CalendarActivity extends AppCompatActivity
     @BindView(R.id.calendarView) CalendarView mCalendarView;
     @BindView(R.id.tv_empty_list) TextView mEmptyListView;
 
+    /**
+     * Handles the add job button click event
+     */
+    @OnClick(R.id.fab_add_job)
+    public void addJob(){
+        Intent intent = new Intent(CalendarActivity.this, JobActivity.class);
+        intent.putExtra(JOB_DATE, mSelectedDate.toString());
+        startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
         ButterKnife.bind(this);
 
-//        initializeAd();
-        // initialize view_model
-        mViewModel = ViewModelProviders.of(this).get(CalendarViewModel.class);
-        // initialize jobs_list and it's adapter
-        mJobsAdapter = new CalendarJobsAdapter(this, this);
-        mJobsListView.setAdapter(mJobsAdapter);
-        mJobsListView.setLayoutManager(new LinearLayoutManager(this));
-        mJobsListView.setHasFixedSize(true);
-
-        // initialize date and calendar_view on date listener
         mSelectedDate = new LocalDate();
-        setupViewModel(mSelectedDate);
+
+//        initializeAd();
+
+        setupRecyclerView();
+
+        setupViewModel();
+
+        setupCalendarView();
+
+        loadJobsAtDate(mSelectedDate);
+
+    }
+
+    /**
+     * Setup calendar_view with date change listener
+     */
+    private void setupCalendarView() {
         mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 String date = year + "-" + (month+1) + "-" + dayOfMonth;
                 Log.i(TAG, date);
-                mSelectedDate = LocalDate.parse(date);
-                setupViewModel(mSelectedDate);
+                LocalDate localDate = LocalDate.parse(date);
+                mSelectedDate = localDate;
+                loadJobsAtDate(localDate);
             }
         });
     }
 
     /**
-     * Handle date clicks on calendar to load data on that date
-     * @param pickedDate the date picked in calendar
+     * Load jobs at selected date
+     * @param date selected date
      */
-    private void setupViewModel(LocalDate pickedDate) {
-        Log.i(TAG, pickedDate.toString());
-        mViewModel.getJobsAtDate(pickedDate).observe(CalendarActivity.this,
-                new Observer<List<JobCalendarModel>>() {
-                    @Override
-                    public void onChanged(@Nullable List<JobCalendarModel> jobCalendarList) {
-                        Log.i(TAG, "onChanged");
-                        Log.i(TAG, jobCalendarList.size() + "");
-                        mJobsAdapter.setJobs(jobCalendarList);
-                        if(jobCalendarList != null && jobCalendarList.size() > 0) {
-                            mEmptyListView.setVisibility(View.INVISIBLE);
-                        } else mEmptyListView.setVisibility(View.VISIBLE);
-                    }
-                });
+    private void loadJobsAtDate(LocalDate date){
+        mViewModel.loadJobsByDate(date);
     }
 
     /**
-     * Handles the add job button click event
+     * Setup recycler_view and Jobs_adapter
      */
-    public void addJob(View view){
-        Intent intent = new Intent(CalendarActivity.this, JobActivity.class);
-        intent.putExtra(DATE, mSelectedDate.toString());
-        startActivity(intent);
+    private void setupRecyclerView() {
+        // initialize jobs_list and it's adapter
+        mJobsAdapter = new CalendarJobsAdapter(this, this);
+        mJobsListView.setAdapter(mJobsAdapter);
+        mJobsListView.setLayoutManager(new LinearLayoutManager(this));
+        mJobsListView.setHasFixedSize(true);
     }
 
-    @Override
-    public void onClick(long jobId) {
-        Intent intent = new Intent(CalendarActivity.this, JobActivity.class);
-        intent.putExtra(JOB_ID_UPDATE, jobId);
-        startActivity(intent);
+    /**
+     * Setup ViewModel with observe to update jobs list when selecting date
+     * with calendar_view
+     */
+    private void setupViewModel() {
+        // initialize view_model
+        mViewModel = ViewModelProviders.of(this).get(CalendarViewModel.class);
+        mViewModel.getMutableJobsList().observe(this, new Observer<List<JobCalendarModel>>() {
+            @Override
+            public void onChanged(@Nullable List<JobCalendarModel> jobCalendarModelList) {
+                Log.i(TAG, "onChanged");
+                if(jobCalendarModelList != null) {
+                    // pass jobs list to adapter
+                    mJobsAdapter.setJobs(jobCalendarModelList);
+                    // check if there are jobs at the date, if so then show list
+                    // else show "No jobs" text
+                    if (jobCalendarModelList.size() > 0) {
+                        mEmptyListView.setVisibility(View.INVISIBLE);
+                    } else mEmptyListView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -156,6 +184,14 @@ public class CalendarActivity extends AppCompatActivity
             case R.id.mi_debug:
                 mViewModel.debugPrint();
                 break;
+            case R.id.mi_insert_dummmy_categories:
+                CategoriesRepository categoriesRepository = CategoriesRepository.getInstance(this);
+                categoriesRepository.insertCategories(DummyData.getDummyCategories());
+                break;
+            case R.id.mi_insert_dummy_jobs:
+                mViewModel.insertJobs(DummyData.getDummyJobs());
+                break;
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -176,4 +212,15 @@ public class CalendarActivity extends AppCompatActivity
             }
         });
     }
+
+    @Override
+    public void onJobClick(long jobId) {
+        Intent intent = new Intent(CalendarActivity.this, JobActivity.class);
+        intent.putExtra(JOB_ID_UPDATE, jobId);
+        startActivity(intent);
+    }
+
+    //TODO: 1 - add time to each list item
+    //TODO: 2 - decide on if to show profit in each list item - if so then maybe add dollar icon
+
 }

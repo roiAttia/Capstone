@@ -64,7 +64,15 @@ public class JobEntry {
     }
 
     @Ignore
-    public JobEntry() {
+    public JobEntry(long i, String jobDescription, LocalDate jobDate, LocalDate dateOfPayment,
+                    double income, double expenses, double profit) {
+        mCategoryId = i;
+        mJobDescription = jobDescription;
+        mJobDate = jobDate;
+        mJobDateOfPayment = dateOfPayment;
+        mJobIncome = income;
+        mJobExpenses = expenses;
+        mJobProfits = profit;
     }
 
     public LocalDate getJobDate() {

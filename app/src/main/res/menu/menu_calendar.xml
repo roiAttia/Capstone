@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/mi_finances"
@@ -19,4 +20,12 @@
     <item
         android:id="@+id/mi_debug"
         android:title="Debug print" />
+    <item
+        android:id="@+id/mi_insert_dummmy_categories"
+        android:title="Insert dummy categories"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/mi_insert_dummy_jobs"
+        android:title="Insert dummy jobs"
+        app:showAsAction="never" />
 </menu>

@@ -52,7 +52,7 @@ public class JobRepository {
 
 
     /**
-     * The interface that receives onClick messages.
+     * The interface that receives onJobClick messages.
      */
     public interface DataInsertHandler {
         void onCategoryInserted(long categoryId);

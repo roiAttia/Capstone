@@ -15,14 +15,17 @@ import roiattia.com.capstone.database.entry.CategoryEntry;
 @Dao
 public interface CategoryDao {
 
+    @Insert
+    long insertCategory(CategoryEntry categoryEntry);
+
+    @Insert
+    void insertCategories(List<CategoryEntry> categoryEntries);
+
     @Query("SELECT * FROM category WHERE category_type=:type ORDER BY category_name")
     LiveData<List<CategoryEntry>> loadCategories(CategoryEntry.Type type);
 
     @Query("SELECT * FROM category")
     List<CategoryEntry> debugLoadCategories();
-
-    @Insert
-    long insertCategory(CategoryEntry categoryEntry);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateCategory(CategoryEntry categoryEntry);
@@ -32,4 +35,6 @@ public interface CategoryDao {
 
     @Query("SELECT category_name FROM category WHERE category_id=:categoryId")
     String getCategoryName(long categoryId);
+
+
 }

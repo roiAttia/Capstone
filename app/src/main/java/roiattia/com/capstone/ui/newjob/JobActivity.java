@@ -50,6 +50,9 @@ import roiattia.com.capstone.utils.AmountUtils;
 import roiattia.com.capstone.utils.InjectorUtils;
 
 import static roiattia.com.capstone.ui.newexpense.ExpenseActivity.EXPENSE_FOR_RESULT;
+import static roiattia.com.capstone.utils.Constants.JOB_DATE;
+import static roiattia.com.capstone.utils.Constants.JOB_ID_UPDATE;
+import static roiattia.com.capstone.utils.Constants.JOB_PAYMENT_DATE;
 
 public class JobActivity extends AppCompatActivity
     implements JobRepository.DataInsertHandler {
@@ -57,9 +60,6 @@ public class JobActivity extends AppCompatActivity
     public static final String TAG = JobActivity.class.getSimpleName();
 
     static final int EXPENSE_ID_REQUEST = 1;  // Request code
-    public static final String JOB_DATE = "job_date";
-    public static final String JOB_PAYMENT_DATE = "job_payment_date";
-    public static final String JOB_ID_UPDATE = "job_id_update";
     private static final long DEFAULT_JOB_ID = -1;
     private long mJobId = DEFAULT_JOB_ID;
 
@@ -102,8 +102,8 @@ public class JobActivity extends AppCompatActivity
         Intent intent = getIntent();
         if(intent != null){
             // check for date
-            if(intent.hasExtra(CalendarActivity.DATE)) {
-                String dateAsString = intent.getStringExtra(CalendarActivity.DATE);
+            if(intent.hasExtra(JOB_DATE)) {
+                String dateAsString = intent.getStringExtra(JOB_DATE);
                 LocalDate localDate = new LocalDate(dateAsString);
                 mJobDate = localDate;
                 DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");

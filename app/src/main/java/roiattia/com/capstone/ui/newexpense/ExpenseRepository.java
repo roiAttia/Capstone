@@ -45,7 +45,7 @@ public class ExpenseRepository {
     }
 
     /**
-     * The interface that receives onClick messages.
+     * The interface that receives onJobClick messages.
      */
     public interface GetIdHandler {
         void onCategoryInserted(Long categoryId);

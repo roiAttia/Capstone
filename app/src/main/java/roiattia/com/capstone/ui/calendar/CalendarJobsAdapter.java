@@ -31,7 +31,7 @@ public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapte
     }
 
     public interface OnJobClickHandler{
-        void onClick(long jobId);
+        void onJobClick(long jobId);
     }
 
     @NonNull
@@ -80,7 +80,7 @@ public class CalendarJobsAdapter extends RecyclerView.Adapter<CalendarJobsAdapte
 
         @Override
         public void onClick(View v) {
-            mOnJobClickHandler.onClick(mJobEntries.get(getAdapterPosition()).getJobId());
+            mOnJobClickHandler.onJobClick(mJobEntries.get(getAdapterPosition()).getJobId());
         }
     }
 
