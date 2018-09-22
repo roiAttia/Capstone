@@ -2,8 +2,10 @@ package roiattia.com.capstone.database;
 
 import android.arch.persistence.room.TypeConverter;
 
-import static roiattia.com.capstone.database.CategoryEntry.Type.EXPENSE;
-import static roiattia.com.capstone.database.CategoryEntry.Type.JOB;
+import roiattia.com.capstone.database.entry.CategoryEntry;
+
+import static roiattia.com.capstone.database.entry.CategoryEntry.Type.EXPENSE;
+import static roiattia.com.capstone.database.entry.CategoryEntry.Type.JOB;
 
 public class CategoryTypeConverter {
     @TypeConverter
@@ -13,7 +15,7 @@ public class CategoryTypeConverter {
         } else if (type == EXPENSE.getCode()) {
             return EXPENSE;
         } else {
-            throw new IllegalArgumentException("Could not recognize status");
+            throw new IllegalArgumentException("Could not recognize category");
         }
     }
 

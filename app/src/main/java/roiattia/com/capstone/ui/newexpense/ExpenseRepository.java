@@ -5,15 +5,13 @@ import android.util.Log;
 
 import java.util.List;
 
-import roiattia.com.capstone.database.CategoryDao;
-import roiattia.com.capstone.database.CategoryEntry;
-import roiattia.com.capstone.database.ExpenseDao;
-import roiattia.com.capstone.database.ExpenseEntry;
-import roiattia.com.capstone.database.JobDao;
-import roiattia.com.capstone.database.PaymentDao;
-import roiattia.com.capstone.database.PaymentEntry;
-import roiattia.com.capstone.ui.newjob.JobRepository;
-import roiattia.com.capstone.utils.AppExecutors;
+import roiattia.com.capstone.database.dao.CategoryDao;
+import roiattia.com.capstone.database.entry.CategoryEntry;
+import roiattia.com.capstone.database.dao.ExpenseDao;
+import roiattia.com.capstone.database.entry.ExpenseEntry;
+import roiattia.com.capstone.database.dao.PaymentDao;
+import roiattia.com.capstone.database.entry.PaymentEntry;
+import roiattia.com.capstone.database.AppExecutors;
 
 public class ExpenseRepository {
     private static final String TAG = ExpenseRepository.class.getSimpleName();
@@ -51,7 +49,7 @@ public class ExpenseRepository {
      */
     public interface GetIdHandler {
         void onCategoryInserted(Long categoryId);
-        void onExpensesInserted(long[] expensesId);
+//        void onExpensesInserted(long[] expensesId);
         void onExpenseInserted(long expenseId);
     }
 
@@ -88,17 +86,17 @@ public class ExpenseRepository {
         });
     }
 
-    public void insertExpenses(final List<ExpenseEntry> expenseEntries) {
-        mExecutors.diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                long[] expensesIds = mExpenseDao.insertExpenses(expenseEntries);
-                mGetIdCallback.onExpensesInserted(expensesIds);
-                for(Long id : expensesIds)
-                    Log.i(TAG, String.valueOf(id));
-            }
-        });
-    }
+//    public void insertExpenses(final List<ExpenseEntry> expenseEntries) {
+//        mExecutors.diskIO().execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                long[] expensesIds = mExpenseDao.insertExpenses(expenseEntries);
+//                mGetIdCallback.onExpensesInserted(expensesIds);
+//                for(Long id : expensesIds)
+//                    Log.i(TAG, String.valueOf(id));
+//            }
+//        });
+//    }
 
     public void insertExpense(final ExpenseEntry expenseEntrie) {
         mExecutors.diskIO().execute(new Runnable() {

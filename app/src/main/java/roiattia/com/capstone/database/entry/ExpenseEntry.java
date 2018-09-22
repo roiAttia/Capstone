@@ -1,4 +1,4 @@
-package roiattia.com.capstone.database;
+package roiattia.com.capstone.database.entry;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
@@ -6,7 +6,6 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.Nullable;
 
 import org.joda.time.LocalDate;
 
@@ -29,22 +28,20 @@ public class ExpenseEntry {
     private double mExpenseCost;
     @ColumnInfo(name = "number_of_payments")
     private int numberOfPayments;
-    @ColumnInfo(name = "expense_payment_date")
-    private LocalDate mExpensePaymentDate;
+    @ColumnInfo(name = "expense_monthly_cost")
+    private double mMonthlyCost;
+    @ColumnInfo(name = "expense_first_payment_date")
+    private LocalDate mExpenseFirstPayment;
+    @ColumnInfo(name = "expense_last_payment_date")
+    private LocalDate mExpenseLastPayment;
 
     @Ignore
-    public ExpenseEntry(double expenseCost, int numberOfPayments, LocalDate expensePaymentDate) {
-        this.mExpenseCost = expenseCost;
-        this.numberOfPayments = numberOfPayments;
-        this.mExpensePaymentDate = expensePaymentDate;
-    }
-
-    @Ignore
-    public ExpenseEntry(Long categoryId, double expenseCost, int numberOfPayments, LocalDate expensePaymentDate) {
+    public ExpenseEntry(Long categoryId, double expenseCost, int numberOfPayments,
+                        LocalDate expensePaymentDate) {
         this.mCategoryId = categoryId;
         this.mExpenseCost = expenseCost;
         this.numberOfPayments = numberOfPayments;
-        this.mExpensePaymentDate = expensePaymentDate;
+        this.mExpenseFirstPayment = expensePaymentDate;
     }
 
     @Ignore
@@ -54,21 +51,33 @@ public class ExpenseEntry {
         this.mCategoryId = categoryId;
         this.mExpenseCost = expenseCost;
         this.numberOfPayments = numberOfPayments;
-        this.mExpensePaymentDate = expensePaymentDate;
+        this.mExpenseFirstPayment = expensePaymentDate;
     }
 
     @Ignore
-    public ExpenseEntry(){}
-
-    public ExpenseEntry(Long expenseId, Long jobId, Long categoryId, double expenseCost,
-                        int numberOfPayments, LocalDate expensePaymentDate) {
-        this.mExpenseId = expenseId;
-        this.mJobId = jobId;
-        this.mCategoryId = categoryId;
-        this.mExpenseCost = expenseCost;
+    public ExpenseEntry(Long categoryId, double cost, int numberOfPayments, double monthlyCost,
+                        LocalDate expenseFirstPayment, LocalDate expenseLastPayment) {
+        mCategoryId = categoryId;
+        mExpenseCost = cost;
         this.numberOfPayments = numberOfPayments;
-        this.mExpensePaymentDate = expensePaymentDate;
+        mMonthlyCost = monthlyCost;
+        mExpenseFirstPayment = expenseFirstPayment;
+        mExpenseLastPayment = expenseLastPayment;
     }
+
+    public ExpenseEntry(Long expenseId, Long jobId, Long categoryId, double expenseCost, int numberOfPayments,
+                        double monthlyCost, LocalDate expenseFirstPayment, LocalDate expenseLastPayment) {
+        mExpenseId = expenseId;
+        mJobId = jobId;
+        mCategoryId = categoryId;
+        mExpenseCost = expenseCost;
+        this.numberOfPayments = numberOfPayments;
+        mMonthlyCost = monthlyCost;
+        mExpenseFirstPayment = expenseFirstPayment;
+        mExpenseLastPayment = expenseLastPayment;
+    }
+
+
 
     public Long getExpenseId() {
         return mExpenseId;
@@ -94,8 +103,8 @@ public class ExpenseEntry {
         return numberOfPayments;
     }
 
-    public LocalDate getExpensePaymentDate() {
-        return mExpensePaymentDate;
+    public LocalDate getExpenseFirstPayment() {
+        return mExpenseFirstPayment;
     }
 
     public double getExpenseCost() {
@@ -114,14 +123,34 @@ public class ExpenseEntry {
         this.numberOfPayments = numberOfPayments;
     }
 
-    public void setExpensePaymentDate(LocalDate expensePaymentDate) {
-        mExpensePaymentDate = expensePaymentDate;
+    public void setExpenseFirstPayment(LocalDate expenseFirstPayment) {
+        mExpenseFirstPayment = expenseFirstPayment;
+    }
+
+    public double getMonthlyCost() {
+        return mMonthlyCost;
+    }
+
+    public void setMonthlyCost(double monthlyCost) {
+        mMonthlyCost = monthlyCost;
+    }
+
+    public LocalDate getExpenseLastPayment() {
+        return mExpenseLastPayment;
+    }
+
+    public void setExpenseLastPayment(LocalDate expenseLastPayment) {
+        mExpenseLastPayment = expenseLastPayment;
     }
 
     @Override
     public String toString() {
-        return "**EXPENSE ENTRY** Expense mExpenseId: " + mExpenseId +"Job mExpenseId: " + mJobId + ", Category mExpenseId: " + mCategoryId +
-                ", Cost: " + mExpenseCost + ", number of payments: " + numberOfPayments +
-                ", payment day: " + mExpensePaymentDate;
+        return "**EXPENSE ENTRY** mExpenseId: " + mExpenseId +
+                ", mJobId: " + mJobId + ", mCategoryId: " + mCategoryId +
+                ", mExpenseCost: " + mExpenseCost + ", numberOfPayments: " + numberOfPayments +
+                ", mExpenseFirstPayment: " + mExpenseFirstPayment +
+                ", mExpenseLastPayment" + mExpenseLastPayment;
     }
+
+    //TODO: add description for expense
 }

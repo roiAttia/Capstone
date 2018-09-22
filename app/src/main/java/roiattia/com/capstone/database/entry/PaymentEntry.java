@@ -1,4 +1,4 @@
-package roiattia.com.capstone.database;
+package roiattia.com.capstone.database.entry;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
@@ -14,7 +14,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 @Entity(tableName = "payment",
         foreignKeys = {
                 @ForeignKey(entity = ExpenseEntry.class, parentColumns = "expense_id",
-                        childColumns = "expense_id", onDelete = CASCADE)},
+                        childColumns = "expense_id", onDelete = CASCADE, onUpdate = CASCADE)},
         indices = {@Index("payment_id"), @Index("expense_id")})
 public class PaymentEntry {
 

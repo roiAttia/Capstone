@@ -6,16 +6,14 @@ import android.support.annotation.NonNull;
 
 import org.joda.time.LocalDate;
 
-public class CategoryDetailsViewModelFactory extends ViewModelProvider.NewInstanceFactory {
+public class ExpensesListViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
-    private long mCategoryId;
     private LocalDate mStartDate;
     private LocalDate mEndDate;
-    private CategoryDetailsRepository mRepository;
+    private ExpensesListRepository mRepository;
 
-    public CategoryDetailsViewModelFactory(long categoryId, LocalDate startDate, LocalDate endDate,
-                                           CategoryDetailsRepository repository) {
-        mCategoryId = categoryId;
+    public ExpensesListViewModelFactory(LocalDate startDate, LocalDate endDate,
+                                        ExpensesListRepository repository) {
         mStartDate = startDate;
         mEndDate = endDate;
         mRepository = repository;
@@ -24,6 +22,6 @@ public class CategoryDetailsViewModelFactory extends ViewModelProvider.NewInstan
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        return (T) new CategoryDetailsViewModel(mRepository, mCategoryId, mStartDate, mEndDate);
+        return (T) new ExpensesListViewModel(mRepository,mStartDate, mEndDate);
     }
 }

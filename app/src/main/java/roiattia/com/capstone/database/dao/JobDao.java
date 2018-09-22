@@ -1,4 +1,4 @@
-package roiattia.com.capstone.database;
+package roiattia.com.capstone.database.dao;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
@@ -12,6 +12,8 @@ import org.joda.time.LocalDate;
 
 import java.util.List;
 
+import roiattia.com.capstone.database.entry.CategoryEntry;
+import roiattia.com.capstone.database.entry.JobEntry;
 import roiattia.com.capstone.model.OverallIncomeModel;
 import roiattia.com.capstone.model.IncomeModel;
 import roiattia.com.capstone.model.JobCalendarModel;

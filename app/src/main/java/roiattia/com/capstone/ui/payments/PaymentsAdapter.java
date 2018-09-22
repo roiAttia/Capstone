@@ -24,7 +24,7 @@ public class PaymentsAdapter extends RecyclerView
     private Context mContext;
     private List<PaymentItemModel> mPaymentsList;
 
-    public PaymentsAdapter(Context context){
+    PaymentsAdapter(Context context){
         mContext = context;
     }
 
@@ -54,6 +54,8 @@ public class PaymentsAdapter extends RecyclerView
             holder.mPaymentNumber.setText(String.format(Locale.getDefault(), "%s%d/%d",
                     mContext.getString(R.string.payment_number),
                     payment.getPaymentNumber(), payment.getTotalPayments()));
+        } else {
+            holder.mPaymentNumber.setVisibility(View.GONE);
         }
     }
 

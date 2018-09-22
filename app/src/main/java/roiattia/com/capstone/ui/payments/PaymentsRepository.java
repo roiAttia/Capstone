@@ -6,11 +6,8 @@ import org.joda.time.LocalDate;
 
 import java.util.List;
 
-import roiattia.com.capstone.database.ExpenseDao;
-import roiattia.com.capstone.database.ExpenseEntry;
-import roiattia.com.capstone.database.PaymentDao;
+import roiattia.com.capstone.database.dao.PaymentDao;
 import roiattia.com.capstone.model.PaymentItemModel;
-import roiattia.com.capstone.utils.AppExecutors;
 
 public class PaymentsRepository {
 

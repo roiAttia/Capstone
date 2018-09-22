@@ -1,7 +1,5 @@
 package roiattia.com.capstone.ui.finances;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,16 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.joda.time.LocalDate;
-
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
-import roiattia.com.capstone.database.CategoryEntry;
 import roiattia.com.capstone.model.IncomeModel;
-import roiattia.com.capstone.utils.InjectorUtils;
 
 public class IncomeFragment extends BaseFinancialFragment{
 
@@ -33,6 +27,12 @@ public class IncomeFragment extends BaseFinancialFragment{
     @BindView(R.id.rv_income) RecyclerView mIncomeListView;
 
     public IncomeFragment(){}
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.i(TAG, "onCreate");
+    }
 
     @Nullable
     @Override

@@ -40,6 +40,12 @@ public class OverallFragment extends BaseFinancialFragment {
     @BindView(R.id.tv_expected_profits)TextView mExpectedProfitsView;
     @BindView(R.id.btn_select_period)Button mSelectPeriodButton;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.i(TAG, "onCreate");
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,

@@ -2,6 +2,7 @@ package roiattia.com.capstone.ui.newjob;
 
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 public class JobViewModelFactory extends ViewModelProvider.NewInstanceFactory {
@@ -9,10 +10,8 @@ public class JobViewModelFactory extends ViewModelProvider.NewInstanceFactory {
     private JobRepository mJobRepository;
     private Long mJobId;
 
-    public JobViewModelFactory(JobRepository jobRepository, Long jobId,
-                               JobRepository.GetJobIdHandler callback) {
+    public JobViewModelFactory(JobRepository jobRepository, Long jobId) {
         mJobRepository = jobRepository;
-        mJobRepository.setCallbackListener(callback);
         mJobId = jobId;
     }
 

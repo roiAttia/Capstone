@@ -5,6 +5,9 @@
         android:id="@+id/mi_finances"
         android:title="Finances" />
     <item
+        android:id="@+id/mi_expenses_list"
+        android:title="Expenses list" />
+    <item
         android:id="@+id/mi_new_expense"
         android:title="New expense" />
     <item

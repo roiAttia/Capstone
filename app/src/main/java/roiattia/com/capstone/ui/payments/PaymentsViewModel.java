@@ -7,7 +7,6 @@ import org.joda.time.LocalDate;
 
 import java.util.List;
 
-import roiattia.com.capstone.database.ExpenseEntry;
 import roiattia.com.capstone.model.PaymentItemModel;
 
 public class PaymentsViewModel extends ViewModel {
@@ -16,7 +15,7 @@ public class PaymentsViewModel extends ViewModel {
     private PaymentsRepository mRepository;
 
     PaymentsViewModel(PaymentsRepository repository,
-                      long categoryId, LocalDate startDate, LocalDate endDate) {
+                      Long categoryId, LocalDate startDate, LocalDate endDate) {
         mRepository = repository;
         mPaymentsDetails = mRepository.loadPaymentsByCategoryIdAndDates(
                 categoryId, startDate, endDate);

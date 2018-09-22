@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/tv_payment_date"
+        android:id="@+id/tv_first_payment_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -14,12 +14,12 @@
         android:layout_marginTop="16dp"
         android:text="TextView"
         android:textColor="@android:color/black"
-        android:textSize="16sp"
+        android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@+id/btn_edit"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Payment date: 10/09/2018" />
+        tools:text="First payment: 10/09/2018" />
 
     <TextView
         android:id="@+id/tv_cost"
@@ -28,10 +28,10 @@
         android:layout_marginTop="8dp"
         android:text="TextView"
         android:textColor="@android:color/black"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="@+id/tv_payment_date"
-        app:layout_constraintTop_toBottomOf="@+id/tv_payment_date"
-        tools:text="Cost: 150" />
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@+id/tv_last_payment"
+        app:layout_constraintTop_toBottomOf="@+id/tv_last_payment"
+        tools:text="Total Cost: 150" />
 
     <ImageButton
         android:id="@+id/btn_delete"
@@ -39,20 +39,19 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:background="@android:color/transparent"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_cost"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tv_payment_date"
+        app:layout_constraintTop_toTopOf="@+id/tv_first_payment_date"
         app:srcCompat="@drawable/ic_delete" />
 
     <View
         android:id="@+id/divider3"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:background="?android:attr/listDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_cost" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_expense_number_of_payments" />
 
     <ImageButton
         android:id="@+id/btn_edit"
@@ -64,4 +63,28 @@
         app:layout_constraintEnd_toStartOf="@+id/btn_delete"
         app:layout_constraintTop_toTopOf="@+id/btn_delete"
         app:srcCompat="@drawable/ic_edit" />
+
+    <TextView
+        android:id="@+id/tv_expense_number_of_payments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_cost"
+        app:layout_constraintEnd_toEndOf="@+id/btn_delete"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/tv_cost"
+        tools:text="12 payments of 250 each" />
+
+    <TextView
+        android:id="@+id/tv_last_payment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@+id/tv_first_payment_date"
+        app:layout_constraintTop_toBottomOf="@+id/tv_first_payment_date"
+        tools:text="Last payment: 10/09/2019" />
 </android.support.constraint.ConstraintLayout>

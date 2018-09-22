@@ -7,17 +7,17 @@ import org.joda.time.LocalDate;
 
 import java.util.List;
 
-import roiattia.com.capstone.database.CategoryDao;
-import roiattia.com.capstone.database.CategoryEntry;
-import roiattia.com.capstone.database.ExpenseDao;
-import roiattia.com.capstone.database.ExpenseEntry;
-import roiattia.com.capstone.database.JobDao;
-import roiattia.com.capstone.database.JobEntry;
-import roiattia.com.capstone.database.PaymentDao;
-import roiattia.com.capstone.database.PaymentEntry;
+import roiattia.com.capstone.database.AppDatabase;
+import roiattia.com.capstone.database.dao.CategoryDao;
+import roiattia.com.capstone.database.entry.CategoryEntry;
+import roiattia.com.capstone.database.dao.ExpenseDao;
+import roiattia.com.capstone.database.entry.ExpenseEntry;
+import roiattia.com.capstone.database.dao.JobDao;
+import roiattia.com.capstone.database.entry.JobEntry;
+import roiattia.com.capstone.database.dao.PaymentDao;
+import roiattia.com.capstone.database.entry.PaymentEntry;
 import roiattia.com.capstone.model.JobCalendarModel;
-import roiattia.com.capstone.ui.newjob.JobRepository;
-import roiattia.com.capstone.utils.AppExecutors;
+import roiattia.com.capstone.database.AppExecutors;
 
 public class CalendarRepository {
     private static final String TAG = CalendarRepository.class.getSimpleName();

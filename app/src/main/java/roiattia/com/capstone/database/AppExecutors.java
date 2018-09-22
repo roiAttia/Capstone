@@ -1,4 +1,4 @@
-package roiattia.com.capstone.utils;
+package roiattia.com.capstone.database;
 
 import android.os.Handler;
 import android.os.Looper;

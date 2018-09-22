@@ -29,6 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.model.JobCalendarModel;
+import roiattia.com.capstone.ui.expenses_list.ExpensesListActivity;
 import roiattia.com.capstone.ui.finances.FinancesActivity;
 import roiattia.com.capstone.ui.finances.FinancesViewModel;
 import roiattia.com.capstone.ui.newexpense.ExpenseActivity;
@@ -135,6 +136,10 @@ public class CalendarActivity extends AppCompatActivity
 //                } else {
 //                    Log.d(TAG, "The interstitial wasn't loaded yet.");
 //                }
+                break;
+            case R.id.mi_expenses_list:
+                intent = new Intent(this, ExpensesListActivity.class);
+                startActivity(intent);
                 break;
             case R.id.mi_new_expense:
                 intent = new Intent(this, ExpenseActivity.class);

@@ -18,7 +18,7 @@ import org.joda.time.LocalDate;
 import java.util.List;
 
 import roiattia.com.capstone.R;
-import roiattia.com.capstone.database.CategoryEntry;
+import roiattia.com.capstone.database.entry.CategoryEntry;
 import roiattia.com.capstone.model.ExpensesModel;
 import roiattia.com.capstone.model.OverallExpensesModel;
 import roiattia.com.capstone.model.OverallIncomeModel;

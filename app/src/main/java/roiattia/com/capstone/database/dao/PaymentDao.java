@@ -1,4 +1,4 @@
-package roiattia.com.capstone.database;
+package roiattia.com.capstone.database.dao;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
@@ -9,6 +9,7 @@ import org.joda.time.LocalDate;
 
 import java.util.List;
 
+import roiattia.com.capstone.database.entry.PaymentEntry;
 import roiattia.com.capstone.model.PaymentItemModel;
 
 @Dao

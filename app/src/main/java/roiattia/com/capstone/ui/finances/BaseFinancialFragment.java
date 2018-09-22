@@ -3,14 +3,6 @@ package roiattia.com.capstone.ui.finances;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import roiattia.com.capstone.R;
-import roiattia.com.capstone.database.CategoryEntry;
 
 public class BaseFinancialFragment extends Fragment {
 

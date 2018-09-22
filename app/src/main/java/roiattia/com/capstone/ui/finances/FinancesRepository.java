@@ -6,15 +6,15 @@ import org.joda.time.LocalDate;
 
 import java.util.List;
 
-import roiattia.com.capstone.database.CategoryEntry;
-import roiattia.com.capstone.database.ExpenseDao;
-import roiattia.com.capstone.database.ExpenseEntry;
-import roiattia.com.capstone.database.JobDao;
+import roiattia.com.capstone.database.entry.CategoryEntry;
+import roiattia.com.capstone.database.dao.ExpenseDao;
+import roiattia.com.capstone.database.entry.ExpenseEntry;
+import roiattia.com.capstone.database.dao.JobDao;
 import roiattia.com.capstone.model.ExpensesModel;
 import roiattia.com.capstone.model.OverallExpensesModel;
 import roiattia.com.capstone.model.OverallIncomeModel;
 import roiattia.com.capstone.model.IncomeModel;
-import roiattia.com.capstone.utils.AppExecutors;
+import roiattia.com.capstone.database.AppExecutors;
 
 public class FinancesRepository {
     private static final String TAG = FinancesRepository.class.getSimpleName();

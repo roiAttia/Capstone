@@ -11,7 +11,7 @@ import org.joda.time.LocalDate;
 
 import roiattia.com.capstone.database.AppDatabase;
 import roiattia.com.capstone.model.OverallIncomeModel;
-import roiattia.com.capstone.utils.AppExecutors;
+import roiattia.com.capstone.database.AppExecutors;
 import roiattia.com.capstone.utils.DateUtils;
 
 public  class FinancesReportService extends IntentService {

@@ -4,8 +4,7 @@ import android.content.Context;
 
 import org.joda.time.LocalDate;
 
-import roiattia.com.capstone.database.CategoryEntry;
-import roiattia.com.capstone.database.JobEntry;
+import roiattia.com.capstone.database.entry.CategoryEntry;
 
 public class DummyData {
 

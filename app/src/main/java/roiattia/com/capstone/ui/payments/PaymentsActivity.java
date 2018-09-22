@@ -27,20 +27,18 @@ public class PaymentsActivity extends AppCompatActivity {
 
     private final String TAG = PaymentsActivity.class.getSimpleName();
 
-    private PaymentsViewModel mViewModel;
-    private PaymentsAdapter mPaymentsAdapter;
-
     @BindView(R.id.tv_header) TextView mCategoryHeader;
     @BindView(R.id.rv_job_list) RecyclerView mDetailsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_category_details);
+        setContentView(R.layout.activity_payments_details);
         ButterKnife.bind(this);
 
-        mPaymentsAdapter = new PaymentsAdapter(this);
-        mDetailsList.setAdapter(mPaymentsAdapter);
+        // setup recycler_view and adapter
+        final PaymentsAdapter paymentsAdapter = new PaymentsAdapter(this);
+        mDetailsList.setAdapter(paymentsAdapter);
         mDetailsList.setLayoutManager(new LinearLayoutManager(this));
         mDetailsList.setHasFixedSize(true);
 
@@ -65,12 +63,12 @@ public class PaymentsActivity extends AppCompatActivity {
             // setup factory and view model
             PaymentsViewModelFactory factory = InjectorUtils
                     .provideCategoryDetailsViewModelFactory(this, categoryId, startDate, endDate);
-            mViewModel = ViewModelProviders.of(this, factory).get(PaymentsViewModel.class);
+            PaymentsViewModel viewModel = ViewModelProviders.of(this, factory).get(PaymentsViewModel.class);
             // observe on payments
-            mViewModel.getPaymentsDetails().observe(this, new Observer<List<PaymentItemModel>>() {
+            viewModel.getPaymentsDetails().observe(this, new Observer<List<PaymentItemModel>>() {
                 @Override
                 public void onChanged(List<PaymentItemModel> paymentsList) {
-                    mPaymentsAdapter.setData(paymentsList);
+                    paymentsAdapter.setData(paymentsList);
                     for(PaymentItemModel paymentItemModel : paymentsList){
                         Log.i(TAG, paymentItemModel.toString());
                     }
@@ -78,5 +76,4 @@ public class PaymentsActivity extends AppCompatActivity {
             });
         }
     }
-
 }

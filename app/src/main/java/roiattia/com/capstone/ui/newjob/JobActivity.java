@@ -15,13 +15,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
@@ -33,22 +36,27 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import iammert.com.expandablelib.ExpandCollapseListener;
+import iammert.com.expandablelib.ExpandableLayout;
+import iammert.com.expandablelib.Section;
 import roiattia.com.capstone.R;
-import roiattia.com.capstone.database.CategoryEntry;
-import roiattia.com.capstone.database.ExpenseEntry;
-import roiattia.com.capstone.database.JobEntry;
+import roiattia.com.capstone.database.entry.CategoryEntry;
+import roiattia.com.capstone.database.entry.ExpenseEntry;
+import roiattia.com.capstone.database.entry.JobEntry;
+import roiattia.com.capstone.model.ExpandableListParent;
 import roiattia.com.capstone.ui.calendar.CalendarActivity;
 import roiattia.com.capstone.ui.newexpense.ExpenseActivity;
+import roiattia.com.capstone.utils.AmountUtils;
 import roiattia.com.capstone.utils.InjectorUtils;
 
 import static roiattia.com.capstone.ui.newexpense.ExpenseActivity.EXPENSE_FOR_RESULT;
 
 public class JobActivity extends AppCompatActivity
-    implements JobRepository.GetJobIdHandler{
+    implements JobRepository.DataInsertHandler {
 
     public static final String TAG = JobActivity.class.getSimpleName();
 
-    static final int EXPENSE_ID_REQUEST = 1;  // The request code
+    static final int EXPENSE_ID_REQUEST = 1;  // Request code
     public static final String JOB_DATE = "job_date";
     public static final String JOB_PAYMENT_DATE = "job_payment_date";
     public static final String JOB_ID_UPDATE = "job_id_update";
@@ -65,20 +73,22 @@ public class JobActivity extends AppCompatActivity
     private long mCategoryId;
     private String mDescription;
     private List<CategoryEntry> mCategories;
+    private Section<ExpandableListParent, ExpenseEntry> mSection;
+    ExpandableListParent mParent;
 
     @BindView(R.id.et_date) EditText mJobDateView;
     @BindView(R.id.et_date_of_payment)EditText mJobPaymentDateView;
-    @BindView(R.id.et_fee)EditText mFeeView;
+    @BindView(R.id.et_fee)EditText mIncomeView;
     @BindView(R.id.et_category)EditText mJobCategoryView;
     @BindView(R.id.et_job_description)EditText mJobDescriptionView;
     @BindView(R.id.spinner_job_category) Spinner mCategorySpinner;
-    @BindView(R.id.tv_expenses) TextView mExpensesView;
-    @BindView(R.id.tv_profit) TextView mProfitView;
-    @BindView(R.id.tv_income) TextView mJobIncomeView;
-    @BindView(R.id.ll_expense_list_view) LinearLayout mExpensesListView;
+    @BindView(R.id.tv_summary_expenses) TextView mSummaryExpensesView;
+    @BindView(R.id.tv_summary_profit) TextView mSummaryProfitView;
+    @BindView(R.id.tv_summary_income) TextView mSummaryIncomeView;
     @BindView(R.id.rb_existed_category) RadioButton mExistedCategoryButton;
     @BindView(R.id.rb_new_category) RadioButton mNewCategoryButton;
     @BindView(R.id.cardview_summary) CardView mSummaryCardView;
+    @BindView(R.id.el_expenses_list) ExpandableLayout mExpensesListExpandable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,9 +96,12 @@ public class JobActivity extends AppCompatActivity
         setContentView(R.layout.activity_job);
         ButterKnife.bind(this);
 
-        // get date selected for job from calendar activity
+        mSection = new Section<>();
+
+        // check for data passed: date or job_id for update
         Intent intent = getIntent();
         if(intent != null){
+            // check for date
             if(intent.hasExtra(CalendarActivity.DATE)) {
                 String dateAsString = intent.getStringExtra(CalendarActivity.DATE);
                 LocalDate localDate = new LocalDate(dateAsString);
@@ -96,44 +109,22 @@ public class JobActivity extends AppCompatActivity
                 DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
                 mJobDateView.setText(fmt.print(localDate));
             }
+            // check for job_id for update
             if(intent.hasExtra(JOB_ID_UPDATE)){
                 mJobId = intent.getLongExtra(JOB_ID_UPDATE, DEFAULT_JOB_ID);
             }
         }
 
-        // setup view_model
-        JobViewModelFactory factory = InjectorUtils
-                .provideNewJobViewModelFactory(this, mJobId, this);
-        mViewModel = ViewModelProviders.of(this, factory)
-                .get(JobViewModel.class);
-        // if it's an update then load expense_entry by it's id and call for
-        // update ui with it's details
-        if(mJobId != DEFAULT_JOB_ID){
-            mViewModel.getJob().observe(this, new Observer<JobEntry>() {
-                @Override
-                public void onChanged(@Nullable JobEntry jobEntry) {
-                    mViewModel.getJob().removeObserver(this);
-                    if(jobEntry != null) {
-                        updateUiWithJobDetails(jobEntry);
-                    } else Log.i(TAG, "jobEntry is null");
-                }
-            });
-        }
+        setupViewModel();
 
-        mViewModel.getJobCategories().observe(this, new Observer<List<CategoryEntry>>() {
-            @Override
-            public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
-                if(categoryEntries != null) {
-                    mCategories = categoryEntries;
-                    setupSpinner(categoryEntries);
-                    for (CategoryEntry categoryEntry : categoryEntries) {
-                        Log.i(TAG, categoryEntry.toString());
-                    }
-                }
-            }
-        });
-        mViewModel.debugPrint();
+        loadCategories();
 
+        setupUI();
+
+        setupExpandableList();
+    }
+
+    private void setupUI() {
         mCategorySpinner.setEnabled(false);
         mJobCategoryView.setEnabled(false);
 
@@ -154,7 +145,7 @@ public class JobActivity extends AppCompatActivity
         });
 
         // setup fee change listener
-        mFeeView.addTextChangedListener(new TextWatcher() {
+        mIncomeView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override
@@ -163,7 +154,7 @@ public class JobActivity extends AppCompatActivity
             @Override
             public void afterTextChanged(Editable s) {
                 if(!s.toString().equals("")) {
-                    mJobIncome = Integer.parseInt(s.toString());
+                    mJobIncome = AmountUtils.getDoubleFormatFromString(s.toString());
                     updateSummaryCard();
                 }
             }
@@ -191,6 +182,38 @@ public class JobActivity extends AppCompatActivity
         });
     }
 
+    private void loadCategories() {
+        mViewModel.getJobCategories().observe(this, new Observer<List<CategoryEntry>>() {
+            @Override
+            public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
+                if(categoryEntries != null) {
+                    mCategories = categoryEntries;
+                    setupSpinner(categoryEntries);
+                }
+            }
+        });
+        mViewModel.debugPrint();
+    }
+
+    private void setupViewModel() {
+        JobViewModelFactory factory = InjectorUtils
+                .provideNewJobViewModelFactory(this, mJobId, this);
+        mViewModel = ViewModelProviders.of(this, factory).get(JobViewModel.class);
+        // if it's an update then load expense_entry by it's id and call for
+        // update ui with it's details
+        if(mJobId != DEFAULT_JOB_ID){
+            mViewModel.getJob().observe(this, new Observer<JobEntry>() {
+                @Override
+                public void onChanged(@Nullable JobEntry jobEntry) {
+                    mViewModel.getJob().removeObserver(this);
+                    if(jobEntry != null) {
+                        updateUiWithJobDetails(jobEntry);
+                    } else Log.i(TAG, "jobEntry is null");
+                }
+            });
+        }
+    }
+
     private void setupSpinner(List<CategoryEntry> categoryEntries) {
         List<String> categoriesNames = new ArrayList<>();
         categoriesNames.add(this.getString(R.string.spinner_category_default_value));
@@ -210,7 +233,7 @@ public class JobActivity extends AppCompatActivity
         mJobProfit = jobEntry.getJobProfits();
         mJobExpense = jobEntry.getJobExpenses();
         mJobIncome = jobEntry.getJobIncome();
-        mJobIncomeView.setText(String.valueOf(mJobIncome));
+        mIncomeView.setText(mJobIncome + "");
         updateSummaryCard();
         mJobDate = jobEntry.getJobDate();
         mJobPaymentDate = jobEntry.getJobDateOfPayment();
@@ -246,15 +269,15 @@ public class JobActivity extends AppCompatActivity
         } else {
             mSummaryCardView.setCardBackgroundColor(getResources().getColor(R.color.colorPositiveGreen));
         }
-        mJobIncomeView.setText(String.format("%s", mJobIncome));
-        mExpensesView.setText(String.format("%s", mJobExpense));
-        mProfitView.setText(String.format("%s", mJobProfit));
+        mSummaryIncomeView.setText(String.format(" %s", AmountUtils.getStringFormatFromDouble(mJobIncome)));
+        mSummaryExpensesView.setText(String.format("%s", AmountUtils.getStringFormatFromDouble(mJobExpense)));
+        mSummaryProfitView.setText(String.format("%s", AmountUtils.getStringFormatFromDouble(mJobProfit)));
     }
 
     /**
      * Check input validation
      */
-    public Boolean checkInputValidation() {
+    private Boolean checkInputValidation() {
         boolean isInputValid = true;
         // check category validation
         if(!mNewCategoryButton.isChecked() && !mExistedCategoryButton.isChecked()
@@ -272,8 +295,8 @@ public class JobActivity extends AppCompatActivity
             isInputValid = false;
         }
         // check payment_date validation
-        if(mFeeView.getText().toString().trim().equals("")){
-            mFeeView.setError("Must enter a fee");
+        if(mIncomeView.getText().toString().trim().equals("")){
+            mIncomeView.setError("Must enter a fee");
             isInputValid = false;
         }
         return isInputValid;
@@ -329,38 +352,95 @@ public class JobActivity extends AppCompatActivity
         if (requestCode == EXPENSE_ID_REQUEST) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                long[] expensesId = data.getLongArrayExtra(EXPENSE_FOR_RESULT);
-                loadExpensesById(expensesId);
-                Log.i(TAG, String.valueOf(expensesId.length));
+                long expenseId = data.getLongExtra(EXPENSE_FOR_RESULT, 0);
+                loadExpensesById(expenseId);
+                Log.i(TAG, String.valueOf(expenseId));
             }
         }
     }
 
-    private void loadExpensesById(final long[] expensesId) {
-        mViewModel.loadExpensesById(expensesId).observe(this, new Observer<List<ExpenseEntry>>() {
+    private void loadExpensesById(final long expenseId) {
+//        mViewModel.clearExpenses();
+        mJobExpense = 0;
+
+//        Observer observer = new Observer<ExpenseEntry>() {
+//            @Override
+//            public void onChanged(@Nullable ExpenseEntry expenseEntry) {
+//                mViewModel.loadExpenseByIdLiveData(expenseId).removeObserver(this);
+//                Log.i(TAG, "onChanged, id: " + expenseId);
+//                mViewModel.addExpense(expenseEntry);
+//                mJobExpense += expenseEntry.getExpenseCost();
+//                updateSummaryCard();
+//                updateExpandableList();
+//            }
+//        };
+//
+//        mViewModel.loadExpenseByIdLiveData(expenseId).observe(this, observer);
+
+        mViewModel.loadExpenseByIdLiveData(expenseId).observe(this, new Observer<ExpenseEntry>() {
             @Override
-            public void onChanged(@Nullable List<ExpenseEntry> expensesList) {
-                if (expensesList != null) {
-                    updateUiWithNewExpenses(expensesList);
-                }
+            public void onChanged(@Nullable ExpenseEntry expenseEntry) {
+                mViewModel.loadExpenseByIdLiveData(expenseId).removeObserver(this);
+                mViewModel.loadExpenseByIdLiveData(expenseId).removeObservers(JobActivity.this);
+                Log.i(TAG, "onChanged, id: " + expenseId);
+                mViewModel.addExpense(expenseEntry);
+                mJobExpense += expenseEntry.getExpenseCost();
+                updateSummaryCard();
+                updateExpandableList();
             }
         });
     }
 
-    private void updateUiWithNewExpenses(List<ExpenseEntry> expensesList) {
-        double expenseCost = 0;
-        int numberOfPayments = expensesList.size();
-        LocalDate startPaymentDate = expensesList.get(0).getExpensePaymentDate();
-        for(ExpenseEntry expenseEntry : expensesList){
-            expenseCost += expenseEntry.getExpenseCost();
-            mJobExpense += expenseEntry.getExpenseCost();
-            Log.i(TAG, expenseEntry.toString());
-        }
-        TextView textView = new TextView(this);
-        textView.setText("cost: "  + expenseCost + ", payments: " + numberOfPayments);
-        mExpensesListView.addView(textView);
-        updateSummaryCard();
-        mViewModel.addExpenses(expensesList);
+    private void updateExpandableList() {
+        mSection.children.clear();
+        mSection.children.addAll(mViewModel.getExpensesList());
+        mParent = new ExpandableListParent(mJobExpense, mViewModel.getExpensesList().size());
+        mSection.parent = mParent;
+        mExpensesListExpandable.notifyParentChanged(0);
+    }
+
+    private void setupExpandableList(){
+        mExpensesListExpandable.setRenderer(new ExpandableLayout.Renderer<ExpandableListParent, ExpenseEntry>() {
+            @Override
+            public void renderParent(View view, ExpandableListParent parent, boolean b, int i) {
+                TextView expensesAmountText = view.findViewById(R.id.tv_parent_expenses);
+                TextView expensesNumberText = view.findViewById(R.id.tv_parent_number_of_expenses);
+                expensesAmountText.setText(String.format("Total expenses amount: %s",
+                        AmountUtils.getStringFormatFromDouble(parent.getExpensesAmount())));
+                expensesNumberText.setText(String.format("Number of expenses: %s",
+                        String.valueOf(parent.getNumberOfExpenses())));
+            }
+
+            @Override
+            public void renderChild(final View view, ExpenseEntry child, final int i, final int i1) {
+                TextView categoryName = view.findViewById(R.id.tv_expandalbe_child_category);
+                TextView categoryAmount = view.findViewById(R.id.tv_expandalbe_child_amount);
+                categoryAmount.setText(AmountUtils.getStringFormatFromDouble(child.getExpenseCost()));
+            }
+        });
+
+        mExpensesListExpandable.setExpandListener(new ExpandCollapseListener.ExpandListener<ExpandableListParent>() {
+            @Override
+            public void onExpanded(int parentIndex, ExpandableListParent parent, View view) {
+                //Layout expanded
+                ImageButton imageButton = view.findViewById(R.id.ib_drop_list);
+                imageButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_drop_down));
+            }
+        });
+
+        mExpensesListExpandable.setCollapseListener(new ExpandCollapseListener.CollapseListener<ExpandableListParent>() {
+            @Override
+            public void onCollapsed(int parentIndex, ExpandableListParent parent, View view) {
+                //Layout collapsed
+                ImageButton imageButton = view.findViewById(R.id.ib_drop_list);
+                imageButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_drop_up));
+            }
+        });
+
+        mSection.children.addAll(mViewModel.getExpensesList());
+        mParent = new ExpandableListParent(mJobExpense, mViewModel.getExpensesList().size());
+        mSection.parent = mParent;
+        mExpensesListExpandable.addSection(mSection);
     }
 
     @Override
@@ -377,5 +457,11 @@ public class JobActivity extends AppCompatActivity
         }
         mViewModel.updateExpenses();
         finish();
+    }
+
+    @Override
+    public void onExpenseLoaded(ExpenseEntry expenseEntry) {
+//        mViewModel.addExpense(expenseEntry);
+//        updateExpandableList();
     }
 }

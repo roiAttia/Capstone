@@ -34,8 +34,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
-import roiattia.com.capstone.database.CategoryEntry;
-import roiattia.com.capstone.database.ExpenseEntry;
+import roiattia.com.capstone.database.entry.CategoryEntry;
+import roiattia.com.capstone.database.entry.ExpenseEntry;
 import roiattia.com.capstone.utils.AmountUtils;
 import roiattia.com.capstone.utils.DateUtils;
 import roiattia.com.capstone.utils.InjectorUtils;
@@ -54,7 +54,9 @@ public class ExpenseActivity extends AppCompatActivity
 
     private double mCost;
     private int mNumberOfPayments;
-    private LocalDate mPaymentDate;
+    private double mMonthlyCost;
+    private LocalDate mFirstPaymentDate;
+    private LocalDate mLastPaymentDate;
     private List<CategoryEntry> mCategoriesList;
     private long mCategoryId;
     private Long mJobId;
@@ -143,7 +145,7 @@ public class ExpenseActivity extends AppCompatActivity
                     mCost = Double.parseDouble((mCostView.getText().toString()));
                     mNumberOfPayments = Integer.parseInt(mNumPaymentsView.getText().toString());
                     if (mNumberOfPayments > 0) {
-                        updateUiWithPayments(mPaymentDate);
+                        updateUiWithPayments(mFirstPaymentDate);
                     }
                 }
             }
@@ -192,6 +194,7 @@ public class ExpenseActivity extends AppCompatActivity
     private void updateUiWithPayments(LocalDate paymentDate) {
         mPaymentsDetailsView.setText("");
         double monthlyCost = mCost / mNumberOfPayments;
+        mMonthlyCost = monthlyCost;
         for(int i = 0; i<mNumberOfPayments; i++){
             mPaymentsDetailsView.append(Html.fromHtml("<br>" + (i+1) + " payment: "
                     + AmountUtils.getStringFormatFromDouble(monthlyCost) +
@@ -207,8 +210,8 @@ public class ExpenseActivity extends AppCompatActivity
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         String dateString = year + "-" + (month+1) + "-" + dayOfMonth;
-                        mPaymentDate = LocalDate.parse(dateString);
-                        mPaymentDateView.setText(DateUtils.getDateStringFormat(mPaymentDate));
+                        mFirstPaymentDate = LocalDate.parse(dateString);
+                        mPaymentDateView.setText(DateUtils.getDateStringFormat(mFirstPaymentDate));
                     }
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
 
@@ -250,22 +253,25 @@ public class ExpenseActivity extends AppCompatActivity
         if(expenseEntry.getJobId() != null) mJobId = expenseEntry.getJobId();
         mCost = expenseEntry.getExpenseCost();
         mCostView.setText(AmountUtils.getStringFormatFromDouble(expenseEntry.getExpenseCost()));
-        mNumberOfPayments = 1;
-        mNumPaymentsView.setText(String.valueOf(1));
-        mPaymentDate = expenseEntry.getExpensePaymentDate();
-        mPaymentDateView.setText(DateUtils.getDateStringFormat(mPaymentDate));
+        mNumberOfPayments = expenseEntry.getNumberOfPayments();
+        mMonthlyCost = expenseEntry.getMonthlyCost();
+        mNumPaymentsView.setText(String.valueOf(mNumberOfPayments));
+        mFirstPaymentDate = expenseEntry.getExpenseFirstPayment();
+        mPaymentDateView.setText(DateUtils.getDateStringFormat(mFirstPaymentDate));
+        mLastPaymentDate = expenseEntry.getExpenseLastPayment();
         mExistedCategoryButton.setChecked(true);
     }
 
-    private void confirmExpenseWithCategoryId(Long categoryId) {
+    private void confirmExpenseWithCategoryId(long categoryId) {
         // confirm new expense
         if (mExpenseId == DEFAULT_EXPENSE_ID) {
-            mViewModel.insertNewExpense(categoryId, mCost, mNumberOfPayments, mPaymentDate);
+            mViewModel.insertNewExpense(categoryId, mCost, mNumberOfPayments, mFirstPaymentDate);
         }
         // update expense
         else {
             Log.i(TAG, "UPDATE" + " expenseId: " + mExpenseId);
-            mViewModel.updateExpense(mExpenseId, mJobId, categoryId, mCost, mNumberOfPayments, mPaymentDate);
+            mViewModel.updateExpense(mExpenseId, mJobId, categoryId, mCost, mNumberOfPayments,
+                    mMonthlyCost, mFirstPaymentDate, mLastPaymentDate);
             finish();
         }
     }
@@ -276,21 +282,26 @@ public class ExpenseActivity extends AppCompatActivity
         confirmExpenseWithCategoryId(categoryId);
     }
 
-    @Override
-    public void onExpensesInserted(long[] expensesId) {
-        Log.i(TAG, "new expenses ids array length: " + expensesId.length);
-        if(getCallingActivity() != null){
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra(EXPENSE_FOR_RESULT, expensesId);
-            setResult(Activity.RESULT_OK, resultIntent);
-        }
-        finish();
-    }
+//    @Override
+//    public void onExpensesInserted(long[] expensesId) {
+//        Log.i(TAG, "new expenses ids array length: " + expensesId.length);
+//        if(getCallingActivity() != null){
+//            Intent resultIntent = new Intent();
+//            resultIntent.putExtra(EXPENSE_FOR_RESULT, expensesId);
+//            setResult(Activity.RESULT_OK, resultIntent);
+//        }
+//        finish();
+//    }
 
     @Override
     public void onExpenseInserted(long expenseId) {
         mViewModel.updatePaymentsWithExpenseID(expenseId);
         mViewModel.insertPayments();
+        if(getCallingActivity() != null){
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra(EXPENSE_FOR_RESULT, expenseId);
+            setResult(Activity.RESULT_OK, resultIntent);
+        }
         finish();
     }
 
@@ -311,7 +322,7 @@ public class ExpenseActivity extends AppCompatActivity
                     mViewModel.insertNewCategory(categoryName);
                 } else {
                     int categoryPosition = mCategoriesSpinner.getSelectedItemPosition() - 1;
-                    Long categoryId = mCategoriesList.get(categoryPosition).getCategoryId();
+                    long categoryId = mCategoriesList.get(categoryPosition).getCategoryId();
                     confirmExpenseWithCategoryId(categoryId);
                 }
             }

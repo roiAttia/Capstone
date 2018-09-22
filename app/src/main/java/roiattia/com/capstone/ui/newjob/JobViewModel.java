@@ -1,6 +1,7 @@
 package roiattia.com.capstone.ui.newjob;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
 import org.joda.time.LocalDate;
@@ -8,9 +9,9 @@ import org.joda.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import roiattia.com.capstone.database.CategoryEntry;
-import roiattia.com.capstone.database.ExpenseEntry;
-import roiattia.com.capstone.database.JobEntry;
+import roiattia.com.capstone.database.entry.CategoryEntry;
+import roiattia.com.capstone.database.entry.ExpenseEntry;
+import roiattia.com.capstone.database.entry.JobEntry;
 
 public class JobViewModel extends ViewModel {
 
@@ -82,5 +83,21 @@ public class JobViewModel extends ViewModel {
 
     public void updateExpenses() {
         mRepository.updateExpenses(mExpensesList);
+    }
+
+//    public void loadExpenseById(long expenseId) {
+//        mRepository.loadExpenseById(expenseId);
+//    }
+
+    public void addExpense(ExpenseEntry expenseEntry) {
+        mExpensesList.add(expenseEntry);
+    }
+
+    public LiveData<ExpenseEntry> loadExpenseByIdLiveData(long expenseId) {
+        return mRepository.loadExpenseByIdLiveData(expenseId);
+    }
+
+    public void clearExpenses() {
+        mExpensesList.clear();
     }
 }

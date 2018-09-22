@@ -5,14 +5,13 @@ import android.util.Log;
 
 import java.util.List;
 
-import roiattia.com.capstone.database.CategoryDao;
-import roiattia.com.capstone.database.CategoryEntry;
-import roiattia.com.capstone.database.ExpenseDao;
-import roiattia.com.capstone.database.ExpenseEntry;
-import roiattia.com.capstone.database.JobDao;
-import roiattia.com.capstone.database.JobEntry;
-import roiattia.com.capstone.ui.newexpense.ExpenseRepository;
-import roiattia.com.capstone.utils.AppExecutors;
+import roiattia.com.capstone.database.dao.CategoryDao;
+import roiattia.com.capstone.database.entry.CategoryEntry;
+import roiattia.com.capstone.database.dao.ExpenseDao;
+import roiattia.com.capstone.database.entry.ExpenseEntry;
+import roiattia.com.capstone.database.dao.JobDao;
+import roiattia.com.capstone.database.entry.JobEntry;
+import roiattia.com.capstone.database.AppExecutors;
 
 public class JobRepository {
 
@@ -25,26 +24,52 @@ public class JobRepository {
     private final CategoryDao mCategoryDao;
     private final ExpenseDao mExpenseDao;
     private final AppExecutors mExecutors;
-    private GetJobIdHandler mCallback;
+    private DataInsertHandler mCallback;
 
     private JobRepository(JobDao jobDao, CategoryDao categoryDao, ExpenseDao expenseDao,
-                          AppExecutors appExecutors){
+                          AppExecutors appExecutors, DataInsertHandler callback){
         mJobDao = jobDao;
         mCategoryDao = categoryDao;
         mExpenseDao = expenseDao;
         mExecutors = appExecutors;
+        mCallback = callback;
     }
 
     public synchronized static JobRepository getInstance(
             JobDao jobDao, CategoryDao categoryDao, ExpenseDao expenseDao,
-            AppExecutors appExecutors) {
+            AppExecutors appExecutors, DataInsertHandler callback) {
         if (sInstance == null) {
             synchronized (LOCK) {
-                sInstance = new JobRepository(jobDao, categoryDao, expenseDao, appExecutors);
+                sInstance = new JobRepository(jobDao, categoryDao, expenseDao, appExecutors, callback);
             }
         }
         return sInstance;
     }
+
+    public LiveData<ExpenseEntry> loadExpenseByIdLiveData(long expenseId) {
+        return mExpenseDao.loadExpenseByIdLiveData(expenseId);
+    }
+
+
+    /**
+     * The interface that receives onClick messages.
+     */
+    public interface DataInsertHandler {
+        void onCategoryInserted(long categoryId);
+        void onJobInserted(long expensesId);
+        void onExpenseLoaded(ExpenseEntry expenseEntry);
+    }
+
+
+//    public void loadExpenseById(final long expenseId) {
+//        mExecutors.diskIO().execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                ExpenseEntry expenseEntry = mExpenseDao.loadExpenseById(expenseId);
+//                mCallback.onExpenseLoaded(expenseEntry);
+//            }
+//        });
+//    }
 
     public void insertJob(final JobEntry jobEntry) {
         mExecutors.diskIO().execute(new Runnable() {
@@ -74,19 +99,6 @@ public class JobRepository {
         });
     }
 
-    /**
-     * The interface that receives onClick messages.
-     */
-    public interface GetJobIdHandler {
-        void onCategoryInserted(long categoryId);
-        void onJobInserted(long expensesId);
-    }
-
-    public void setCallbackListener(GetJobIdHandler getIdCallback){
-        mCallback = getIdCallback;
-    }
-
-
     public LiveData<JobEntry> loadJobById(Long jobId) {
         return mJobDao.loadJobById(jobId);
     }
@@ -98,6 +110,16 @@ public class JobRepository {
 
     public LiveData<List<CategoryEntry>> getCategories(CategoryEntry.Type type) {
         return mCategoryDao.loadCategories(type);
+    }
+
+    public void insertCategory(final CategoryEntry categoryEntry) {
+        mExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                long categoryId = mCategoryDao.insertCategory(categoryEntry);
+                mCallback.onCategoryInserted(categoryId);
+            }
+        });
     }
 
     public void debugPrint() {
@@ -116,16 +138,6 @@ public class JobRepository {
                 for(CategoryEntry categoryEntry : categoryEntries){
                     Log.i(TAG, categoryEntry.toString());
                 }
-            }
-        });
-    }
-
-    public void insertCategory(final CategoryEntry categoryEntry) {
-        mExecutors.diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                long categoryId = mCategoryDao.insertCategory(categoryEntry);
-                mCallback.onCategoryInserted(categoryId);
             }
         });
     }

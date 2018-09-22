@@ -8,4 +8,8 @@ public class AmountUtils {
         DecimalFormat formatter = new DecimalFormat("#,###,###.###");
         return formatter.format(amount);
     }
+
+    public static double getDoubleFormatFromString(String amount){
+        return Double.parseDouble(amount.replaceAll(",", ""));
+    }
 }

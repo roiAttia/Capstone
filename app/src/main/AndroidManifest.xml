@@ -18,6 +18,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.newjob.JobActivity" />
+        <activity android:name=".ui.expenses_list.ExpensesListActivity" />
         <activity android:name=".ui.payments.PaymentsActivity" />
         <activity
             android:name=".ui.finances.FinancesActivity"
@@ -33,7 +34,13 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/finances_widget_provider_info" />
         </receiver>
+
         <service android:name=".widget.FinancesReportService" />
+
+        <activity
+            android:name=".ui.NavigationDrawerActivity"
+            android:label="@string/title_activity_navigation_drawer"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

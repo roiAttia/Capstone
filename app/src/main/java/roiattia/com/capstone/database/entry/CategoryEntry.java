@@ -1,4 +1,4 @@
-package roiattia.com.capstone.database;
+package roiattia.com.capstone.database.entry;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Embedded;
