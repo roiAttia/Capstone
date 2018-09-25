@@ -54,6 +54,10 @@ public class CalendarViewModel extends AndroidViewModel {
         mRepository.debugPrint();
     }
 
+    public void deleteAllData(){
+        mRepository.deleteAllData();
+    }
+
     public void insertJobs(List<JobEntry> jobs) {
         mRepository.insertJobs(jobs);
     }

@@ -19,9 +19,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.entry.ExpenseEntry;
+import roiattia.com.capstone.model.ExpenseListModel;
 import roiattia.com.capstone.ui.newexpense.ExpenseActivity;
 import roiattia.com.capstone.utils.DateUtils;
-import roiattia.com.capstone.utils.InjectorUtils;
 
 import static roiattia.com.capstone.ui.newexpense.ExpenseActivity.EXTRA_EXPENSE_ID;
 
@@ -32,8 +32,6 @@ public class ExpensesListActivity extends AppCompatActivity
 
     private ExpensesListViewModel mViewModel;
     private ExpensesListAdapter mAdapter;
-    private LocalDate mStartDate;
-    private LocalDate mEndDate;
 
     @BindView(R.id.rv_expenses_list) RecyclerView mDetailsList;
 
@@ -43,29 +41,28 @@ public class ExpensesListActivity extends AppCompatActivity
         setContentView(R.layout.activity_expenses_list);
         ButterKnife.bind(this);
 
-        mStartDate = DateUtils.getStartDateOfTheMonth();
-        mEndDate = DateUtils.getEndDateOfTheMonth();
+        setupRecyclerView();
 
+        setupViewModel();
+
+    }
+
+    private void setupRecyclerView() {
         // initialize jobs_list and it's adapter
         mAdapter = new ExpensesListAdapter(this, this);
         mDetailsList.setAdapter(mAdapter);
         mDetailsList.setLayoutManager(new LinearLayoutManager(this));
         mDetailsList.setHasFixedSize(true);
-
-        setupViewModel();
     }
 
     private void setupViewModel() {
-        // setup factory and view model
-        ExpensesListViewModelFactory factory = InjectorUtils
-                .provideExpensesListViewModelFactory(this, mStartDate, mEndDate);
-        mViewModel = ViewModelProviders.of(this, factory).get(ExpensesListViewModel.class);
+        mViewModel = ViewModelProviders.of(this).get(ExpensesListViewModel.class);
         // observe on expenses
-        mViewModel.getExpenseDetails().observe(this, new Observer<List<ExpenseEntry>>() {
+        mViewModel.getExpenses().observe(this, new Observer<List<ExpenseListModel>>() {
             @Override
-            public void onChanged(List<ExpenseEntry> expenseEntries) {
+            public void onChanged(List<ExpenseListModel> expenseEntries) {
                 mAdapter.setData(expenseEntries);
-                for(ExpenseEntry expenseEntry : expenseEntries){
+                for(ExpenseListModel expenseEntry : expenseEntries){
                     Log.i(TAG, expenseEntry.toString());
                 }
             }
@@ -73,14 +70,14 @@ public class ExpensesListActivity extends AppCompatActivity
     }
 
     @Override
-    public void onDeleteClick(final ExpenseEntry expenseEntry) {
+    public void onDeleteClick(final long expenseId) {
         // create alert dialog to confirm delete operation
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.alert_dialog_delete_title)
-                .setMessage(expenseEntry.toString())
+                .setMessage("message")
                 .setPositiveButton(R.string.alert_dialog_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mViewModel.deleteExpense(expenseEntry);
+                        mViewModel.deleteExpense(expenseId);
                     }
                 })
                 .setNegativeButton(R.string.alert_dialog_cancel, new DialogInterface.OnClickListener() {
@@ -99,4 +96,6 @@ public class ExpensesListActivity extends AppCompatActivity
         intent.putExtra(EXTRA_EXPENSE_ID, expenseId);
         startActivity(intent);
     }
+
+    // TODO: order expenses by completion and end date
 }

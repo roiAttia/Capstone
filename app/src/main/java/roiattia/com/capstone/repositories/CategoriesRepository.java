@@ -1,5 +1,6 @@
 package roiattia.com.capstone.repositories;
 
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 
 import java.util.List;
@@ -30,6 +31,10 @@ public class CategoriesRepository {
         return sInstance;
     }
 
+    public interface OnCategoryListener{
+        void onCategoryInserted(long categoryId);
+    }
+
     public void insertCategories(final List<CategoryEntry> categoryEntries){
         mExecutors.diskIO().execute(new Runnable() {
             @Override
@@ -39,4 +44,17 @@ public class CategoriesRepository {
         });
     }
 
+    public LiveData<List<CategoryEntry>> getCategories(CategoryEntry.Type type) {
+        return mDb.categoryDao().loadCategories(type);
+    }
+
+    public void insertCategory(final CategoryEntry category, final OnCategoryListener listener) {
+        mExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                long categoryId = mDb.categoryDao().insertCategory(category);
+                listener.onCategoryInserted(categoryId);
+            }
+        });
+    }
 }

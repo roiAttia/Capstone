@@ -31,6 +31,7 @@ import butterknife.OnClick;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.model.JobCalendarModel;
 import roiattia.com.capstone.repositories.CategoriesRepository;
+import roiattia.com.capstone.repositories.ExpensesRepository;
 import roiattia.com.capstone.ui.expenses_list.ExpensesListActivity;
 import roiattia.com.capstone.ui.finances.FinancesActivity;
 import roiattia.com.capstone.ui.newexpense.ExpenseActivity;
@@ -190,6 +191,13 @@ public class CalendarActivity extends AppCompatActivity
                 break;
             case R.id.mi_insert_dummy_jobs:
                 mViewModel.insertJobs(DummyData.getDummyJobs());
+                break;
+            case R.id.mi_insert_dummy_expenses:
+                ExpensesRepository expensesRepository = ExpensesRepository.getInstance(this);
+                expensesRepository.insertExpenses(DummyData.getDummyExpenses());
+                break;
+            case R.id.mi_delete_all_data:
+                mViewModel.deleteAllData();
                 break;
 
         }

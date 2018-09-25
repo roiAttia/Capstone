@@ -6,13 +6,9 @@ import org.joda.time.LocalDate;
 
 import roiattia.com.capstone.database.AppDatabase;
 import roiattia.com.capstone.database.AppExecutors;
-import roiattia.com.capstone.ui.expenses_list.ExpensesListRepository;
-import roiattia.com.capstone.ui.expenses_list.ExpensesListViewModelFactory;
 import roiattia.com.capstone.ui.payments.PaymentsRepository;
 import roiattia.com.capstone.ui.payments.PaymentsViewModelFactory;
 import roiattia.com.capstone.ui.finances.FinancesRepository;
-import roiattia.com.capstone.ui.newexpense.ExpenseRepository;
-import roiattia.com.capstone.ui.newexpense.ExpenseViewModelFactory;
 import roiattia.com.capstone.ui.newjob.JobRepository;
 import roiattia.com.capstone.ui.newjob.JobViewModelFactory;
 
@@ -23,13 +19,6 @@ public class InjectorUtils {
         AppExecutors executors = AppExecutors.getInstance();
         return JobRepository.getInstance(database.jobDao(), database.categoryDao(),
                 database.expenseDao(), executors, callback);
-    }
-
-    public static ExpenseRepository provideExpenseRepository(Context context){
-        AppDatabase database = AppDatabase.getsInstance(context.getApplicationContext());
-        AppExecutors executors = AppExecutors.getInstance();
-        return ExpenseRepository.getInstance(
-                database.categoryDao(), database.expenseDao(), database.paymentDao(), executors);
     }
 
     public static FinancesRepository provideFinancesRepository(Context context){
@@ -43,12 +32,6 @@ public class InjectorUtils {
         return PaymentsRepository.getInstance(database.paymentDao());
     }
 
-    public static ExpensesListRepository provideExpensesListRepository(Context context) {
-        AppDatabase database = AppDatabase.getsInstance(context.getApplicationContext());
-        AppExecutors executors = AppExecutors.getInstance();
-        return ExpensesListRepository.getInstance(database.expenseDao(), executors);
-    }
-
     /* FACTORIES */
     public static JobViewModelFactory provideNewJobViewModelFactory(
             Context context, Long jobId, JobRepository.DataInsertHandler callback){
@@ -56,22 +39,9 @@ public class InjectorUtils {
         return new JobViewModelFactory(jobRepository, jobId);
     }
 
-    public static ExpenseViewModelFactory provideExpenseViewModelFactory(
-            Context context, Long expenseId, ExpenseRepository.GetIdHandler handler){
-        ExpenseRepository expenseRepository = provideExpenseRepository(context);
-        return new ExpenseViewModelFactory(expenseRepository, expenseId, handler);
-    }
-
     public static PaymentsViewModelFactory provideCategoryDetailsViewModelFactory(
             Context context, long categoryId, LocalDate start, LocalDate end){
         PaymentsRepository repository = providePaymentsRepository(context);
         return new PaymentsViewModelFactory(categoryId, start, end, repository);
     }
-
-    public static ExpensesListViewModelFactory provideExpensesListViewModelFactory(
-            Context context, LocalDate start, LocalDate end){
-        ExpensesListRepository repository = provideExpensesListRepository(context);
-        return new ExpensesListViewModelFactory(start, end, repository);
-    }
-
 }

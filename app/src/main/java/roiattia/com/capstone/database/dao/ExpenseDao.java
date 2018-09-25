@@ -1,9 +1,7 @@
 package roiattia.com.capstone.database.dao;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
@@ -15,6 +13,7 @@ import java.util.List;
 
 import roiattia.com.capstone.database.entry.CategoryEntry;
 import roiattia.com.capstone.database.entry.ExpenseEntry;
+import roiattia.com.capstone.model.ExpenseListModel;
 import roiattia.com.capstone.model.ExpensesModel;
 import roiattia.com.capstone.model.OverallExpensesModel;
 
@@ -30,14 +29,14 @@ public interface ExpenseDao {
     @Insert
     long[] insertExpenses(List<ExpenseEntry> expenseEntries);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertExpense(ExpenseEntry expenseEntrie);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     int updateExpense(ExpenseEntry expenseEntry);
 
-    @Delete
-    void deleteExpense(ExpenseEntry expenseEntry);
+    @Query("DELETE FROM expense WHERE expense_id = :expenseId")
+    void deleteExpense(long expenseId);
 
     @Query("SELECT expense.category_id as mCategoryId, COUNT(category_name) as mCount, " +
             "category_name as mName, SUM(expense_cost) as mCost " +
@@ -58,7 +57,7 @@ public interface ExpenseDao {
 
     @Query("SELECT * FROM expense " +
             "WHERE expense_id=:expenseId")
-    LiveData<ExpenseEntry> loadExpenseById(Long expenseId);
+    ExpenseEntry loadExpenseById(Long expenseId);
 
     @Query("SELECT * FROM expense " +
             "WHERE expense_id=:expenseId")
@@ -83,6 +82,17 @@ public interface ExpenseDao {
     LiveData<OverallExpensesModel> loadPaymentsBetweenDates(LocalDate from, LocalDate to);
 
     @Query("SELECT * FROM expense " +
-            "WHERE expense_last_payment_date >=:to")
-    LiveData<List<ExpenseEntry>> loadExpensesBetweenDates(LocalDate to);
+            "WHERE expense_first_payment_date >=:start AND expense_last_payment_date >=:end")
+    List<ExpenseEntry> loadExpensesBetweenDates(LocalDate start, LocalDate end);
+
+    @Query("SELECT expense_id as mExpenseId, description as mDescription, expense_cost as mExpenseCost, " +
+            "number_of_payments as mNumberOfPayments, expense_monthly_cost as mMonthlyCost," +
+            "expense_first_payment_date as mExpenseFirstPayment, expense_last_payment_date " +
+            "as mExpenseLastPayment, category_name as mCategoryName FROM expense " +
+            "JOIN category ON expense.category_id = category.category_id " +
+            "WHERE number_of_payments > 1 ORDER BY expense_last_payment_date ASC")
+    LiveData<List<ExpenseListModel>> loadExpenses();
+
+    @Query("DELETE FROM expense")
+    void deleteAllExpenses();
 }

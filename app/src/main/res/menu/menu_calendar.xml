@@ -28,4 +28,11 @@
         android:id="@+id/mi_insert_dummy_jobs"
         android:title="Insert dummy jobs"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/mi_insert_dummy_expenses"
+        android:title="Insert dummy expenses" />
+    <item
+        android:id="@+id/mi_delete_all_data"
+        android:title="Delete all data"
+        app:showAsAction="never" />
 </menu>

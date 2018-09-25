@@ -11,7 +11,9 @@ import java.util.List;
 import roiattia.com.capstone.database.AppDatabase;
 import roiattia.com.capstone.database.AppExecutors;
 import roiattia.com.capstone.database.entry.CategoryEntry;
+import roiattia.com.capstone.database.entry.ExpenseEntry;
 import roiattia.com.capstone.database.entry.JobEntry;
+import roiattia.com.capstone.database.entry.PaymentEntry;
 import roiattia.com.capstone.model.JobCalendarModel;
 import roiattia.com.capstone.ui.newjob.JobRepository;
 
@@ -59,6 +61,26 @@ public class JobsRepository {
                 for(CategoryEntry categoryEntry : categoryEntries){
                     Log.i(TAG, categoryEntry.toString());
                 }
+                List<ExpenseEntry> expenseEntries = mDb.expenseDao().debugLoadAllExpenses();
+                for(ExpenseEntry expenseEntry : expenseEntries){
+                    Log.i(TAG, expenseEntry.toString());
+                }
+                List<PaymentEntry> paymentEntries = mDb.paymentDao().debugLoadPayments();
+                for(PaymentEntry paymentEntry : paymentEntries){
+                    Log.i(TAG, paymentEntry.toString());
+                }
+            }
+        });
+    }
+
+    public void deleteAllData(){
+        mExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.expenseDao().deleteAllExpenses();
+                mDb.paymentDao().deleteAllPayments();
+                mDb.jobDao().deleteAllJobs();
+                mDb.categoryDao().deleteAllCategories();
             }
         });
     }

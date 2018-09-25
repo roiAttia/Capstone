@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import roiattia.com.capstone.database.entry.CategoryEntry;
+import roiattia.com.capstone.database.entry.ExpenseEntry;
 import roiattia.com.capstone.database.entry.JobEntry;
 
 public class DummyData {
@@ -21,6 +22,22 @@ public class DummyData {
         categoryEntries.add(category_3);
         categoryEntries.add(category_4);
         return categoryEntries;
+    }
+
+    public static List<ExpenseEntry> getDummyExpenses(){
+        List<ExpenseEntry> expenses = new ArrayList<>();
+        LocalDate firstPaymentDate = new LocalDate("2018-09-23");
+        LocalDate lastPaymentDate = new LocalDate("2018-09-23");
+        ExpenseEntry expense_1 = new ExpenseEntry(3, "Lorem ipsum dolor sit amet",
+                200, 2, firstPaymentDate, lastPaymentDate);
+        firstPaymentDate = firstPaymentDate.plusDays(1);
+        lastPaymentDate = new LocalDate("2018-10-23");
+        ExpenseEntry expense_2 = new ExpenseEntry(4,"Lorem ipsum dolor sit amet,\" +\n" +
+                "\" consectetur adipiscing elit, sed", 500, 3,
+                firstPaymentDate, lastPaymentDate);
+        expenses.add(expense_1);
+        expenses.add(expense_2);
+        return expenses;
     }
 
     public static List<JobEntry> getDummyJobs(){

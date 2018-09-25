@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import org.joda.time.LocalDate;
+
 import java.util.List;
 import java.util.Locale;
 
@@ -16,6 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.entry.ExpenseEntry;
+import roiattia.com.capstone.model.ExpenseListModel;
 import roiattia.com.capstone.utils.AmountUtils;
 import roiattia.com.capstone.utils.DateUtils;
 
@@ -23,7 +26,7 @@ public class ExpensesListAdapter extends RecyclerView
         .Adapter<ExpensesListAdapter.CategoryDetailsViewHolder> {
 
     private Context mContext;
-    private List<ExpenseEntry> mExpensesList;
+    private List<ExpenseListModel> mExpensesList;
     private OnExpenseClickHandler mClickHandler;
 
     ExpensesListAdapter(Context context, OnExpenseClickHandler clickHandler){
@@ -37,9 +40,9 @@ public class ExpensesListAdapter extends RecyclerView
     public interface OnExpenseClickHandler {
         /**
          * Trigger delete operation on selected expense
-         * @param expenseEntry the selected expense
+         * @param expenseId selected expense's id
          */
-        void onDeleteClick(ExpenseEntry expenseEntry);
+        void onDeleteClick(long expenseId);
 
         /**
          * Trigger update operation on selected expense
@@ -48,7 +51,7 @@ public class ExpensesListAdapter extends RecyclerView
         void onEditClick(long expenseId);
     }
 
-    public void setData(List<ExpenseEntry> expensesList){
+    public void setData(List<ExpenseListModel> expensesList){
         mExpensesList = expensesList;
         notifyDataSetChanged();
     }
@@ -64,29 +67,28 @@ public class ExpensesListAdapter extends RecyclerView
 
     @Override
     public void onBindViewHolder(@NonNull CategoryDetailsViewHolder holder, int position) {
-        final ExpenseEntry expenseEntry = mExpensesList.get(position);
-        if(expenseEntry.getNumberOfPayments() > 1){
-            holder.mFirstPayment.setText(String.format(
-                    "First payment: %s", DateUtils.getDateStringFormat(expenseEntry.getExpenseFirstPayment())));
-            holder.mLastPayment.setText(String.format(
-                    "Last payment: %s", DateUtils.getDateStringFormat(expenseEntry.getExpenseLastPayment())));
-            holder.mNumberOfPayments.setText(String.format(Locale.getDefault(),
-                    "%d payments of %s", expenseEntry.getNumberOfPayments(),
-                    AmountUtils.getStringFormatFromDouble(expenseEntry.getMonthlyCost())));
-            holder.mCost.setText(String.format("Total Cost: %s", AmountUtils.getStringFormatFromDouble(
-                    expenseEntry.getExpenseCost())));
+        final ExpenseListModel expenseEntry = mExpensesList.get(position);
+        holder.mCategoryName.setText(String.format("%s - %s", expenseEntry.getCategoryName(),
+                expenseEntry.getDescription()));
+        holder.mFirstPayment.setText(String.format(
+                "First payment: %s", DateUtils.getDateStringFormat(expenseEntry.getExpenseFirstPayment())));
+        holder.mLastPayment.setText(String.format(
+                "Last payment: %s", DateUtils.getDateStringFormat(expenseEntry.getExpenseLastPayment())));
+        holder.mNumberOfPayments.setText(String.format(Locale.getDefault(),
+                "%d payments of %s", expenseEntry.getNumberOfPayments(),
+                AmountUtils.getStringFormatFromDouble(expenseEntry.getMonthlyCost())));
+        holder.mCost.setText(String.format("Total Cost: %s", AmountUtils.getStringFormatFromDouble(
+                expenseEntry.getExpenseCost())));
+        LocalDate currentDate = new LocalDate();
+        if(currentDate.isAfter(expenseEntry.getExpenseLastPayment())){
+            holder.mStatus.setText(R.string.expense_list_done_expense);
         } else {
-            holder.mFirstPayment.setText(String.format(
-                    "Payment date: %s", DateUtils.getDateStringFormat(expenseEntry.getExpenseFirstPayment())));
-            holder.mCost.setText(String.format("Cost: %s", AmountUtils.getStringFormatFromDouble(
-                    expenseEntry.getExpenseCost())));
-            holder.mLastPayment.setVisibility(View.GONE);
-            holder.mNumberOfPayments.setVisibility(View.GONE);
+            holder.mStatus.setText(R.string.expense_list_active_expense);
         }
         holder.mDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mClickHandler.onDeleteClick(expenseEntry);
+                mClickHandler.onDeleteClick(expenseEntry.getExpenseId());
             }
         });
         holder.mEditButton.setOnClickListener(new View.OnClickListener() {
@@ -104,10 +106,12 @@ public class ExpensesListAdapter extends RecyclerView
 
     class CategoryDetailsViewHolder extends RecyclerView.ViewHolder{
 
+        @BindView(R.id.tv_expense_category_name) TextView mCategoryName;
         @BindView(R.id.tv_first_payment_date) TextView mFirstPayment;
         @BindView(R.id.tv_last_payment) TextView mLastPayment;
         @BindView(R.id.tv_expense_number_of_payments) TextView mNumberOfPayments;
         @BindView(R.id.tv_cost) TextView mCost;
+        @BindView(R.id.tv_expense_status) TextView mStatus;
         @BindView(R.id.btn_delete) ImageButton mDeleteButton;
         @BindView(R.id.btn_edit) ImageButton mEditButton;
 

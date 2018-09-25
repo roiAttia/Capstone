@@ -24,10 +24,12 @@ public class ExpenseEntry {
     private Long mJobId;
     @ColumnInfo(name = "category_id")
     private Long mCategoryId;
+    @ColumnInfo(name = "description")
+    private String mDescription;
     @ColumnInfo(name = "expense_cost")
     private double mExpenseCost;
     @ColumnInfo(name = "number_of_payments")
-    private int numberOfPayments;
+    private int mNumberOfPayments;
     @ColumnInfo(name = "expense_monthly_cost")
     private double mMonthlyCost;
     @ColumnInfo(name = "expense_first_payment_date")
@@ -36,22 +38,25 @@ public class ExpenseEntry {
     private LocalDate mExpenseLastPayment;
 
     @Ignore
-    public ExpenseEntry(Long categoryId, double expenseCost, int numberOfPayments,
-                        LocalDate expensePaymentDate) {
-        this.mCategoryId = categoryId;
-        this.mExpenseCost = expenseCost;
-        this.numberOfPayments = numberOfPayments;
-        this.mExpenseFirstPayment = expensePaymentDate;
+    public ExpenseEntry(long categoryId, String description, double expenseCost, int numberOfPayments,
+                        LocalDate firstPaymentDate, LocalDate lastPaymentDate) {
+        mCategoryId = categoryId;
+        mDescription = description;
+        mExpenseCost = expenseCost;
+        mNumberOfPayments = numberOfPayments;
+        mExpenseFirstPayment = firstPaymentDate;
+        mExpenseLastPayment = lastPaymentDate;
     }
 
     @Ignore
     public ExpenseEntry(Long jobId, Long categoryId, double expenseCost,
-                        int numberOfPayments, LocalDate expensePaymentDate) {
+                        int numberOfPayments, LocalDate firstPaymentDate, LocalDate lastPaymentDate) {
         this.mJobId = jobId;
         this.mCategoryId = categoryId;
         this.mExpenseCost = expenseCost;
-        this.numberOfPayments = numberOfPayments;
-        this.mExpenseFirstPayment = expensePaymentDate;
+        this.mNumberOfPayments = numberOfPayments;
+        this.mExpenseFirstPayment = firstPaymentDate;
+        mExpenseLastPayment = lastPaymentDate;
     }
 
     @Ignore
@@ -59,19 +64,21 @@ public class ExpenseEntry {
                         LocalDate expenseFirstPayment, LocalDate expenseLastPayment) {
         mCategoryId = categoryId;
         mExpenseCost = cost;
-        this.numberOfPayments = numberOfPayments;
+        this.mNumberOfPayments = numberOfPayments;
         mMonthlyCost = monthlyCost;
         mExpenseFirstPayment = expenseFirstPayment;
         mExpenseLastPayment = expenseLastPayment;
     }
 
-    public ExpenseEntry(Long expenseId, Long jobId, Long categoryId, double expenseCost, int numberOfPayments,
-                        double monthlyCost, LocalDate expenseFirstPayment, LocalDate expenseLastPayment) {
+    public ExpenseEntry(Long expenseId, Long jobId, Long categoryId, String description, double expenseCost,
+                        int numberOfPayments, double monthlyCost, LocalDate expenseFirstPayment,
+                        LocalDate expenseLastPayment) {
         mExpenseId = expenseId;
         mJobId = jobId;
         mCategoryId = categoryId;
+        mDescription = description;
         mExpenseCost = expenseCost;
-        this.numberOfPayments = numberOfPayments;
+        this.mNumberOfPayments = numberOfPayments;
         mMonthlyCost = monthlyCost;
         mExpenseFirstPayment = expenseFirstPayment;
         mExpenseLastPayment = expenseLastPayment;
@@ -100,7 +107,7 @@ public class ExpenseEntry {
     }
 
     public int getNumberOfPayments() {
-        return numberOfPayments;
+        return mNumberOfPayments;
     }
 
     public LocalDate getExpenseFirstPayment() {
@@ -120,7 +127,7 @@ public class ExpenseEntry {
     }
 
     public void setNumberOfPayments(int numberOfPayments) {
-        this.numberOfPayments = numberOfPayments;
+        this.mNumberOfPayments = numberOfPayments;
     }
 
     public void setExpenseFirstPayment(LocalDate expenseFirstPayment) {
@@ -143,14 +150,21 @@ public class ExpenseEntry {
         mExpenseLastPayment = expenseLastPayment;
     }
 
+    public String getDescription() {
+        return mDescription;
+    }
+
+    public void setDescription(String description) {
+        mDescription = description;
+    }
+
     @Override
     public String toString() {
         return "**EXPENSE ENTRY** mExpenseId: " + mExpenseId +
                 ", mJobId: " + mJobId + ", mCategoryId: " + mCategoryId +
-                ", mExpenseCost: " + mExpenseCost + ", numberOfPayments: " + numberOfPayments +
+                ", mExpenseCost: " + mExpenseCost + ", mNumberOfPayments: " + mNumberOfPayments +
                 ", mExpenseFirstPayment: " + mExpenseFirstPayment +
                 ", mExpenseLastPayment" + mExpenseLastPayment;
     }
 
-    //TODO: add description for expense
 }

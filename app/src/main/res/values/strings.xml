@@ -55,6 +55,8 @@
     <string name="payment_date">Payment date: %s</string>
     <string name="payment_cost">Cost: %s</string>
     <string name="payment_number">Payment number:</string>
+
+
     <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -62,6 +64,12 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+
+    <!-- EXPENSES LIST -->
+    <string name="expense_edit_button_description">expense edit button</string>
+    <string name="expense_delete_button_description">expense delete button</string>
+    <string name="expense_list_active_expense">Active</string>
+    <string name="expense_list_done_expense">Done</string>
 
 
 </resources>

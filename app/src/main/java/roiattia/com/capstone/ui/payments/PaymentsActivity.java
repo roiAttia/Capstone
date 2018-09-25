@@ -27,6 +27,8 @@ public class PaymentsActivity extends AppCompatActivity {
 
     private final String TAG = PaymentsActivity.class.getSimpleName();
 
+    private PaymentsAdapter mPaymentsAdapter;
+
     @BindView(R.id.tv_header) TextView mCategoryHeader;
     @BindView(R.id.rv_job_list) RecyclerView mDetailsList;
 
@@ -36,11 +38,7 @@ public class PaymentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_payments_details);
         ButterKnife.bind(this);
 
-        // setup recycler_view and adapter
-        final PaymentsAdapter paymentsAdapter = new PaymentsAdapter(this);
-        mDetailsList.setAdapter(paymentsAdapter);
-        mDetailsList.setLayoutManager(new LinearLayoutManager(this));
-        mDetailsList.setHasFixedSize(true);
+
 
         Intent intent = getIntent();
         // check for intent extra as bundle
@@ -68,12 +66,24 @@ public class PaymentsActivity extends AppCompatActivity {
             viewModel.getPaymentsDetails().observe(this, new Observer<List<PaymentItemModel>>() {
                 @Override
                 public void onChanged(List<PaymentItemModel> paymentsList) {
-                    paymentsAdapter.setData(paymentsList);
+                    mPaymentsAdapter.setData(paymentsList);
                     for(PaymentItemModel paymentItemModel : paymentsList){
                         Log.i(TAG, paymentItemModel.toString());
                     }
                 }
             });
         }
+    }
+
+    private void setupRecyclerView(){
+        // setup recycler_view and adapter
+        mPaymentsAdapter = new PaymentsAdapter(this);
+        mDetailsList.setAdapter(mPaymentsAdapter);
+        mDetailsList.setLayoutManager(new LinearLayoutManager(this));
+        mDetailsList.setHasFixedSize(true);
+    }
+
+    private void setupViewModel(){
+
     }
 }

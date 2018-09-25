@@ -71,4 +71,7 @@ public interface JobDao {
     @Query("SELECT SUM(job_income) as mIncome, SUM(job_profits) as mProfit " +
             "FROM job WHERE job_payment_date BETWEEN :from AND :to")
     OverallIncomeModel loadReportBetweenDates(LocalDate from, LocalDate to);
+
+    @Query("DELETE FROM job")
+    void deleteAllJobs();
 }

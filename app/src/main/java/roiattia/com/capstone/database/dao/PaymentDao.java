@@ -28,4 +28,7 @@ public interface PaymentDao {
 
     @Query("SELECT * FROM payment")
     List<PaymentEntry> debugLoadPayments();
+
+    @Query("DELETE FROM payment")
+    void deleteAllPayments();
 }

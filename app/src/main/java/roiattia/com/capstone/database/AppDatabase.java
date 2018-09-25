@@ -16,7 +16,7 @@ import roiattia.com.capstone.database.entry.JobEntry;
 import roiattia.com.capstone.database.entry.PaymentEntry;
 
 @Database(entities = {JobEntry.class, CategoryEntry.class, ExpenseEntry.class, PaymentEntry.class},
-        version = 8, exportSchema = false)
+        version = 9, exportSchema = false)
 @TypeConverters({DateTypeConverter.class, CategoryTypeConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 

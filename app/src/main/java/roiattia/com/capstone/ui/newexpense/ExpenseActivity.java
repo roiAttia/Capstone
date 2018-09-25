@@ -36,12 +36,13 @@ import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.database.entry.CategoryEntry;
 import roiattia.com.capstone.database.entry.ExpenseEntry;
+import roiattia.com.capstone.repositories.CategoriesRepository;
+import roiattia.com.capstone.repositories.ExpensesRepository;
 import roiattia.com.capstone.utils.AmountUtils;
 import roiattia.com.capstone.utils.DateUtils;
-import roiattia.com.capstone.utils.InjectorUtils;
 
 public class ExpenseActivity extends AppCompatActivity
-    implements ExpenseRepository.GetIdHandler{
+    implements CategoriesRepository.OnCategoryListener, ExpensesRepository.OnExpenseListener{
 
     private static final String TAG = ExpenseActivity.class.getSimpleName();
 
@@ -50,7 +51,7 @@ public class ExpenseActivity extends AppCompatActivity
     private static final long DEFAULT_EXPENSE_ID = -1;
     private long mExpenseId = DEFAULT_EXPENSE_ID;
 
-    private ExpenseViewModel mViewModel;
+    private ExpensesViewModel mViewModel;
 
     private double mCost;
     private int mNumberOfPayments;
@@ -76,45 +77,19 @@ public class ExpenseActivity extends AppCompatActivity
         setContentView(R.layout.activity_expense);
         ButterKnife.bind(this);
 
+        setupViewModel();
+
+        setupUI();
+
         // check for intent extra in case of expense update operation
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_EXPENSE_ID)) {
             mExpenseId = intent.getLongExtra(EXTRA_EXPENSE_ID, DEFAULT_EXPENSE_ID);
+            mViewModel.getExpenseById(mExpenseId);
         }
+    }
 
-        // create view_model
-        ExpenseViewModelFactory factory = InjectorUtils
-                .provideExpenseViewModelFactory(this, mExpenseId, this);
-        mViewModel = ViewModelProviders.of(this, factory).get(ExpenseViewModel.class);
-
-        // if it's an update then load expense_entry by it's id and call for
-        // update ui with it's details
-        if(mExpenseId != DEFAULT_EXPENSE_ID){
-            mViewModel.getExpense().observe(this, new Observer<ExpenseEntry>() {
-                @Override
-                public void onChanged(@Nullable ExpenseEntry expenseEntry) {
-                    mViewModel.getExpense().removeObserver(this);
-                    if(expenseEntry != null) {
-                        updateUiWithExpenseDetails(expenseEntry);
-                    } else Log.i(TAG, "expenseEntry is null");
-                }
-            });
-        }
-
-        // load categories for spinner
-        mViewModel.getCategories().observe(this, new Observer<List<CategoryEntry>>() {
-            @Override
-            public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
-                if(categoryEntries != null){
-                    mCategoriesList = categoryEntries;
-                    setupSpinner(categoryEntries);
-                    for(CategoryEntry categoryEntry : categoryEntries){
-                        Log.i(TAG, categoryEntry.toString());
-                    }
-                }
-            }
-        });
-
+    private void setupUI(){
         // set_enabled false for category spinner and edit_text to be able
         // to interact via radio buttons
         mCategoriesSpinner.setEnabled(false);
@@ -176,6 +151,26 @@ public class ExpenseActivity extends AppCompatActivity
         });
     }
 
+    private void setupViewModel() {
+        mViewModel = ViewModelProviders.of(this).get(ExpensesViewModel.class);
+        mViewModel.getLiveDataCategories().observe(this, new Observer<List<CategoryEntry>>() {
+            @Override
+            public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
+                mViewModel.getLiveDataCategories().removeObserver(this);
+                mCategoriesList = categoryEntries;
+                setupSpinner(categoryEntries);
+            }
+        });
+        mViewModel.getMutableExpense().observe(this, new Observer<ExpenseEntry>() {
+            @Override
+            public void onChanged(@Nullable ExpenseEntry expenseEntry) {
+                if(expenseEntry != null) {
+                    updateUiWithExpenseDetails(expenseEntry);
+                } else Log.i(TAG, "expenseEntry is null");
+            }
+        });
+    }
+
     private void setupSpinner(List<CategoryEntry> categoryEntries) {
         List<String> categoriesNames = new ArrayList<>();
         categoriesNames.add(this.getString(R.string.spinner_category_default_value));
@@ -193,11 +188,10 @@ public class ExpenseActivity extends AppCompatActivity
 
     private void updateUiWithPayments(LocalDate paymentDate) {
         mPaymentsDetailsView.setText("");
-        double monthlyCost = mCost / mNumberOfPayments;
-        mMonthlyCost = monthlyCost;
+        mMonthlyCost = mCost / mNumberOfPayments;
         for(int i = 0; i<mNumberOfPayments; i++){
             mPaymentsDetailsView.append(Html.fromHtml("<br>" + (i+1) + " payment: "
-                    + AmountUtils.getStringFormatFromDouble(monthlyCost) +
+                    + AmountUtils.getStringFormatFromDouble(mMonthlyCost) +
                     ", payment date: " + DateUtils.getDateStringFormat(paymentDate)));
             paymentDate = paymentDate.plusMonths(1);
         }
@@ -262,36 +256,30 @@ public class ExpenseActivity extends AppCompatActivity
         mExistedCategoryButton.setChecked(true);
     }
 
-    private void confirmExpenseWithCategoryId(long categoryId) {
+    private void updateExpenseWithCategoryId(long categoryId) {
+        mViewModel.insertExpense(categoryId, mCost, mNumberOfPayments,
+                mMonthlyCost, mFirstPaymentDate, this);
+        finish();
         // confirm new expense
-        if (mExpenseId == DEFAULT_EXPENSE_ID) {
-            mViewModel.insertNewExpense(categoryId, mCost, mNumberOfPayments, mFirstPaymentDate);
-        }
-        // update expense
-        else {
-            Log.i(TAG, "UPDATE" + " expenseId: " + mExpenseId);
-            mViewModel.updateExpense(mExpenseId, mJobId, categoryId, mCost, mNumberOfPayments,
-                    mMonthlyCost, mFirstPaymentDate, mLastPaymentDate);
-            finish();
-        }
+//        if (mExpenseId == DEFAULT_EXPENSE_ID) {
+//            mExpenseViewModel.insertNewExpense(categoryId, mCost, mNumberOfPayments, mFirstPaymentDate);
+//        }
+//        // update expense
+//        else {
+//            Log.i(TAG, "UPDATE" + " expenseId: " + mExpenseId);
+//            mExpenseViewModel.updateExpense(mExpenseId, mJobId, categoryId, mCost, mNumberOfPayments,
+//                    mMonthlyCost, mFirstPaymentDate, mLastPaymentDate);
+//            finish();
+//        }
     }
 
     @Override
-    public void onCategoryInserted(Long categoryId) {
+    public void onCategoryInserted(long categoryId) {
         Log.i(TAG, "new category id: " + categoryId);
-        confirmExpenseWithCategoryId(categoryId);
+        mCategoryId = categoryId;
+        mViewModel.createPayments(mNumberOfPayments, mMonthlyCost, mFirstPaymentDate);
+        mViewModel.insertExpense(categoryId, mCost, mNumberOfPayments, mMonthlyCost, mFirstPaymentDate,this);
     }
-
-//    @Override
-//    public void onExpensesInserted(long[] expensesId) {
-//        Log.i(TAG, "new expenses ids array length: " + expensesId.length);
-//        if(getCallingActivity() != null){
-//            Intent resultIntent = new Intent();
-//            resultIntent.putExtra(EXPENSE_FOR_RESULT, expensesId);
-//            setResult(Activity.RESULT_OK, resultIntent);
-//        }
-//        finish();
-//    }
 
     @Override
     public void onExpenseInserted(long expenseId) {
@@ -318,16 +306,20 @@ public class ExpenseActivity extends AppCompatActivity
             if(checkInputValidation()) {
                 // check if a new category needs to insert
                 if(mNewCategoryButton.isChecked()){
-                    String categoryName = mCategoryView.getText().toString();
-                    mViewModel.insertNewCategory(categoryName);
+                    insertNewCategory();
                 } else {
                     int categoryPosition = mCategoriesSpinner.getSelectedItemPosition() - 1;
                     long categoryId = mCategoriesList.get(categoryPosition).getCategoryId();
-                    confirmExpenseWithCategoryId(categoryId);
+                    updateExpenseWithCategoryId(categoryId);
                 }
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void insertNewCategory() {
+        String categoryName = mCategoryView.getText().toString();
+        mViewModel.insertNewCategory(categoryName ,this);
     }
 
     @Override
