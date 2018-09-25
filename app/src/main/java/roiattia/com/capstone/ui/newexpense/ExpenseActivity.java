@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -61,13 +62,14 @@ public class ExpenseActivity extends AppCompatActivity
     private List<CategoryEntry> mCategoriesList;
     private long mCategoryId;
     private Long mJobId;
+    private String mDescription;
 
     @BindView(R.id.spinner_expense_category) Spinner mCategoriesSpinner;
-    @BindView(R.id.et_expense_cost) EditText mCostView;
-    @BindView(R.id.et_num_of_payments) EditText mNumPaymentsView;
-    @BindView(R.id.et_payment_date) EditText mPaymentDateView;
+    @BindView(R.id.iet_expense_cost) TextInputEditText mCostView;
+    @BindView(R.id.iet_number_of_payments) TextInputEditText mNumPaymentsView;
+    @BindView(R.id.iet_payment_date) TextInputEditText mPaymentDateView;
     @BindView(R.id.tv_payments_details) TextView mPaymentsDetailsView;
-    @BindView(R.id.et_expense_category) EditText mCategoryView;
+    @BindView(R.id.iet_category_name) TextInputEditText mCategoryView;
     @BindView(R.id.rb_existed_category) RadioButton mExistedCategoryButton;
     @BindView(R.id.rb_new_category) RadioButton mNewCategoryButton;
 
@@ -77,9 +79,7 @@ public class ExpenseActivity extends AppCompatActivity
         setContentView(R.layout.activity_expense);
         ButterKnife.bind(this);
 
-        setupViewModel();
-
-        setupUI();
+        mViewModel = ViewModelProviders.of(this).get(ExpensesViewModel.class);
 
         // check for intent extra in case of expense update operation
         Intent intent = getIntent();
@@ -87,6 +87,10 @@ public class ExpenseActivity extends AppCompatActivity
             mExpenseId = intent.getLongExtra(EXTRA_EXPENSE_ID, DEFAULT_EXPENSE_ID);
             mViewModel.getExpenseById(mExpenseId);
         }
+
+        setupViewModel();
+
+        setupUI();
     }
 
     private void setupUI(){
@@ -117,7 +121,7 @@ public class ExpenseActivity extends AppCompatActivity
                 if(!mNumPaymentsView.getText().toString().equals("") &&
                         !mPaymentDateView.getText().toString().equals("") &&
                         !mCostView.getText().toString().equals("") ) {
-                    mCost = Double.parseDouble((mCostView.getText().toString()));
+                    mCost = Double.parseDouble(((mCostView.getText().toString().replaceAll(",",""))));
                     mNumberOfPayments = Integer.parseInt(mNumPaymentsView.getText().toString());
                     if (mNumberOfPayments > 0) {
                         updateUiWithPayments(mFirstPaymentDate);
@@ -152,7 +156,6 @@ public class ExpenseActivity extends AppCompatActivity
     }
 
     private void setupViewModel() {
-        mViewModel = ViewModelProviders.of(this).get(ExpensesViewModel.class);
         mViewModel.getLiveDataCategories().observe(this, new Observer<List<CategoryEntry>>() {
             @Override
             public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
@@ -174,9 +177,13 @@ public class ExpenseActivity extends AppCompatActivity
     private void setupSpinner(List<CategoryEntry> categoryEntries) {
         List<String> categoriesNames = new ArrayList<>();
         categoriesNames.add(this.getString(R.string.spinner_category_default_value));
+        int categoryIndex = 0;
         if(categoryEntries != null) {
-            for (CategoryEntry categoryEntry : categoryEntries) {
-                categoriesNames.add(categoryEntry.getCategoryName());
+            for (int i = 1; i<categoryEntries.size()+1; i++) {
+                categoriesNames.add(categoryEntries.get(i-1).getCategoryName());
+                if(categoryEntries.get(i-1).getCategoryId() == mCategoryId){
+                    categoryIndex = i;
+                }
             }
             // Creating adapter for spinner
             ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(
@@ -184,6 +191,7 @@ public class ExpenseActivity extends AppCompatActivity
             // attaching data adapter to spinner
             mCategoriesSpinner.setAdapter(dataAdapter);
         }
+        mCategoriesSpinner.setSelection(categoryIndex);
     }
 
     private void updateUiWithPayments(LocalDate paymentDate) {
@@ -254,6 +262,7 @@ public class ExpenseActivity extends AppCompatActivity
         mPaymentDateView.setText(DateUtils.getDateStringFormat(mFirstPaymentDate));
         mLastPaymentDate = expenseEntry.getExpenseLastPayment();
         mExistedCategoryButton.setChecked(true);
+        mDescription = expenseEntry.getDescription();
     }
 
     private void updateExpenseWithCategoryId(long categoryId) {
@@ -310,6 +319,7 @@ public class ExpenseActivity extends AppCompatActivity
                 } else {
                     int categoryPosition = mCategoriesSpinner.getSelectedItemPosition() - 1;
                     long categoryId = mCategoriesList.get(categoryPosition).getCategoryId();
+                    mViewModel.createPayments(mNumberOfPayments, mMonthlyCost, mFirstPaymentDate);
                     updateExpenseWithCategoryId(categoryId);
                 }
             }

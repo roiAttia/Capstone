@@ -68,8 +68,10 @@ public class ExpensesListAdapter extends RecyclerView
     @Override
     public void onBindViewHolder(@NonNull CategoryDetailsViewHolder holder, int position) {
         final ExpenseListModel expenseEntry = mExpensesList.get(position);
-        holder.mCategoryName.setText(String.format("%s - %s", expenseEntry.getCategoryName(),
-                expenseEntry.getDescription()));
+        holder.mCategoryName.setText(expenseEntry.getCategoryName());
+        if(expenseEntry.getDescription() != null){
+            holder.mCategoryName.append(" - " + expenseEntry.getDescription());
+        }
         holder.mFirstPayment.setText(String.format(
                 "First payment: %s", DateUtils.getDateStringFormat(expenseEntry.getExpenseFirstPayment())));
         holder.mLastPayment.setText(String.format(

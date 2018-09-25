@@ -71,7 +71,8 @@ public class ExpensesViewModel extends AndroidViewModel {
         ExpenseEntry expense = mMutableExpense.getValue();
         if(expense == null){
             //create new expense
-            expense = new ExpenseEntry(categoryId, cost, paymentsNumber, monthlyCost, firstDate, mExpenseLastPaymentDate);
+            expense = new ExpenseEntry(categoryId, cost, paymentsNumber, monthlyCost, firstDate,
+                    mExpenseLastPaymentDate);
         } else {
             // pass in fields to expense
             expense.setCategoryId(categoryId);
@@ -79,7 +80,9 @@ public class ExpensesViewModel extends AndroidViewModel {
             expense.setNumberOfPayments(paymentsNumber);
             expense.setMonthlyCost(monthlyCost);
             expense.setExpenseFirstPayment(firstDate);
-            expense.setExpenseLastPayment(mExpenseLastPaymentDate);
+            if(mExpenseLastPaymentDate != null) {
+                expense.setExpenseLastPayment(mExpenseLastPaymentDate);
+            }
         }
         mExpensesRepository.insertExpense(expense, listener);
     }
