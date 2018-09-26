@@ -12,13 +12,13 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.LocalDate;
 
@@ -38,16 +38,17 @@ import roiattia.com.capstone.ui.dialogs.RadioButtonsDialog;
 import roiattia.com.capstone.utils.AmountUtils;
 import roiattia.com.capstone.utils.DateUtils;
 
+import static roiattia.com.capstone.utils.Constants.EXPENSE_FOR_RESULT;
+import static roiattia.com.capstone.utils.Constants.EXTRA_EXPENSE_ID;
+
 public class ExpenseActivity extends AppCompatActivity
     implements CategoriesRepository.OnCategoryListener, ExpensesRepository.OnExpenseListener,
     RadioButtonsDialog.NoticeDialogListener, EditTextDialog.EditTextDialogListener{
 
     private static final String TAG = ExpenseActivity.class.getSimpleName();
 
-    public static final String EXTRA_EXPENSE_ID = "expense_id";
-    public static final String EXPENSE_FOR_RESULT = "expense_for_result";
     private static final long DEFAULT_EXPENSE_ID = -1;
-    private long mExpenseId = DEFAULT_EXPENSE_ID;
+    private long mExpenseId;
 
     private ExpensesViewModel mViewModel;
 
@@ -64,6 +65,7 @@ public class ExpenseActivity extends AppCompatActivity
     @BindView(R.id.iet_expense_cost) TextInputEditText mCostView;
     @BindView(R.id.iet_number_of_payments) TextInputEditText mNumPaymentsView;
     @BindView(R.id.iet_payment_date) TextInputEditText mPaymentDateView;
+    @BindView(R.id.iet_expense_description) TextInputEditText mDescriptionView;
     @BindView(R.id.tv_payments_details) TextView mPaymentsDetailsView;
     @BindView(R.id.rb_existed_category) RadioButton mExistedCategoryButton;
     @BindView(R.id.rb_new_category) RadioButton mNewCategoryButton;
@@ -160,11 +162,11 @@ public class ExpenseActivity extends AppCompatActivity
             public void onClick(View v) {
                 mNewCategoryButton.setChecked(false);
                 RadioButtonsDialog categoryPicker = new RadioButtonsDialog();
-                categoryPicker.setTitle("Pick Category");
+                categoryPicker.setTitle(getString(R.string.pick_category_title));
                 String[] categories = new String[categoriesNames.size()];
                 categories = categoriesNames.toArray(categories);
                 categoryPicker.setData(categories);
-                categoryPicker.show(getSupportFragmentManager(), "cat");
+                categoryPicker.show(getSupportFragmentManager(), "existing_category");
             }
         });
 
@@ -172,8 +174,8 @@ public class ExpenseActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 EditTextDialog dialog = new EditTextDialog();
-                dialog.setTitle("Enter category name");
-                dialog.show(getSupportFragmentManager(), "edit");
+                dialog.setTitle(getString(R.string.enter_category_title));
+                dialog.show(getSupportFragmentManager(), "new_category");
             }
         });
     }
@@ -182,9 +184,11 @@ public class ExpenseActivity extends AppCompatActivity
         mPaymentsDetailsView.setText("");
         mMonthlyCost = mCost / mNumberOfPayments;
         for(int i = 0; i<mNumberOfPayments; i++){
-            mPaymentsDetailsView.append(Html.fromHtml( (i+1) + " payment: "
+            mPaymentsDetailsView.append(Html.fromHtml( (i+1) + " " +
+                    getString(R.string.payments_list_payment)
                     + AmountUtils.getStringFormatFromDouble(mMonthlyCost) +
-                    ", payment date: " + DateUtils.getDateStringFormat(paymentDate) + "<br>"));
+                    ", " +  getString(R.string.payments_list_payment_date) + " " +
+                    DateUtils.getDateStringFormat(paymentDate) + "<br>"));
             paymentDate = paymentDate.plusMonths(1);
         }
     }
@@ -241,26 +245,7 @@ public class ExpenseActivity extends AppCompatActivity
         mPaymentDateView.setText(DateUtils.getDateStringFormat(mFirstPaymentDate));
         mExistedCategoryButton.setChecked(true);
         mDescription = expenseEntry.getDescription();
-    }
-
-    @Override
-    public void onCategoryInserted(long categoryId) {
-        Log.i(TAG, "new category id: " + categoryId);
-        mCategoryId = categoryId;
-        mViewModel.createPayments(mNumberOfPayments, mMonthlyCost, mFirstPaymentDate);
-        mViewModel.insertExpense(categoryId, mCost, mNumberOfPayments, mMonthlyCost, mFirstPaymentDate,this);
-    }
-
-    @Override
-    public void onExpenseInserted(long expenseId) {
-        mViewModel.updatePaymentsWithExpenseID(expenseId);
-        mViewModel.insertPayments();
-        if(getCallingActivity() != null){
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra(EXPENSE_FOR_RESULT, expenseId);
-            setResult(Activity.RESULT_OK, resultIntent);
-        }
-        finish();
+        mDescriptionView.setText(mDescription);
     }
 
     @Override
@@ -274,18 +259,42 @@ public class ExpenseActivity extends AppCompatActivity
         if(item.getItemId() == R.id.mi_done){
             // check if all needed input exists
             if(checkInputValidation()) {
+                // check if user entered description
+                if(mDescriptionView.getText() != null){
+                    mDescription = mDescriptionView.getText().toString();
+                }
+                Toast.makeText(this, R.string.expense_saved_toast, Toast.LENGTH_LONG).show();
                 // check if a new category needs to insert
                 if(mNewCategoryButton.isChecked()){
                     mViewModel.insertNewCategory(mCategoryName ,this);
                 } else {
                     mViewModel.createPayments(mNumberOfPayments, mMonthlyCost, mFirstPaymentDate);
-                    mViewModel.insertExpense(mCategoryId, mCost, mNumberOfPayments,
+                    mViewModel.insertExpense(mCategoryId, mCost, mDescription, mNumberOfPayments,
                             mMonthlyCost, mFirstPaymentDate, this);
-                    finish();
                 }
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCategoryInserted(long categoryId) {
+        mCategoryId = categoryId;
+        mViewModel.createPayments(mNumberOfPayments, mMonthlyCost, mFirstPaymentDate);
+        mViewModel.insertExpense(categoryId, mCost, mDescription, mNumberOfPayments, mMonthlyCost,
+                mFirstPaymentDate,this);
+    }
+
+    @Override
+    public void onExpenseInserted(long expenseId) {
+        mViewModel.updatePaymentsWithExpenseID(expenseId);
+        mViewModel.insertPayments();
+        if(getCallingActivity() != null){
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra(EXPENSE_FOR_RESULT, expenseId);
+            setResult(Activity.RESULT_OK, resultIntent);
+        }
+        finish();
     }
 
     @Override

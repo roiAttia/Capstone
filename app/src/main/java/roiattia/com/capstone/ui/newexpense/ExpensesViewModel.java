@@ -66,12 +66,13 @@ public class ExpensesViewModel extends AndroidViewModel {
         mCategoriesRepository.insertCategory(categoryEntry, listener);
     }
 
-    public void insertExpense(long categoryId, double cost, int paymentsNumber, double monthlyCost,
-                              LocalDate firstDate, ExpensesRepository.OnExpenseListener listener){
+    public void insertExpense(long categoryId, double cost, String description, int paymentsNumber,
+                              double monthlyCost, LocalDate firstDate,
+                              ExpensesRepository.OnExpenseListener listener){
         ExpenseEntry expense = mMutableExpense.getValue();
         if(expense == null){
             //create new expense
-            expense = new ExpenseEntry(categoryId, cost, paymentsNumber, monthlyCost, firstDate,
+            expense = new ExpenseEntry(categoryId, cost, description, paymentsNumber, monthlyCost, firstDate,
                     mExpenseLastPaymentDate);
         } else {
             // pass in fields to expense

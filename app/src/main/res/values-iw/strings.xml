@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- EXPENSES LIST -->
+    <string name="expense_edit_button_description">expense edit button</string>
+    <string name="expense_delete_button_description">expense delete button</string>
+    <string name="expense_list_active_expense">פעיל</string>
+    <string name="expense_list_done_expense">הסתיים</string>
+    <string name="enter_new_category">הכנסת קטגוריה חדשה</string>
+    <string name="pick_from_existing_category">בחירת קטגוריה קיימת</string>
+    <string name="update_expense_title">עדכון הוצאה</string>
+    <string name="new_expense_title">הוצאה חדשה</string>
+    <string name="payments_list_payment">תשלום:</string>
+    <string name="payments_list_payment_date">תאריך תשלום:</string>
+    <string name="select_or_enter_new_category">בחר/י קטגוריה קיימת או הכנס/י קטגוריה חדשה</string>
+    <string name="payments_details">פירוט תשלומים:</string>
+    <string name="expense_cost_hint">עלות</string>
+    <string name="number_of_payments_hint">מספר תשלומים</string>
+    <string name="payment_date_hint">תאריך תשלום</string>
+    <string name="expense_descripiton_hint">תיאור הוצאה</string>
+    <string name="payments_details_missing">חסרים פרטי הוצאה לחישוב תשלומים</string>
+    <string name="expense_saved_toast">הוצאה נשמרה בהצלחה!</string>
+
+    <!-- DIALOG -->
+    <string name="dialog_confirm">אישור</string>
+    <string name="dialog_cancel">ביטול</string>
+    <string name="pick_category_title">בחר/י קטוגריה</string>
+    <string name="enter_category_title">הכנס/י שם לקטגוריה חדשה</string>
+
+</resources>

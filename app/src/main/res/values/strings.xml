@@ -56,7 +56,7 @@
     <string name="payment_cost">Cost: %s</string>
     <string name="payment_number">Payment number:</string>
 
-
+    <!-- DRAWER -->
     <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -74,6 +74,22 @@
     <string name="pick_from_existing_category">Pick from existing category</string>
     <string name="update_expense_title">Update Expense</string>
     <string name="new_expense_title">New Expense</string>
+    <string name="payments_list_payment">payment of:</string>
+    <string name="payments_list_payment_date">payment date:</string>
+    <string name="select_or_enter_new_category">Select or enter new category:</string>
+    <string name="payments_details">Payments details:</string>
+    <string name="expense_cost_hint">Expense cost</string>
+    <string name="number_of_payments_hint">Number of payments</string>
+    <string name="payment_date_hint">Payment date</string>
+    <string name="expense_description_hint">Expense description</string>
+    <string name="payments_details_missing">Payments details missing</string>
+    <string name="expense_saved_toast">Expense saved successfully!</string>
+
+    <!-- DIALOG -->
+    <string name="dialog_confirm">Confirm</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="pick_category_title">Pick Category</string>
+    <string name="enter_category_title">Enter category name</string>
 
 
 </resources>

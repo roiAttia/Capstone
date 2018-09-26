@@ -38,7 +38,7 @@ public class EditTextDialog extends DialogFragment {
 
         builder.setView(view)
                 .setTitle(mTitle)
-                .setPositiveButton("CONFIRM", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.dialog_confirm, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         EditText editText = view.findViewById(R.id.et_user_input);
@@ -46,7 +46,7 @@ public class EditTextDialog extends DialogFragment {
                         dismiss();
                     }
                 })
-                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
