@@ -90,7 +90,7 @@ public interface ExpenseDao {
             "expense_first_payment_date as mExpenseFirstPayment, expense_last_payment_date " +
             "as mExpenseLastPayment, category_name as mCategoryName FROM expense " +
             "JOIN category ON expense.category_id = category.category_id " +
-            "WHERE number_of_payments > 1 ORDER BY expense_last_payment_date ASC")
+            "WHERE number_of_payments > 1 ORDER BY expense_last_payment_date DESC")
     LiveData<List<ExpenseListModel>> loadExpenses();
 
     @Query("DELETE FROM expense")

@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,12 +16,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.joda.time.LocalDate;
@@ -39,11 +33,14 @@ import roiattia.com.capstone.database.entry.CategoryEntry;
 import roiattia.com.capstone.database.entry.ExpenseEntry;
 import roiattia.com.capstone.repositories.CategoriesRepository;
 import roiattia.com.capstone.repositories.ExpensesRepository;
+import roiattia.com.capstone.ui.dialogs.EditTextDialog;
+import roiattia.com.capstone.ui.dialogs.RadioButtonsDialog;
 import roiattia.com.capstone.utils.AmountUtils;
 import roiattia.com.capstone.utils.DateUtils;
 
 public class ExpenseActivity extends AppCompatActivity
-    implements CategoriesRepository.OnCategoryListener, ExpensesRepository.OnExpenseListener{
+    implements CategoriesRepository.OnCategoryListener, ExpensesRepository.OnExpenseListener,
+    RadioButtonsDialog.NoticeDialogListener, EditTextDialog.EditTextDialogListener{
 
     private static final String TAG = ExpenseActivity.class.getSimpleName();
 
@@ -58,18 +55,16 @@ public class ExpenseActivity extends AppCompatActivity
     private int mNumberOfPayments;
     private double mMonthlyCost;
     private LocalDate mFirstPaymentDate;
-    private LocalDate mLastPaymentDate;
     private List<CategoryEntry> mCategoriesList;
     private long mCategoryId;
     private Long mJobId;
     private String mDescription;
+    private String mCategoryName;
 
-    @BindView(R.id.spinner_expense_category) Spinner mCategoriesSpinner;
     @BindView(R.id.iet_expense_cost) TextInputEditText mCostView;
     @BindView(R.id.iet_number_of_payments) TextInputEditText mNumPaymentsView;
     @BindView(R.id.iet_payment_date) TextInputEditText mPaymentDateView;
     @BindView(R.id.tv_payments_details) TextView mPaymentsDetailsView;
-    @BindView(R.id.iet_category_name) TextInputEditText mCategoryView;
     @BindView(R.id.rb_existed_category) RadioButton mExistedCategoryButton;
     @BindView(R.id.rb_new_category) RadioButton mNewCategoryButton;
 
@@ -86,6 +81,9 @@ public class ExpenseActivity extends AppCompatActivity
         if (intent != null && intent.hasExtra(EXTRA_EXPENSE_ID)) {
             mExpenseId = intent.getLongExtra(EXTRA_EXPENSE_ID, DEFAULT_EXPENSE_ID);
             mViewModel.getExpenseById(mExpenseId);
+            setTitle(getString(R.string.update_expense_title));
+        } else {
+            setTitle(getString(R.string.new_expense_title));
         }
 
         setupViewModel();
@@ -94,11 +92,6 @@ public class ExpenseActivity extends AppCompatActivity
     }
 
     private void setupUI(){
-        // set_enabled false for category spinner and edit_text to be able
-        // to interact via radio buttons
-        mCategoriesSpinner.setEnabled(false);
-        mCategoryView.setEnabled(false);
-
         // configure selection of payment date
         mPaymentDateView.setFocusable(false);
         mPaymentDateView.setOnClickListener(new View.OnClickListener() {
@@ -132,27 +125,6 @@ public class ExpenseActivity extends AppCompatActivity
         mCostView.addTextChangedListener(textWatcher);
         mNumPaymentsView.addTextChangedListener(textWatcher);
         mPaymentDateView.addTextChangedListener(textWatcher);
-
-        // setup category radio buttons
-        mExistedCategoryButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    mCategoryView.setEnabled(false);
-                    mCategoriesSpinner.setEnabled(true);
-                }
-            }
-        });
-        mNewCategoryButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    mCategoryView.setEnabled(true);
-                    mCategoryView.requestFocus();
-                    mCategoriesSpinner.setEnabled(false);
-                }
-            }
-        });
     }
 
     private void setupViewModel() {
@@ -160,8 +132,10 @@ public class ExpenseActivity extends AppCompatActivity
             @Override
             public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
                 mViewModel.getLiveDataCategories().removeObserver(this);
-                mCategoriesList = categoryEntries;
-                setupSpinner(categoryEntries);
+                if (categoryEntries != null) {
+                    mCategoriesList = categoryEntries;
+                    setupRadioButtons(categoryEntries);
+                }
             }
         });
         mViewModel.getMutableExpense().observe(this, new Observer<ExpenseEntry>() {
@@ -169,38 +143,48 @@ public class ExpenseActivity extends AppCompatActivity
             public void onChanged(@Nullable ExpenseEntry expenseEntry) {
                 if(expenseEntry != null) {
                     updateUiWithExpenseDetails(expenseEntry);
-                } else Log.i(TAG, "expenseEntry is null");
+                }
             }
         });
     }
 
-    private void setupSpinner(List<CategoryEntry> categoryEntries) {
-        List<String> categoriesNames = new ArrayList<>();
-        categoriesNames.add(this.getString(R.string.spinner_category_default_value));
-        int categoryIndex = 0;
-        if(categoryEntries != null) {
-            for (int i = 1; i<categoryEntries.size()+1; i++) {
-                categoriesNames.add(categoryEntries.get(i-1).getCategoryName());
-                if(categoryEntries.get(i-1).getCategoryId() == mCategoryId){
-                    categoryIndex = i;
-                }
-            }
-            // Creating adapter for spinner
-            ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(
-                    this, android.R.layout.simple_spinner_item, categoriesNames);
-            // attaching data adapter to spinner
-            mCategoriesSpinner.setAdapter(dataAdapter);
+    private void setupRadioButtons(List<CategoryEntry> categoryEntries) {
+        final List<String> categoriesNames = new ArrayList<>();
+        for(CategoryEntry categoryEntry : categoryEntries){
+            categoriesNames.add(categoryEntry.getCategoryName());
         }
-        mCategoriesSpinner.setSelection(categoryIndex);
+
+        // setup category radio buttons
+        mExistedCategoryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mNewCategoryButton.setChecked(false);
+                RadioButtonsDialog categoryPicker = new RadioButtonsDialog();
+                categoryPicker.setTitle("Pick Category");
+                String[] categories = new String[categoriesNames.size()];
+                categories = categoriesNames.toArray(categories);
+                categoryPicker.setData(categories);
+                categoryPicker.show(getSupportFragmentManager(), "cat");
+            }
+        });
+
+        mNewCategoryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditTextDialog dialog = new EditTextDialog();
+                dialog.setTitle("Enter category name");
+                dialog.show(getSupportFragmentManager(), "edit");
+            }
+        });
     }
 
     private void updateUiWithPayments(LocalDate paymentDate) {
         mPaymentsDetailsView.setText("");
         mMonthlyCost = mCost / mNumberOfPayments;
         for(int i = 0; i<mNumberOfPayments; i++){
-            mPaymentsDetailsView.append(Html.fromHtml("<br>" + (i+1) + " payment: "
+            mPaymentsDetailsView.append(Html.fromHtml( (i+1) + " payment: "
                     + AmountUtils.getStringFormatFromDouble(mMonthlyCost) +
-                    ", payment date: " + DateUtils.getDateStringFormat(paymentDate)));
+                    ", payment date: " + DateUtils.getDateStringFormat(paymentDate) + "<br>"));
             paymentDate = paymentDate.plusMonths(1);
         }
     }
@@ -226,11 +210,6 @@ public class ExpenseActivity extends AppCompatActivity
      */
     public Boolean checkInputValidation() {
         boolean isInputValid = true;
-        // check category validation
-        if(!mNewCategoryButton.isChecked() && !mExistedCategoryButton.isChecked()
-                && mCategoriesSpinner.getSelectedItemPosition() == 0){
-            isInputValid = false;
-        }
         // check cost validation
         if(mCostView.getText().toString().trim().equals("")){
             mCostView.setError("Must enter a cost");
@@ -260,26 +239,8 @@ public class ExpenseActivity extends AppCompatActivity
         mNumPaymentsView.setText(String.valueOf(mNumberOfPayments));
         mFirstPaymentDate = expenseEntry.getExpenseFirstPayment();
         mPaymentDateView.setText(DateUtils.getDateStringFormat(mFirstPaymentDate));
-        mLastPaymentDate = expenseEntry.getExpenseLastPayment();
         mExistedCategoryButton.setChecked(true);
         mDescription = expenseEntry.getDescription();
-    }
-
-    private void updateExpenseWithCategoryId(long categoryId) {
-        mViewModel.insertExpense(categoryId, mCost, mNumberOfPayments,
-                mMonthlyCost, mFirstPaymentDate, this);
-        finish();
-        // confirm new expense
-//        if (mExpenseId == DEFAULT_EXPENSE_ID) {
-//            mExpenseViewModel.insertNewExpense(categoryId, mCost, mNumberOfPayments, mFirstPaymentDate);
-//        }
-//        // update expense
-//        else {
-//            Log.i(TAG, "UPDATE" + " expenseId: " + mExpenseId);
-//            mExpenseViewModel.updateExpense(mExpenseId, mJobId, categoryId, mCost, mNumberOfPayments,
-//                    mMonthlyCost, mFirstPaymentDate, mLastPaymentDate);
-//            finish();
-//        }
     }
 
     @Override
@@ -315,39 +276,29 @@ public class ExpenseActivity extends AppCompatActivity
             if(checkInputValidation()) {
                 // check if a new category needs to insert
                 if(mNewCategoryButton.isChecked()){
-                    insertNewCategory();
+                    mViewModel.insertNewCategory(mCategoryName ,this);
                 } else {
-                    int categoryPosition = mCategoriesSpinner.getSelectedItemPosition() - 1;
-                    long categoryId = mCategoriesList.get(categoryPosition).getCategoryId();
                     mViewModel.createPayments(mNumberOfPayments, mMonthlyCost, mFirstPaymentDate);
-                    updateExpenseWithCategoryId(categoryId);
+                    mViewModel.insertExpense(mCategoryId, mCost, mNumberOfPayments,
+                            mMonthlyCost, mFirstPaymentDate, this);
+                    finish();
                 }
             }
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void insertNewCategory() {
-        String categoryName = mCategoryView.getText().toString();
-        mViewModel.insertNewCategory(categoryName ,this);
+    @Override
+    public void onDialogFinishClick(int whichSelected) {
+        mCategoryId = mCategoriesList.get(whichSelected).getCategoryId();
+        mExistedCategoryButton.setText(String.format("%s - %s", getString(R.string.pick_from_existing_category),
+                mCategoriesList.get(whichSelected).getCategoryName()));
     }
 
     @Override
-    public void onBackPressed() {
-        // create alert dialog to confirm delete operation
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Cancel new expense?")
-                .setPositiveButton(R.string.alert_dialog_ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        finish();
-                    }
-                })
-                .setNegativeButton(R.string.alert_dialog_cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                });
-        AlertDialog dialog = builder.create();
-        dialog.show();
+    public void onDialogFinishClick(String input) {
+        mCategoryName = input;
+        mNewCategoryButton.setText(String.format("%s - %s", getString(R.string.enter_new_category),
+                mCategoryName));
     }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusableInTouchMode="true">
@@ -9,28 +10,36 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <RadioGroup
-        android:id="@+id/radioGroup2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:padding="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView7">
-
-        <RadioButton
-            android:id="@+id/rb_new_category"
+        <RadioGroup
+            android:id="@+id/radioGroup2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_marginEnd="32dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/textView7"
+            app:layout_constraintTop_toBottomOf="@+id/textView7">
 
-        <RadioButton
-            android:id="@+id/rb_existed_category"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-    </RadioGroup>
+            <RadioButton
+                android:id="@+id/rb_new_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="@string/enter_new_category" />
+
+            <RadioButton
+                android:id="@+id/rb_existed_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="@string/pick_from_existing_category" />
+
+        </RadioGroup>
 
         <TextView
             android:id="@+id/textView7"
@@ -45,20 +54,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    <Spinner
-        android:id="@+id/spinner_expense_category"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="@+id/textInputLayout3"
-        app:layout_constraintStart_toStartOf="@+id/textInputLayout3"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
-
         <TextView
             android:id="@+id/tv_payments_details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="sddfsdg"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@+id/textView14"
             app:layout_constraintTop_toBottomOf="@+id/textView14" />
@@ -114,24 +114,6 @@
             android:hint="Payment date" />
     </android.support.design.widget.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout3"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/spinner_expense_category"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/radioGroup2"
-        app:layout_constraintTop_toTopOf="@+id/radioGroup2">
-
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/iet_category_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="New category" />
-    </android.support.design.widget.TextInputLayout>
-
         <TextView
             android:id="@+id/textView14"
             android:layout_width="wrap_content"
@@ -144,21 +126,22 @@
             app:layout_constraintStart_toStartOf="@+id/textInputLayout4"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout4" />
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/iet_description"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_expense_category">
-
-        <android.support.design.widget.TextInputEditText
-            android:layout_width="match_parent"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/iet_description"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="Expense descripiton" />
-    </android.support.design.widget.TextInputLayout>
+            android:layout_marginEnd="32dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/radioGroup2">
+
+            <android.support.design.widget.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Expense descripiton" />
+        </android.support.design.widget.TextInputLayout>
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

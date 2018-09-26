@@ -23,6 +23,7 @@ import roiattia.com.capstone.model.ExpensesModel;
 import roiattia.com.capstone.model.OverallExpensesModel;
 import roiattia.com.capstone.model.OverallIncomeModel;
 import roiattia.com.capstone.model.IncomeModel;
+import roiattia.com.capstone.ui.dialogs.RadioButtonsDialog;
 import roiattia.com.capstone.ui.payments.PaymentsActivity;
 import roiattia.com.capstone.ui.newexpense.ExpenseActivity;
 import roiattia.com.capstone.ui.newjob.JobActivity;
@@ -81,7 +82,9 @@ public class FinancesActivity extends AppCompatActivity
     }
 
     public void selectPeriod(View view){
-        PickPeriodDialog pickPeriodDialog = new PickPeriodDialog();
+        RadioButtonsDialog pickPeriodDialog = new RadioButtonsDialog();
+        final String[] itemsFromR = getResources().getStringArray(R.array.period_selection_options);
+        pickPeriodDialog.setData(itemsFromR);
         pickPeriodDialog.show(getSupportFragmentManager(), "pop");
     }
 

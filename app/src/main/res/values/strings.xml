@@ -70,6 +70,10 @@
     <string name="expense_delete_button_description">expense delete button</string>
     <string name="expense_list_active_expense">Active</string>
     <string name="expense_list_done_expense">Done</string>
+    <string name="enter_new_category">Enter new category</string>
+    <string name="pick_from_existing_category">Pick from existing category</string>
+    <string name="update_expense_title">Update Expense</string>
+    <string name="new_expense_title">New Expense</string>
 
 
 </resources>
