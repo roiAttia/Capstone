@@ -4,6 +4,6 @@
     android:id="@+id/expense_fragment_placeholder"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.newexpense.ExpenseActivity">
+    tools:context=".ui.expense.ExpenseActivity">
 
 </FrameLayout>

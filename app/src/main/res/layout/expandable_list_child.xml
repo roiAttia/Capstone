@@ -26,7 +26,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_expandalbe_child_category" />
 
     <ImageButton
-        android:id="@+id/tv_expandable_child_delete_button"
+        android:id="@+id/btn_expandable_child_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
@@ -36,13 +36,13 @@
         app:srcCompat="@drawable/ic_delete" />
 
     <ImageButton
-        android:id="@+id/tv_expandable_child_edit_button"
+        android:id="@+id/btn_expandable_child_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:background="@android:color/transparent"
-        app:layout_constraintEnd_toStartOf="@+id/tv_expandable_child_delete_button"
-        app:layout_constraintTop_toTopOf="@+id/tv_expandable_child_delete_button"
+        app:layout_constraintEnd_toStartOf="@+id/btn_expandable_child_delete"
+        app:layout_constraintTop_toTopOf="@+id/btn_expandable_child_delete"
         app:srcCompat="@drawable/ic_edit" />
 
     <View

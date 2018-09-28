@@ -38,8 +38,9 @@ public class ExpenseEntry {
     private LocalDate mExpenseLastPayment;
 
     @Ignore
-    public ExpenseEntry(long categoryId, double expenseCost, String description, int numberOfPayments,
+    public ExpenseEntry(Long jobId, long categoryId, double expenseCost, String description, int numberOfPayments,
                         double monthlyCost, LocalDate firstPaymentDate, LocalDate lastPaymentDate) {
+        mJobId = jobId;
         mCategoryId = categoryId;
         mDescription = description;
         mExpenseCost = expenseCost;
@@ -85,6 +86,10 @@ public class ExpenseEntry {
         mExpenseLastPayment = expenseLastPayment;
     }
 
+    @Ignore
+    public ExpenseEntry() {
+
+    }
 
 
     public Long getExpenseId() {

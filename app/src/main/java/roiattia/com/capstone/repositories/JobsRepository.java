@@ -1,6 +1,5 @@
 package roiattia.com.capstone.repositories;
 
-import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.util.Log;
 
@@ -15,7 +14,6 @@ import roiattia.com.capstone.database.entry.ExpenseEntry;
 import roiattia.com.capstone.database.entry.JobEntry;
 import roiattia.com.capstone.database.entry.PaymentEntry;
 import roiattia.com.capstone.model.JobCalendarModel;
-import roiattia.com.capstone.ui.newjob.JobRepository;
 
 public class JobsRepository {
 
@@ -38,6 +36,10 @@ public class JobsRepository {
             }
         }
         return sInstance;
+    }
+
+    public interface OnJobListener{
+        void onJobInserted(long jobId);
     }
 
     /**
@@ -85,11 +87,12 @@ public class JobsRepository {
         });
     }
 
-    public void insertJob(final JobEntry jobEntry){
+    public void insertJob(final JobEntry jobEntry, final OnJobListener listener){
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                mDb.jobDao().insertJob(jobEntry);
+                long jobId = mDb.jobDao().insertJob(jobEntry);
+                listener.onJobInserted(jobId);
             }
         });
     }
@@ -101,5 +104,9 @@ public class JobsRepository {
                 mDb.jobDao().insertJobs(jobs);
             }
         });
+    }
+
+    public JobEntry getJobById(long jobId) {
+        return mDb.jobDao().loadJobById(jobId);
     }
 }

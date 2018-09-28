@@ -1,4 +1,4 @@
-package roiattia.com.capstone.ui.newexpense;
+package roiattia.com.capstone.ui.expense;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
@@ -259,17 +259,17 @@ public class ExpenseActivity extends AppCompatActivity
         if(item.getItemId() == R.id.mi_done){
             // check if all needed input exists
             if(checkInputValidation()) {
+                Toast.makeText(this, R.string.expense_saved_toast, Toast.LENGTH_LONG).show();
                 // check if user entered description
                 if(mDescriptionView.getText() != null){
                     mDescription = mDescriptionView.getText().toString();
                 }
-                Toast.makeText(this, R.string.expense_saved_toast, Toast.LENGTH_LONG).show();
                 // check if a new category needs to insert
                 if(mNewCategoryButton.isChecked()){
                     mViewModel.insertNewCategory(mCategoryName ,this);
                 } else {
                     mViewModel.createPayments(mNumberOfPayments, mMonthlyCost, mFirstPaymentDate);
-                    mViewModel.insertExpense(mCategoryId, mCost, mDescription, mNumberOfPayments,
+                    mViewModel.insertExpense(mJobId, mCategoryId, mCost, mDescription, mNumberOfPayments,
                             mMonthlyCost, mFirstPaymentDate, this);
                 }
             }
@@ -281,7 +281,7 @@ public class ExpenseActivity extends AppCompatActivity
     public void onCategoryInserted(long categoryId) {
         mCategoryId = categoryId;
         mViewModel.createPayments(mNumberOfPayments, mMonthlyCost, mFirstPaymentDate);
-        mViewModel.insertExpense(categoryId, mCost, mDescription, mNumberOfPayments, mMonthlyCost,
+        mViewModel.insertExpense(mJobId, categoryId, mCost, mDescription, mNumberOfPayments, mMonthlyCost,
                 mFirstPaymentDate,this);
     }
 

@@ -65,7 +65,7 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
-    <!-- EXPENSES LIST -->
+    <!-- EXPENSES -->
     <string name="expense_edit_button_description">expense edit button</string>
     <string name="expense_delete_button_description">expense delete button</string>
     <string name="expense_list_active_expense">Active</string>
@@ -90,6 +90,10 @@
     <string name="dialog_cancel">Cancel</string>
     <string name="pick_category_title">Pick Category</string>
     <string name="enter_category_title">Enter category name</string>
+
+    <!-- EXPENSES LIST -->
+    <string name="expenses_list_title">Expenses</string>
+    <string name="job_saved_toast_message">Job saved successfully!</string>
 
 
 </resources>

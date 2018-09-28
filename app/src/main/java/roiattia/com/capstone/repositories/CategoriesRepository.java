@@ -31,6 +31,10 @@ public class CategoriesRepository {
         return sInstance;
     }
 
+    public CategoryEntry getCategoryById(long categoryId) {
+        return mDb.categoryDao().getCategoryById(categoryId);
+    }
+
     public interface OnCategoryListener{
         void onCategoryInserted(long categoryId);
     }

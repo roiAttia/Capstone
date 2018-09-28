@@ -2,7 +2,6 @@ package roiattia.com.capstone.ui.calendar;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -15,7 +14,6 @@ import roiattia.com.capstone.database.AppExecutors;
 import roiattia.com.capstone.database.entry.JobEntry;
 import roiattia.com.capstone.model.JobCalendarModel;
 import roiattia.com.capstone.repositories.JobsRepository;
-import roiattia.com.capstone.utils.InjectorUtils;
 
 public class CalendarViewModel extends AndroidViewModel {
 
@@ -33,10 +31,6 @@ public class CalendarViewModel extends AndroidViewModel {
 
     public MutableLiveData<List<JobCalendarModel>> getMutableJobsList() {
         return mMutableJobsList;
-    }
-
-    public void insertJob(JobEntry jobEntry){
-        mRepository.insertJob(jobEntry);
     }
 
     public void loadJobsByDate(final LocalDate datePicked){

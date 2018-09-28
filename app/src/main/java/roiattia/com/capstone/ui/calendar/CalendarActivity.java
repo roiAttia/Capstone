@@ -34,7 +34,7 @@ import roiattia.com.capstone.repositories.CategoriesRepository;
 import roiattia.com.capstone.repositories.ExpensesRepository;
 import roiattia.com.capstone.ui.expenses_list.ExpensesListActivity;
 import roiattia.com.capstone.ui.finances.FinancesActivity;
-import roiattia.com.capstone.ui.newexpense.ExpenseActivity;
+import roiattia.com.capstone.ui.expense.ExpenseActivity;
 import roiattia.com.capstone.ui.newjob.JobActivity;
 import roiattia.com.capstone.utils.DummyData;
 
@@ -61,7 +61,7 @@ public class CalendarActivity extends AppCompatActivity
      */
     @OnClick(R.id.fab_add_job)
     public void addJob(){
-        Intent intent = new Intent(CalendarActivity.this, JobActivity.class);
+        Intent intent = new Intent(CalendarActivity.this, roiattia.com.capstone.ui.job.JobActivity.class);
         intent.putExtra(JOB_DATE, mSelectedDate.toString());
         startActivity(intent);
     }
@@ -223,7 +223,7 @@ public class CalendarActivity extends AppCompatActivity
 
     @Override
     public void onJobClick(long jobId) {
-        Intent intent = new Intent(CalendarActivity.this, JobActivity.class);
+        Intent intent = new Intent(CalendarActivity.this, roiattia.com.capstone.ui.job.JobActivity.class);
         intent.putExtra(JOB_ID_UPDATE, jobId);
         startActivity(intent);
     }

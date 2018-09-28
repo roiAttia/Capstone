@@ -40,7 +40,7 @@ public interface JobDao {
     void deleteJob(JobEntry jobEntry);
 
     @Query("SELECT * FROM job WHERE job_id=:jobId")
-    LiveData<JobEntry> loadJobById(Long jobId);
+    JobEntry loadJobById(long jobId);
 
     @Query("SELECT SUM(job_income) as mIncome, SUM(job_profits) as mProfit " +
             "FROM job WHERE job_payment_date BETWEEN :from AND :to")

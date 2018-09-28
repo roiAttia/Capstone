@@ -28,11 +28,11 @@ public class DummyData {
         List<ExpenseEntry> expenses = new ArrayList<>();
         LocalDate firstPaymentDate = new LocalDate("2018-09-23");
         LocalDate lastPaymentDate = new LocalDate("2018-09-23");
-        ExpenseEntry expense_1 = new ExpenseEntry(3, 400, "Lorem ipsum dolor sit amet",
+        ExpenseEntry expense_1 = new ExpenseEntry(null, 3, 400, "Lorem ipsum dolor sit amet",
                 200, 2, firstPaymentDate, lastPaymentDate);
         firstPaymentDate = firstPaymentDate.plusDays(1);
         lastPaymentDate = new LocalDate("2018-10-23");
-        ExpenseEntry expense_2 = new ExpenseEntry(4,1500, "Lorem ipsum dolor sit amet,\" +\n" +
+        ExpenseEntry expense_2 = new ExpenseEntry(null,4,1500, "Lorem ipsum dolor sit amet,\" +\n" +
                 "\" consectetur adipiscing elit, sed", 500, 3,
                 firstPaymentDate, lastPaymentDate);
         expenses.add(expense_1);

@@ -23,7 +23,7 @@
         <activity
             android:name=".ui.finances.FinancesActivity"
             android:parentActivityName=".ui.calendar.CalendarActivity" />
-        <activity android:name=".ui.newexpense.ExpenseActivity" />
+        <activity android:name=".ui.expense.ExpenseActivity" />
 
         <receiver android:name=".widget.FinancesWidgetProvider">
             <intent-filter>
@@ -40,7 +40,8 @@
         <activity
             android:name=".ui.NavigationDrawerActivity"
             android:label="@string/title_activity_navigation_drawer"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ui.job.JobActivity"></activity>
     </application>
 
 </manifest>

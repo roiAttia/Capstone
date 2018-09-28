@@ -1,4 +1,4 @@
-package roiattia.com.capstone.ui.newexpense;
+package roiattia.com.capstone.ui.expense;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -22,7 +22,9 @@ import roiattia.com.capstone.repositories.PaymentsRepository;
 import static roiattia.com.capstone.database.entry.CategoryEntry.Type.EXPENSE;
 
 public class ExpensesViewModel extends AndroidViewModel {
+
     private static final String TAG = ExpensesViewModel.class.getSimpleName();
+
     private ExpensesRepository mExpensesRepository;
     private CategoriesRepository mCategoriesRepository;
     private PaymentsRepository mPaymentsRepository;
@@ -66,14 +68,14 @@ public class ExpensesViewModel extends AndroidViewModel {
         mCategoriesRepository.insertCategory(categoryEntry, listener);
     }
 
-    public void insertExpense(long categoryId, double cost, String description, int paymentsNumber,
+    public void insertExpense(Long jobId, long categoryId, double cost, String description, int paymentsNumber,
                               double monthlyCost, LocalDate firstDate,
                               ExpensesRepository.OnExpenseListener listener){
         ExpenseEntry expense = mMutableExpense.getValue();
         if(expense == null){
             //create new expense
-            expense = new ExpenseEntry(categoryId, cost, description, paymentsNumber, monthlyCost, firstDate,
-                    mExpenseLastPaymentDate);
+            expense = new ExpenseEntry(jobId, categoryId, cost, description, paymentsNumber, monthlyCost,
+                    firstDate, mExpenseLastPaymentDate);
         } else {
             // pass in fields to expense
             expense.setCategoryId(categoryId);
@@ -84,6 +86,7 @@ public class ExpensesViewModel extends AndroidViewModel {
             if(mExpenseLastPaymentDate != null) {
                 expense.setExpenseLastPayment(mExpenseLastPaymentDate);
             }
+            expense.setJobId(jobId);
         }
         mExpensesRepository.insertExpense(expense, listener);
     }

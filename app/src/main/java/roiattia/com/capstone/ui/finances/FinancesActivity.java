@@ -25,7 +25,7 @@ import roiattia.com.capstone.model.OverallIncomeModel;
 import roiattia.com.capstone.model.IncomeModel;
 import roiattia.com.capstone.ui.dialogs.RadioButtonsDialog;
 import roiattia.com.capstone.ui.payments.PaymentsActivity;
-import roiattia.com.capstone.ui.newexpense.ExpenseActivity;
+import roiattia.com.capstone.ui.expense.ExpenseActivity;
 import roiattia.com.capstone.ui.newjob.JobActivity;
 import roiattia.com.capstone.utils.DateUtils;
 

@@ -7,4 +7,6 @@ public class Constants {
     public static final String JOB_ID_UPDATE = "job_id_update";
     public static final String EXTRA_EXPENSE_ID = "expense_id";
     public static final String EXPENSE_FOR_RESULT = "expense_for_result";
+
+    public static final int EXPENSE_ID_REQUEST = 1;  // Request code
 }

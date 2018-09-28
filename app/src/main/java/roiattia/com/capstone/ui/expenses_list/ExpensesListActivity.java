@@ -11,19 +11,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import org.joda.time.LocalDate;
-
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
-import roiattia.com.capstone.database.entry.ExpenseEntry;
 import roiattia.com.capstone.model.ExpenseListModel;
-import roiattia.com.capstone.ui.newexpense.ExpenseActivity;
-import roiattia.com.capstone.utils.DateUtils;
+import roiattia.com.capstone.ui.expense.ExpenseActivity;
 
-import static roiattia.com.capstone.ui.newexpense.ExpenseActivity.EXTRA_EXPENSE_ID;
+import static roiattia.com.capstone.utils.Constants.EXTRA_EXPENSE_ID;
 
 public class ExpensesListActivity extends AppCompatActivity
     implements ExpensesListAdapter.OnExpenseClickHandler {
@@ -40,6 +36,8 @@ public class ExpensesListActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expenses_list);
         ButterKnife.bind(this);
+
+        setTitle(getString(R.string.expenses_list_title));
 
         setupRecyclerView();
 
@@ -96,6 +94,4 @@ public class ExpensesListActivity extends AppCompatActivity
         intent.putExtra(EXTRA_EXPENSE_ID, expenseId);
         startActivity(intent);
     }
-
-    // TODO: order expenses by completion and end date
 }

@@ -10,6 +10,7 @@ import java.util.List;
 import roiattia.com.capstone.database.AppDatabase;
 import roiattia.com.capstone.database.AppExecutors;
 import roiattia.com.capstone.database.entry.ExpenseEntry;
+import roiattia.com.capstone.model.ExpandableListChild;
 import roiattia.com.capstone.model.ExpenseListModel;
 
 public class ExpensesRepository {
@@ -50,6 +51,10 @@ public class ExpensesRepository {
 
     public LiveData<List<ExpenseListModel>> getExpenses() {
         return mDb.expenseDao().loadExpenses();
+    }
+
+    public LiveData<List<ExpandableListChild>> getExpensesByIds(long[] expensesIds) {
+        return mDb.expenseDao().loadExpensesByIds(expensesIds);
     }
 
     public interface OnExpenseListener{
