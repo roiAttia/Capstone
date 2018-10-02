@@ -12,6 +12,7 @@ import roiattia.com.capstone.database.AppExecutors;
 import roiattia.com.capstone.database.entry.ExpenseEntry;
 import roiattia.com.capstone.model.ExpandableListChild;
 import roiattia.com.capstone.model.ExpenseListModel;
+import roiattia.com.capstone.model.OverallExpensesModel;
 
 public class ExpensesRepository {
 
@@ -45,7 +46,7 @@ public class ExpensesRepository {
         });
     }
 
-    public List<ExpenseEntry> getExpensesBetweenDates(LocalDate start, LocalDate end) {
+    public OverallExpensesModel getExpensesBetweenDates(LocalDate start, LocalDate end) {
         return mDb.expenseDao().loadExpensesBetweenDates(start, end);
     }
 

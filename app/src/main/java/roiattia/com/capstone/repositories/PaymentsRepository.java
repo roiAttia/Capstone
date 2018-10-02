@@ -2,11 +2,14 @@ package roiattia.com.capstone.repositories;
 
 import android.content.Context;
 
+import org.joda.time.LocalDate;
+
 import java.util.List;
 
 import roiattia.com.capstone.database.AppDatabase;
 import roiattia.com.capstone.database.AppExecutors;
 import roiattia.com.capstone.database.entry.PaymentEntry;
+import roiattia.com.capstone.model.OverallExpensesModel;
 
 public class PaymentsRepository {
 
@@ -38,5 +41,9 @@ public class PaymentsRepository {
                 mDb.paymentDao().insertPayments(payments);
             }
         });
+    }
+
+    public OverallExpensesModel getPaymentsBetweenDates(LocalDate from, LocalDate to) {
+        return mDb.paymentDao().getPaymentsBetweenDates(from, to);
     }
 }

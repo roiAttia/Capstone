@@ -35,7 +35,7 @@ import roiattia.com.capstone.repositories.ExpensesRepository;
 import roiattia.com.capstone.ui.expenses_list.ExpensesListActivity;
 import roiattia.com.capstone.ui.finances.FinancesActivity;
 import roiattia.com.capstone.ui.expense.ExpenseActivity;
-import roiattia.com.capstone.ui.newjob.JobActivity;
+import roiattia.com.capstone.ui.job.JobActivity;
 import roiattia.com.capstone.utils.DummyData;
 
 import static roiattia.com.capstone.utils.Constants.JOB_DATE;

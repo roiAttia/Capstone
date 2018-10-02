@@ -19,9 +19,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.model.PaymentItemModel;
-import roiattia.com.capstone.ui.finances.FinancesActivity;
 import roiattia.com.capstone.utils.DateUtils;
-import roiattia.com.capstone.utils.InjectorUtils;
+
+import static roiattia.com.capstone.utils.Constants.BUNDLE_CATEGORY_DATA;
+import static roiattia.com.capstone.utils.Constants.BUNDLE_CATEGORY_ID;
+import static roiattia.com.capstone.utils.Constants.BUNDLE_CATEGORY_NAME;
+import static roiattia.com.capstone.utils.Constants.BUNDLE_END_DATE;
+import static roiattia.com.capstone.utils.Constants.BUNDLE_START_DATE;
 
 public class PaymentsActivity extends AppCompatActivity {
 
@@ -42,15 +46,15 @@ public class PaymentsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         // check for intent extra as bundle
-        if(intent != null && intent.hasExtra(FinancesActivity.BUNDLE_CATEGORY_DATA)){
+        if(intent != null && intent.hasExtra(BUNDLE_CATEGORY_DATA)){
             // extract all data from bundle
-            Bundle categoryDataBundle = intent.getBundleExtra(FinancesActivity.BUNDLE_CATEGORY_DATA);
-            String categoryName = categoryDataBundle.getString(FinancesActivity.BUNDLE_CATEGORY_NAME);
-            long categoryId = categoryDataBundle.getLong(FinancesActivity.BUNDLE_CATEGORY_ID);
+            Bundle categoryDataBundle = intent.getBundleExtra(BUNDLE_CATEGORY_DATA);
+            String categoryName = categoryDataBundle.getString(BUNDLE_CATEGORY_NAME);
+            long categoryId = categoryDataBundle.getLong(BUNDLE_CATEGORY_ID);
             LocalDate startDate = new LocalDate(
-                    categoryDataBundle.getString(FinancesActivity.BUNDLE_START_DATE));
+                    categoryDataBundle.getString(BUNDLE_START_DATE));
             LocalDate endDate = new LocalDate(
-                    categoryDataBundle.getString(FinancesActivity.BUNDLE_END_DATE));
+                    categoryDataBundle.getString(BUNDLE_END_DATE));
 
             // set head_line as follows: *category_name* transactions <br> *start_date*
             // - *end_date*. example: Fuel transactions <br> 20/08/2018 - 26/08/2018
@@ -58,10 +62,8 @@ public class PaymentsActivity extends AppCompatActivity {
                     + "<br>" + DateUtils.getDateStringFormat(startDate) + " - " +
                     DateUtils.getDateStringFormat(endDate)));
 
-            // setup factory and view model
-            PaymentsViewModelFactory factory = InjectorUtils
-                    .provideCategoryDetailsViewModelFactory(this, categoryId, startDate, endDate);
-            PaymentsViewModel viewModel = ViewModelProviders.of(this, factory).get(PaymentsViewModel.class);
+
+            PaymentsViewModel viewModel = ViewModelProviders.of(this).get(PaymentsViewModel.class);
             // observe on payments
             viewModel.getPaymentsDetails().observe(this, new Observer<List<PaymentItemModel>>() {
                 @Override

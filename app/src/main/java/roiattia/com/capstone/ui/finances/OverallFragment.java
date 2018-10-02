@@ -1,9 +1,10 @@
 package roiattia.com.capstone.ui.finances;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +15,12 @@ import org.joda.time.LocalDate;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 import roiattia.com.capstone.R;
-import roiattia.com.capstone.model.ExpensesModel;
 import roiattia.com.capstone.model.OverallExpensesModel;
 import roiattia.com.capstone.model.OverallIncomeModel;
+import roiattia.com.capstone.ui.dialogs.RadioButtonsDialog;
 import roiattia.com.capstone.utils.AmountUtils;
 import roiattia.com.capstone.utils.DateUtils;
 
@@ -25,12 +28,9 @@ public class OverallFragment extends BaseFinancialFragment {
 
     public static final String TAG = OverallFragment.class.getSimpleName();
 
-    private OverallIncomeModel mCurrentFinancial;
-    private OverallIncomeModel mExpectedFinancial;
-    private OverallExpensesModel mCurrentExpenses;
-    private OverallExpensesModel mExpectedExpenses;
-    private LocalDate mStartDate;
-    private LocalDate mEndDate;
+    private FinancesViewModel mViewModel;
+    private DateModel mDateModel;
+    private Unbinder unbinder;
 
     @BindView(R.id.tv_current_income)TextView mCurrentIncomeView;
     @BindView(R.id.tv_current_expenses)TextView mCurrentExpensesView;
@@ -38,12 +38,21 @@ public class OverallFragment extends BaseFinancialFragment {
     @BindView(R.id.tv_expected_income)TextView mExpectedIncomeView;
     @BindView(R.id.tv_expected_expenses)TextView mExpectedExpensesView;
     @BindView(R.id.tv_expected_profits)TextView mExpectedProfitsView;
+    @BindView(R.id.tv_overall_income)TextView mOverallIncomeView;
+    @BindView(R.id.tv_overall_expenses)TextView mOverallExpensesView;
+    @BindView(R.id.tv_overall_profits)TextView mOverallProfitsView;
+    @BindView(R.id.tv_current_date)TextView mCurrentDateText;
+    @BindView(R.id.tv_expected_date)TextView mExpectedText;
+    @BindView(R.id.tv_overall_date)TextView mOverallText;
     @BindView(R.id.btn_select_period)Button mSelectPeriodButton;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.i(TAG, "onCreate");
+    @OnClick(R.id.btn_select_period)
+    public void selectPeriod(){
+        RadioButtonsDialog pickPeriodDialog = new RadioButtonsDialog();
+        final String[] itemsFromR = getResources().getStringArray(R.array.period_selection_options);
+        pickPeriodDialog.setData(itemsFromR);
+        pickPeriodDialog.setTitle("Select period");
+        pickPeriodDialog.show(getChildFragmentManager(), "pop");
     }
 
     @Nullable
@@ -51,94 +60,109 @@ public class OverallFragment extends BaseFinancialFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_overall, container, false);
-        ButterKnife.bind(this, rootView);
-        Log.i(TAG, "onCreateView");
+        unbinder = ButterKnife.bind(this, rootView);
+        mDateModel = DateModel.getInstance();
 
-        mSelectPeriodButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PickPeriodDialog pickPeriodDialog = new PickPeriodDialog();
-                if (getFragmentManager() != null) {
-                    pickPeriodDialog.show(getFragmentManager(), "pop");
-                }
-            }
-        });
-
-        if(mStartDate != null && mEndDate != null) {
-            mSelectPeriodButton.setText(DateUtils.getDateStringFormat(mStartDate) + " - " +
-                    DateUtils.getDateStringFormat(mEndDate));
-        }
-
-        updateCurrentCard();
-        updateExpectedCard();
-        updateCurrentExpenses();
-        updateExpectedExpenses();
+        setupViewModel();
 
         return rootView;
     }
 
-    public void setCurrentData(OverallIncomeModel financialModel){
-        mCurrentFinancial = financialModel;
-        updateCurrentCard();
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
-    public void setExpectedData(OverallIncomeModel financialModel){
-        mExpectedFinancial = financialModel;
-        updateExpectedCard();
-    }
+    private void setupViewModel() {
+        final double[] profits = {0};
+        mViewModel = ViewModelProviders.of(getActivity()).get(FinancesViewModel.class);
+        // current
+        mViewModel.getCurrentFromIncomeProfitLiveData().observe(this, new Observer<OverallIncomeModel>() {
+            @Override
+            public void onChanged(@Nullable OverallIncomeModel overallIncomeModel) {
+                if(overallIncomeModel != null) {
+                    mCurrentIncomeView.setText(String.format("%s%s", getString(R.string.overall_income),
+                            AmountUtils.getStringFormatFromDouble(overallIncomeModel.getIncome())));
+                    profits[0] = overallIncomeModel.getProfit();
+                    mCurrentDateText.setText(String.format("%s %s - %s", getString(R.string.current),
+                            DateUtils.getDateStringFormat(mDateModel.getCurrentFromDate()),
+                            DateUtils.getDateStringFormat(mDateModel.getCurrentToDate())));
+                }
+            }
+        });
+        mViewModel.getCurrentExpensesLiveData().observe(this, new Observer<OverallExpensesModel>() {
+            @Override
+            public void onChanged(@Nullable OverallExpensesModel overallExpensesModel) {
+                if(overallExpensesModel != null){
+                    mCurrentExpensesView.setText(String.format("%s%s", getString(R.string.overall_expenses),
+                            AmountUtils.getStringFormatFromDouble(overallExpensesModel.getCost())));
+                    profits[0] -= overallExpensesModel.getCost();
+                    mCurrentProfitsView.setText(String.format("%s%s", getString(R.string.overall_profits),
+                            AmountUtils.getStringFormatFromDouble(profits[0])));
+                }
+            }
+        });
+        profits[0] = 0;
+        // expected
+        mViewModel.getExpectedIncomeProfitLiveData().observe(this, new Observer<OverallIncomeModel>() {
+            @Override
+            public void onChanged(@Nullable OverallIncomeModel overallIncomeModel) {
+                if(overallIncomeModel != null) {
+                    mExpectedIncomeView.setText(String.format("%s%s", getString(R.string.overall_income),
+                            AmountUtils.getStringFormatFromDouble(overallIncomeModel.getIncome())));
+                    profits[0] = overallIncomeModel.getProfit();
+                    mExpectedText.setText(String.format("%s %s - %s", getString(R.string.current),
+                            DateUtils.getDateStringFormat(mDateModel.getExpectedFromDate()),
+                            DateUtils.getDateStringFormat(mDateModel.getExpectedToDate())));
+                }
+            }
+        });
+        mViewModel.getExpectedExpensesLiveData().observe(this, new Observer<OverallExpensesModel>() {
+            @Override
+            public void onChanged(@Nullable OverallExpensesModel overallExpensesModel) {
+                if(overallExpensesModel != null){
+                    mExpectedExpensesView.setText(String.format("%s%s", getString(R.string.overall_expenses),
+                            AmountUtils.getStringFormatFromDouble(overallExpensesModel.getCost())));
+                    profits[0] -= overallExpensesModel.getCost();
+                    mExpectedProfitsView.setText(String.format("%s%s", getString(R.string.overall_profits),
+                            AmountUtils.getStringFormatFromDouble(profits[0])));
+                }
+            }
+        });
+        profits[0] = 0;
+        // overall
+        mViewModel.getOverallIncomeProfitLiveData().observe(this, new Observer<OverallIncomeModel>() {
+            @Override
+            public void onChanged(@Nullable OverallIncomeModel overallIncomeModel) {
+                if(overallIncomeModel != null) {
+                    mOverallIncomeView.setText(String.format("%s%s", getString(R.string.overall_income),
+                            AmountUtils.getStringFormatFromDouble(overallIncomeModel.getIncome())));
+                    profits[0] = overallIncomeModel.getProfit();
+                    mOverallText.setText(String.format("%s %s - %s", getString(R.string.current),
+                            DateUtils.getDateStringFormat(mDateModel.getCurrentFromDate()),
+                            DateUtils.getDateStringFormat(mDateModel.getExpectedToDate())));
+                }
+            }
+        });
+        mViewModel.getOverallExpensesLiveData().observe(this, new Observer<OverallExpensesModel>() {
+            @Override
+            public void onChanged(@Nullable OverallExpensesModel overallExpensesModel) {
+                if(overallExpensesModel != null){
+                    mOverallExpensesView.setText(String.format("%s%s", getString(R.string.overall_expenses),
+                            AmountUtils.getStringFormatFromDouble(overallExpensesModel.getCost())));
+                    profits[0] -= overallExpensesModel.getCost();
+                    mOverallProfitsView.setText(String.format("%s%s", getString(R.string.overall_profits),
+                            AmountUtils.getStringFormatFromDouble(profits[0])));
+                }
+            }
+        });
 
-    public void setCurrentExpensesData(OverallExpensesModel expensesModel){
-        mCurrentExpenses = expensesModel;
-        updateCurrentExpenses();
-    }
-
-    public void setExpectedExpensesData(OverallExpensesModel expensesModel){
-        mExpectedExpenses = expensesModel;
-        updateExpectedExpenses();
-    }
-
-    public void updateCurrentCard() {
-        Log.i(TAG, "updateCurrentCard");
-        if(mCurrentFinancial != null) {
-            mCurrentIncomeView.setText(String.format("INCOME: %s", AmountUtils.getStringFormatFromDouble(
-                    mCurrentFinancial.getIncome())));
-            mCurrentProfitsView.setText(String.format("PROFITS: %s", AmountUtils.getStringFormatFromDouble(
-                    mCurrentFinancial.getProfit())));
-        }
-    }
-
-    public void updateExpectedCard() {
-        Log.i(TAG, "updateExpectedCard");
-        if(mExpectedFinancial != null) {
-            mExpectedIncomeView.setText(String.format("INCOME: %s", AmountUtils.getStringFormatFromDouble(
-                    mExpectedFinancial.getIncome())));
-            mExpectedProfitsView.setText(String.format("PROFITS: %s", AmountUtils.getStringFormatFromDouble(
-                    mExpectedFinancial.getProfit())));
-        }
-    }
-
-    public void updateCurrentExpenses() {
-        Log.i(TAG, "updateCurrentExpenses");
-        if(mCurrentExpenses != null) {
-            mCurrentExpensesView.setText(String.format("EXPENSES: %s", AmountUtils.getStringFormatFromDouble(
-                    mCurrentExpenses.getCost())));
-        }
-    }
-
-    public void updateExpectedExpenses() {
-        Log.i(TAG, "updateExpectedExpenses");
-        if(mExpectedExpenses != null) {
-            mExpectedExpensesView.setText(String.format("EXPENSES: %s", AmountUtils.getStringFormatFromDouble(
-                    mExpectedExpenses.getCost())));
-        }
     }
 
     public void updatePeriodText(LocalDate startDate, LocalDate endDate) {
-        mStartDate = startDate;
-        mEndDate = endDate;
         if(mSelectPeriodButton != null){
-            mSelectPeriodButton.setText(DateUtils.getDateStringFormat(mStartDate) + " - " +
-                    DateUtils.getDateStringFormat(mEndDate));
+            mSelectPeriodButton.setText(DateUtils.getDateStringFormat(startDate) + " - " +
+                    DateUtils.getDateStringFormat(endDate));
         }
     }
 }

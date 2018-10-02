@@ -94,6 +94,7 @@
     <!-- EXPENSES LIST -->
     <string name="expenses_list_title">Expenses</string>
     <string name="job_saved_toast_message">Job saved successfully!</string>
+    <string name="current">CURRENT:</string>
 
 
 </resources>

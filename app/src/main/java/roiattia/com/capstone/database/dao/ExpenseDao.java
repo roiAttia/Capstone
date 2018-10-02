@@ -92,9 +92,9 @@ public interface ExpenseDao {
             "FROM payment WHERE payment_date BETWEEN :from AND :to")
     LiveData<OverallExpensesModel> loadPaymentsBetweenDates(LocalDate from, LocalDate to);
 
-    @Query("SELECT * FROM expense " +
+    @Query("SELECT SUM(expense_cost) AS mCost FROM expense " +
             "WHERE expense_first_payment_date >=:start AND expense_last_payment_date >=:end")
-    List<ExpenseEntry> loadExpensesBetweenDates(LocalDate start, LocalDate end);
+    OverallExpensesModel loadExpensesBetweenDates(LocalDate start, LocalDate end);
 
     @Query("SELECT expense_id as mExpenseId, description as mDescription, expense_cost as mExpenseCost, " +
             "number_of_payments as mNumberOfPayments, expense_monthly_cost as mMonthlyCost," +

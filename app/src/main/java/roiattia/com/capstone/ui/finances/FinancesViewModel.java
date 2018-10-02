@@ -2,74 +2,95 @@ package roiattia.com.capstone.ui.finances;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import org.joda.time.LocalDate;
 
-import java.util.List;
-
-import roiattia.com.capstone.database.entry.CategoryEntry;
-import roiattia.com.capstone.database.entry.ExpenseEntry;
-import roiattia.com.capstone.model.ExpensesModel;
+import roiattia.com.capstone.database.AppExecutors;
 import roiattia.com.capstone.model.OverallExpensesModel;
 import roiattia.com.capstone.model.OverallIncomeModel;
-import roiattia.com.capstone.model.IncomeModel;
-import roiattia.com.capstone.utils.InjectorUtils;
+import roiattia.com.capstone.repositories.ExpensesRepository;
+import roiattia.com.capstone.repositories.JobsRepository;
+import roiattia.com.capstone.repositories.PaymentsRepository;
 
 public class FinancesViewModel extends AndroidViewModel {
 
     private static final String TAG = FinancesViewModel.class.getSimpleName();
 
-    private FinancesRepository mRepository;
-    private LocalDate mStartDate;
-    private LocalDate mEndDate;
+    private ExpensesRepository mExpensesRepository;
+    private JobsRepository mJobsRepository;
+    PaymentsRepository mPaymentsRepository;
+    private AppExecutors mExecutors;
+    private DateModel mDateModel;
+    private MutableLiveData<OverallIncomeModel> mCurrentFromIncomeProfitLiveData;
+    private MutableLiveData<OverallExpensesModel> mCurrentExpensesLiveData;
+    private MutableLiveData<OverallIncomeModel> mExpectedIncomeProfitLiveData;
+    private MutableLiveData<OverallExpensesModel> mExpectedExpensesLiveData;
+    private MutableLiveData<OverallIncomeModel> mOverallIncomeProfitLiveData;
+    private MutableLiveData<OverallExpensesModel> mOverallExpensesLiveData;
 
     public FinancesViewModel(@NonNull Application application) {
         super(application);
-        mRepository = InjectorUtils.provideFinancesRepository(this.getApplication());
-        mStartDate = new LocalDate();
-        mEndDate = new LocalDate();
+        mExecutors = AppExecutors.getInstance();
+        mDateModel = DateModel.getInstance();
+        mExpensesRepository = ExpensesRepository.getInstance(application.getApplicationContext());
+        mJobsRepository = JobsRepository.getInstance(application.getApplicationContext());
+        mPaymentsRepository = PaymentsRepository.getInstance(application.getApplicationContext());
+        mCurrentFromIncomeProfitLiveData = new MutableLiveData<>();
+        mCurrentExpensesLiveData = new MutableLiveData<>();
+        mExpectedIncomeProfitLiveData = new MutableLiveData<>();
+        mExpectedExpensesLiveData = new MutableLiveData<>();
+        mOverallIncomeProfitLiveData = new MutableLiveData<>();
+        mOverallExpensesLiveData = new MutableLiveData<>();
     }
 
-    public LiveData<OverallIncomeModel> getCurrentOverallReport() {
-        return mRepository.getJobsBetweenDates(mStartDate, new LocalDate());
+    public void setDates(final LocalDate from, final LocalDate to, final MutableLiveData income,
+                         final MutableLiveData expenses){
+        mExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                OverallIncomeModel incomeModel = mJobsRepository.getIncomeAndProfitsBetweenDates(from, to);
+                OverallExpensesModel expensesModel = mPaymentsRepository.getPaymentsBetweenDates(from, to);
+                income.postValue(incomeModel);
+                expenses.postValue(expensesModel);
+            }
+        });
     }
 
-    public LiveData<OverallIncomeModel> getExpectedOverallReport() {
-        return mRepository.getJobsBetweenDates(new LocalDate(), mEndDate);
+    public MutableLiveData<OverallIncomeModel> getCurrentFromIncomeProfitLiveData() {
+        return mCurrentFromIncomeProfitLiveData;
     }
 
-    public LiveData<OverallExpensesModel> getCurrentExpensesReport() {
-        return mRepository.getExpensesBetweenDates(mStartDate, new LocalDate());
+    public MutableLiveData<OverallExpensesModel> getCurrentExpensesLiveData() {
+        return mCurrentExpensesLiveData;
     }
 
-    public LiveData<OverallExpensesModel> getExpectedExpensesReport() {
-        return mRepository.getExpensesBetweenDates(new LocalDate(), mEndDate);
+    public MutableLiveData<OverallIncomeModel> getExpectedIncomeProfitLiveData() {
+        return mExpectedIncomeProfitLiveData;
     }
 
-
-    public LiveData<List<IncomeModel>> getIncomeReport(CategoryEntry.Type type) {
-        Log.i(TAG, "get income report start date: " + mStartDate + ", end date: " + mEndDate);
-        return mRepository.getIncomeBetweenDates(mStartDate, mEndDate, type);
+    public MutableLiveData<OverallExpensesModel> getExpectedExpensesLiveData() {
+        return mExpectedExpensesLiveData;
     }
 
-    public LiveData<List<ExpensesModel>> getExpensesReport(CategoryEntry.Type type) {
-        return mRepository.getExpensesBetweenDates(mStartDate, mEndDate, type);
+    public MutableLiveData<OverallIncomeModel> getOverallIncomeProfitLiveData() {
+        return mOverallIncomeProfitLiveData;
     }
 
-    public void setDatesRange(LocalDate startDate, LocalDate endDate){
-        mStartDate = startDate;
-        mEndDate = endDate;
+    public MutableLiveData<OverallExpensesModel> getOverallExpensesLiveData() {
+        return mOverallExpensesLiveData;
     }
 
-    public LiveData<List<ExpenseEntry>> getExpensesByCategory(long categoryId){
-        return mRepository.getExpensesByCategoryId(categoryId);
+    public void updateDates() {
+        setDates(mDateModel.getCurrentFromDate(), mDateModel.getCurrentToDate(), mCurrentFromIncomeProfitLiveData,
+                 mCurrentExpensesLiveData);
+        setDates(mDateModel.getExpectedFromDate(), mDateModel.getExpectedToDate(), mExpectedIncomeProfitLiveData,
+                mExpectedExpensesLiveData);
+        setDates(mDateModel.getCurrentFromDate(), mDateModel.getExpectedToDate(), mOverallIncomeProfitLiveData,
+                mOverallExpensesLiveData);
+
     }
 
-    public LiveData<List<ExpensesModel>> getPaymentsReport() {
-        return mRepository.getPaymentsPerCategoryBetweenDates(mStartDate, mEndDate);
-    }
 
 }

@@ -10,6 +10,7 @@ import org.joda.time.LocalDate;
 import java.util.List;
 
 import roiattia.com.capstone.database.entry.PaymentEntry;
+import roiattia.com.capstone.model.OverallExpensesModel;
 import roiattia.com.capstone.model.PaymentItemModel;
 
 @Dao
@@ -31,4 +32,8 @@ public interface PaymentDao {
 
     @Query("DELETE FROM payment")
     void deleteAllPayments();
+
+    @Query("SELECT SUM(payment_cost) AS mCost FROM payment " +
+            "WHERE payment_date BETWEEN :from AND :to")
+    OverallExpensesModel getPaymentsBetweenDates(LocalDate from, LocalDate to);
 }
