@@ -99,7 +99,7 @@ public class JobViewModel extends AndroidViewModel {
         return mMutableLiveCategory;
     }
 
-    public void insertJob(long jobId, long categoryId, String description, LocalDate jobDate, LocalDate jobPaymentDate,
+    public void insertJob(Long jobId, long categoryId, String description, LocalDate jobDate, LocalDate jobPaymentDate,
                           double jobIncome, double jobExpense, double jobProfit, JobsRepository.OnJobListener listener){
         JobEntry job = new JobEntry(jobId, categoryId, description, jobDate, jobPaymentDate,
                 jobIncome, jobExpense, jobProfit);

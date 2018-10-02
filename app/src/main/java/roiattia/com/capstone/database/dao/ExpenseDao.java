@@ -54,7 +54,7 @@ public interface ExpenseDao {
             "JOIN payment ON expense.expense_id = payment.expense_id " +
             "WHERE payment.payment_date BETWEEN :from AND :to " +
             "GROUP BY category_name")
-    LiveData<List<ExpensesModel>> loadPaymentsPerCategoryBetweenDates(LocalDate from, LocalDate to);
+    List<ExpensesModel> loadPaymentsPerCategoryBetweenDates(LocalDate from, LocalDate to);
 
     @Query("SELECT * FROM expense " +
             "WHERE expense_id=:expenseId")

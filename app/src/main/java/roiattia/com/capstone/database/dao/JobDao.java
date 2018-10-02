@@ -59,7 +59,7 @@ public interface JobDao {
             "WHERE job_payment_date BETWEEN :from AND :to " +
             "AND category_type=:type " +
             "GROUP BY category_name")
-    LiveData<List<IncomeModel>> loadIncomeBetweenDates(LocalDate from, LocalDate to,
+    List<IncomeModel> loadIncomeBetweenDates(LocalDate from, LocalDate to,
                                                        CategoryEntry.Type type);
 
     @Query("SELECT job_id as mJobId, category_name as mCategoryName, job_income as mJobIncome, " +

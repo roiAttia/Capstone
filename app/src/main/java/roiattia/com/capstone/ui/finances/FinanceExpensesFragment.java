@@ -31,21 +31,15 @@ public class FinanceExpensesFragment extends BaseFinancialFragment {
 
     public FinanceExpensesFragment(){}
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.i(TAG, "onCreate");
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_finances_expenses, container, false);
         mUnbinder = ButterKnife.bind(this, rootView);
 
-        setupViewModel();
-
         setupRecyclerView();
+        
+        setupViewModel();
 
         return rootView;
     }

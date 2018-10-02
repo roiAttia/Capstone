@@ -12,6 +12,7 @@ import java.util.List;
 
 import roiattia.com.capstone.database.AppExecutors;
 import roiattia.com.capstone.model.ExpensesModel;
+import roiattia.com.capstone.model.IncomeModel;
 import roiattia.com.capstone.model.OverallExpensesModel;
 import roiattia.com.capstone.model.OverallIncomeModel;
 import roiattia.com.capstone.repositories.ExpensesRepository;
@@ -24,7 +25,7 @@ public class FinancesViewModel extends AndroidViewModel {
 
     private ExpensesRepository mExpensesRepository;
     private JobsRepository mJobsRepository;
-    PaymentsRepository mPaymentsRepository;
+    private PaymentsRepository mPaymentsRepository;
     private AppExecutors mExecutors;
     private DateModel mDateModel;
     private MutableLiveData<OverallIncomeModel> mCurrentFromIncomeProfitLiveData;
@@ -33,6 +34,8 @@ public class FinancesViewModel extends AndroidViewModel {
     private MutableLiveData<OverallExpensesModel> mExpectedExpensesLiveData;
     private MutableLiveData<OverallIncomeModel> mOverallIncomeProfitLiveData;
     private MutableLiveData<OverallExpensesModel> mOverallExpensesLiveData;
+    private MutableLiveData<List<ExpensesModel>> mExpensesModelLiveData;
+    private MutableLiveData<List<IncomeModel>> mIncomeModelLiveData;
 
     public FinancesViewModel(@NonNull Application application) {
         super(application);
@@ -47,24 +50,33 @@ public class FinancesViewModel extends AndroidViewModel {
         mExpectedExpensesLiveData = new MutableLiveData<>();
         mOverallIncomeProfitLiveData = new MutableLiveData<>();
         mOverallExpensesLiveData = new MutableLiveData<>();
+        mExpensesModelLiveData = new MutableLiveData<>();
+        mIncomeModelLiveData = new MutableLiveData<>();
     }
 
-    public LiveData<List<ExpensesModel>> getExpensesLiveModel() {
-        return mExpensesRepository.getExpensesModelBetweenDates(mDateModel.getCurrentFromDate(),
-                mDateModel.getExpectedToDate());
-    }
-
-    public void setDates(final LocalDate from, final LocalDate to, final MutableLiveData income,
-                         final MutableLiveData expenses){
+    private void setDates(final LocalDate from, final LocalDate to, final MutableLiveData income,
+                          final MutableLiveData expenses){
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
                 OverallIncomeModel incomeModel = mJobsRepository.getIncomeAndProfitsBetweenDates(from, to);
                 OverallExpensesModel expensesModel = mPaymentsRepository.getPaymentsBetweenDates(from, to);
+                List<IncomeModel> incomeModels = mJobsRepository.getIncomeModelBetweenDates(from, to);
+                List<ExpensesModel> expensesModels = mExpensesRepository.getExpensesModelBetweenDates(from, to);
+                mExpensesModelLiveData.postValue(expensesModels);
+                mIncomeModelLiveData.postValue(incomeModels);
                 income.postValue(incomeModel);
                 expenses.postValue(expensesModel);
             }
         });
+    }
+
+    public MutableLiveData<List<IncomeModel>> getIncomeModelLiveData() {
+        return mIncomeModelLiveData;
+    }
+
+    public MutableLiveData<List<ExpensesModel>> getExpensesLiveModel() {
+        return mExpensesModelLiveData;
     }
 
     public MutableLiveData<OverallIncomeModel> getCurrentFromIncomeProfitLiveData() {

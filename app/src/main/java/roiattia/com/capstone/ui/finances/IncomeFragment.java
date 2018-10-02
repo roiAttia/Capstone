@@ -1,5 +1,7 @@
 package roiattia.com.capstone.ui.finances;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,6 +16,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.model.IncomeModel;
 
@@ -22,44 +25,46 @@ public class IncomeFragment extends BaseFinancialFragment{
     public static final String TAG = IncomeFragment.class.getSimpleName();
 
     private IncomeAdapter mIncomeJobsAdapter;
-    private List<IncomeModel> mIncomeModelList;
+    private Unbinder mUnbinder;
 
     @BindView(R.id.rv_income) RecyclerView mIncomeListView;
 
     public IncomeFragment(){}
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.i(TAG, "onCreate");
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_income, container, false);
-        ButterKnife.bind(this, rootView);
+        mUnbinder = ButterKnife.bind(this, rootView);
 
-        mIncomeJobsAdapter = new IncomeAdapter(mListener);
-        mIncomeListView.setHasFixedSize(true);
-        mIncomeListView.setAdapter(mIncomeJobsAdapter);
-        mIncomeListView.setLayoutManager(new LinearLayoutManager(mListener));
-        if(mIncomeModelList != null){
-            mIncomeJobsAdapter.setData(mIncomeModelList);
-        } else {
-            Log.i(TAG, "mIncomeJobsAdapter is null");
-        }
+        setupRecyclerView();
+
+        setupViewModel();
 
         return rootView;
     }
 
-    public void setData(List<IncomeModel> incomeModelList) {
-        mIncomeModelList = incomeModelList;
-        if(mIncomeJobsAdapter != null){
-            mIncomeJobsAdapter.setData(incomeModelList);
-        } else {
-            Log.i(TAG, "mIncomeJobsAdapter is null");
-        }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mUnbinder.unbind();
+    }
+
+    private void setupViewModel() {
+        FinancesViewModel viewModel = ViewModelProviders.of(getActivity()).get(FinancesViewModel.class);
+        viewModel.getIncomeModelLiveData().observe(getActivity(), new Observer<List<IncomeModel>>() {
+            @Override
+            public void onChanged(@Nullable List<IncomeModel> incomeModelList) {
+                mIncomeJobsAdapter.setData(incomeModelList);
+            }
+        });
+    }
+
+    private void setupRecyclerView() {
+        mIncomeJobsAdapter = new IncomeAdapter(mListener);
+        mIncomeListView.setHasFixedSize(true);
+        mIncomeListView.setAdapter(mIncomeJobsAdapter);
+        mIncomeListView.setLayoutManager(new LinearLayoutManager(mListener));
     }
 
 }

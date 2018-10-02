@@ -38,18 +38,22 @@ public class DateModel {
     public void setDates(int periodSelected){
         switch (periodSelected){
             case 0: // week
-                mCurrentFromDate = DateUtils.getStartDateOfTheWeek();
+                mCurrentFromDate = LocalDate.now().withDayOfWeek(1);
                 mCurrentToDate = LocalDate.now();
                 mExpectedFromDate = LocalDate.now().plusDays(1);
                 mExpectedToDate = LocalDate.now().withDayOfWeek(7);
                 break;
             case 1: // month
-//                mStartDate = mStartDate.plusMonths(0).withDayOfMonth(1);
-//                mEndDate = mEndDate.plusMonths(1).withDayOfMonth(1);
+                mCurrentFromDate = LocalDate.now().withDayOfMonth(1);
+                mCurrentToDate = LocalDate.now();
+                mExpectedFromDate = LocalDate.now().plusDays(1);
+                mExpectedToDate = LocalDate.now().withDayOfMonth(31);
                 break;
             case 2: // year
-//                mStartDate = mStartDate.plusYears(0).plusMonths(0).withDayOfYear(1);
-//                mEndDate = mEndDate.plusYears(1).plusMonths(0).withDayOfYear(1);
+                mCurrentFromDate = LocalDate.now().withDayOfYear(1);
+                mCurrentToDate = LocalDate.now();
+                mExpectedFromDate = LocalDate.now().plusDays(1);
+                mExpectedToDate = LocalDate.now().withDayOfYear(365);
                 break;
         }
         logDates();

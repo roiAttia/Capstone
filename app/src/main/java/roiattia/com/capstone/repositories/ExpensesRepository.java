@@ -59,7 +59,7 @@ public class ExpensesRepository {
         return mDb.expenseDao().loadExpensesByIds(expensesIds);
     }
 
-    public LiveData<List<ExpensesModel>> getExpensesModelBetweenDates(
+    public List<ExpensesModel> getExpensesModelBetweenDates(
             LocalDate currentFromDate, LocalDate expectedToDate) {
         return mDb.expenseDao().loadPaymentsPerCategoryBetweenDates(currentFromDate, expectedToDate);
     }
