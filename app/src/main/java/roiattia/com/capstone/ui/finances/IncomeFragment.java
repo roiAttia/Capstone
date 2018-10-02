@@ -25,7 +25,6 @@ public class IncomeFragment extends BaseFinancialFragment{
     public static final String TAG = IncomeFragment.class.getSimpleName();
 
     private IncomeAdapter mIncomeJobsAdapter;
-    private Unbinder mUnbinder;
 
     @BindView(R.id.rv_income) RecyclerView mIncomeListView;
 
@@ -35,7 +34,7 @@ public class IncomeFragment extends BaseFinancialFragment{
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_income, container, false);
-        mUnbinder = ButterKnife.bind(this, rootView);
+        super.mUnbinder = ButterKnife.bind(this, rootView);
 
         setupRecyclerView();
 
@@ -44,15 +43,8 @@ public class IncomeFragment extends BaseFinancialFragment{
         return rootView;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mUnbinder.unbind();
-    }
-
     private void setupViewModel() {
-        FinancesViewModel viewModel = ViewModelProviders.of(getActivity()).get(FinancesViewModel.class);
-        viewModel.getIncomeModelLiveData().observe(getActivity(), new Observer<List<IncomeModel>>() {
+        mViewModel.getIncomeModelLiveData().observe(this, new Observer<List<IncomeModel>>() {
             @Override
             public void onChanged(@Nullable List<IncomeModel> incomeModelList) {
                 mIncomeJobsAdapter.setData(incomeModelList);
@@ -62,9 +54,7 @@ public class IncomeFragment extends BaseFinancialFragment{
 
     private void setupRecyclerView() {
         mIncomeJobsAdapter = new IncomeAdapter(mListener);
-        mIncomeListView.setHasFixedSize(true);
-        mIncomeListView.setAdapter(mIncomeJobsAdapter);
-        mIncomeListView.setLayoutManager(new LinearLayoutManager(mListener));
+        super.setupRecyclerView(mIncomeListView, mIncomeJobsAdapter);
     }
 
 }

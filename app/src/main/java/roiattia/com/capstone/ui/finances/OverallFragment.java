@@ -28,9 +28,7 @@ public class OverallFragment extends BaseFinancialFragment {
 
     public static final String TAG = OverallFragment.class.getSimpleName();
 
-    private FinancesViewModel mViewModel;
     private DateModel mDateModel;
-    private Unbinder mUnbinder;
 
     @BindView(R.id.tv_current_income)TextView mCurrentIncomeView;
     @BindView(R.id.tv_current_expenses)TextView mCurrentExpensesView;
@@ -60,7 +58,7 @@ public class OverallFragment extends BaseFinancialFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_overall, container, false);
-        mUnbinder = ButterKnife.bind(this, rootView);
+        super.mUnbinder = ButterKnife.bind(this, rootView);
         mDateModel = DateModel.getInstance();
 
         setupViewModel();
@@ -68,14 +66,8 @@ public class OverallFragment extends BaseFinancialFragment {
         return rootView;
     }
 
-    @Override public void onDestroyView() {
-        super.onDestroyView();
-        mUnbinder.unbind();
-    }
-
     private void setupViewModel() {
         final double[] profits = {0};
-        mViewModel = ViewModelProviders.of(getActivity()).get(FinancesViewModel.class);
         // current
         mViewModel.getCurrentFromIncomeProfitLiveData().observe(this, new Observer<OverallIncomeModel>() {
             @Override

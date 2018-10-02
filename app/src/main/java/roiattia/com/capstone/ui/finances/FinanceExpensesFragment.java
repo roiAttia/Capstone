@@ -25,7 +25,6 @@ public class FinanceExpensesFragment extends BaseFinancialFragment {
     public static final String TAG = FinanceExpensesFragment.class.getSimpleName();
 
     private ExpensesAdapter mExpensesAdapter;
-    private Unbinder mUnbinder;
 
     @BindView(R.id.rv_expenses) RecyclerView mExpensesListView;
 
@@ -35,10 +34,10 @@ public class FinanceExpensesFragment extends BaseFinancialFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_finances_expenses, container, false);
-        mUnbinder = ButterKnife.bind(this, rootView);
+        super.mUnbinder = ButterKnife.bind(this, rootView);
 
         setupRecyclerView();
-        
+
         setupViewModel();
 
         return rootView;
@@ -46,25 +45,16 @@ public class FinanceExpensesFragment extends BaseFinancialFragment {
 
     private void setupRecyclerView() {
         mExpensesAdapter = new ExpensesAdapter(mListener, (ExpensesAdapter.OnExpenseClickHandler) getActivity());
-        mExpensesListView.setHasFixedSize(true);
-        mExpensesListView.setAdapter(mExpensesAdapter);
-        mExpensesListView.setLayoutManager(new LinearLayoutManager(mListener));
+        super.setupRecyclerView(mExpensesListView, mExpensesAdapter);
     }
 
     private void setupViewModel() {
-        FinancesViewModel viewModel = ViewModelProviders.of(getActivity()).get(FinancesViewModel.class);
-        viewModel.getExpensesLiveModel().observe(getActivity(), new Observer<List<ExpensesModel>>() {
+        mViewModel.getExpensesLiveModel().observe(this, new Observer<List<ExpensesModel>>() {
             @Override
             public void onChanged(@Nullable List<ExpensesModel> expensesModels) {
                 mExpensesAdapter.setData(expensesModels);
             }
         });
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mUnbinder.unbind();
     }
 
 }
