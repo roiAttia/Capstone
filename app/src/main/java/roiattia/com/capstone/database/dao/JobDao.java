@@ -14,7 +14,6 @@ import java.util.List;
 
 import roiattia.com.capstone.database.entry.CategoryEntry;
 import roiattia.com.capstone.database.entry.JobEntry;
-import roiattia.com.capstone.model.FinancialModel;
 import roiattia.com.capstone.model.OverallIncomeModel;
 import roiattia.com.capstone.model.IncomeModel;
 import roiattia.com.capstone.model.JobCalendarModel;
@@ -75,10 +74,4 @@ public interface JobDao {
 
     @Query("DELETE FROM job")
     void deleteAllJobs();
-
-    @Query("SELECT SUM(job_income) AS mIncome, SUM(payment_cost) AS mExpenses, " +
-            "SUM(job_income)-SUM(payment_cost) AS mProfits " +
-            "FROM job JOIN payment ON job.job_payment_date BETWEEN :from AND :to" +
-            " = payment.payment_date BETWEEN :from AND :to ")
-    FinancialModel getFinancialModelBetweenDates(LocalDate from, LocalDate to);
 }

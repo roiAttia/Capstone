@@ -12,6 +12,7 @@ import roiattia.com.capstone.database.AppExecutors;
 import roiattia.com.capstone.database.entry.ExpenseEntry;
 import roiattia.com.capstone.model.ExpandableListChild;
 import roiattia.com.capstone.model.ExpenseListModel;
+import roiattia.com.capstone.model.ExpensesModel;
 import roiattia.com.capstone.model.OverallExpensesModel;
 
 public class ExpensesRepository {
@@ -56,6 +57,11 @@ public class ExpensesRepository {
 
     public LiveData<List<ExpandableListChild>> getExpensesByIds(long[] expensesIds) {
         return mDb.expenseDao().loadExpensesByIds(expensesIds);
+    }
+
+    public LiveData<List<ExpensesModel>> getExpensesModelBetweenDates(
+            LocalDate currentFromDate, LocalDate expectedToDate) {
+        return mDb.expenseDao().loadPaymentsPerCategoryBetweenDates(currentFromDate, expectedToDate);
     }
 
     public interface OnExpenseListener{

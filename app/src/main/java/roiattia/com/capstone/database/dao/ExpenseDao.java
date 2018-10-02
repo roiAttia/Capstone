@@ -68,18 +68,11 @@ public interface ExpenseDao {
             "WHERE expense_id IN (:ids) ")
     LiveData<List<ExpenseEntry>> loadExpensesById(long[] ids);
 
-//    private long mExpenseId;
-//    private String mCategoryName;
-//    private String mDescription;
-//    private double mCost;
     @Query("SELECT expense_id AS mExpenseId, description AS mDescription, expense_cost AS mCost, " +
             "category_name AS mCategoryName FROM expense JOIN category ON " +
             "expense.category_id = category.category_id " +
             "WHERE expense_id IN (:ids) ")
     LiveData<List<ExpandableListChild>> loadExpensesByIds(long[] ids);
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateExpenses(List<ExpenseEntry> expensesList);
 
     @Query("SELECT * FROM expense " +
             "WHERE category_id=:categoryId " +

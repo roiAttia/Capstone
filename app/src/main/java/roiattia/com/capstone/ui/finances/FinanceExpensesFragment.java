@@ -1,5 +1,7 @@
 package roiattia.com.capstone.ui.finances;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,6 +16,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import roiattia.com.capstone.R;
 import roiattia.com.capstone.model.ExpensesModel;
 
@@ -22,7 +25,7 @@ public class FinanceExpensesFragment extends BaseFinancialFragment {
     public static final String TAG = FinanceExpensesFragment.class.getSimpleName();
 
     private ExpensesAdapter mExpensesAdapter;
-    private List<ExpensesModel> mExpensesModelList;
+    private Unbinder mUnbinder;
 
     @BindView(R.id.rv_expenses) RecyclerView mExpensesListView;
 
@@ -38,28 +41,36 @@ public class FinanceExpensesFragment extends BaseFinancialFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_finances_expenses, container, false);
-        ButterKnife.bind(this, rootView);
+        mUnbinder = ButterKnife.bind(this, rootView);
 
-        mExpensesAdapter = new ExpensesAdapter(mListener, (ExpensesAdapter.OnExpenseClickHandler) getActivity());
-        mExpensesListView.setHasFixedSize(true);
-        mExpensesListView.setAdapter(mExpensesAdapter);
-        mExpensesListView.setLayoutManager(new LinearLayoutManager(mListener));
-        if(mExpensesModelList != null){
-            mExpensesAdapter.setData(mExpensesModelList);
-        } else{
-            Log.i(TAG, "mExpensesModelList is null");
-        }
+        setupViewModel();
+
+        setupRecyclerView();
 
         return rootView;
     }
 
-    public void setData(List<ExpensesModel> expensesModelList) {
-       mExpensesModelList = expensesModelList;
-       if(mExpensesAdapter != null){
-           mExpensesAdapter.setData(mExpensesModelList);
-       } else {
-           Log.i(TAG, "mExpensesAdapter is null");
-       }
+    private void setupRecyclerView() {
+        mExpensesAdapter = new ExpensesAdapter(mListener, (ExpensesAdapter.OnExpenseClickHandler) getActivity());
+        mExpensesListView.setHasFixedSize(true);
+        mExpensesListView.setAdapter(mExpensesAdapter);
+        mExpensesListView.setLayoutManager(new LinearLayoutManager(mListener));
+    }
+
+    private void setupViewModel() {
+        FinancesViewModel viewModel = ViewModelProviders.of(getActivity()).get(FinancesViewModel.class);
+        viewModel.getExpensesLiveModel().observe(getActivity(), new Observer<List<ExpensesModel>>() {
+            @Override
+            public void onChanged(@Nullable List<ExpensesModel> expensesModels) {
+                mExpensesAdapter.setData(expensesModels);
+            }
+        });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mUnbinder.unbind();
     }
 
 }

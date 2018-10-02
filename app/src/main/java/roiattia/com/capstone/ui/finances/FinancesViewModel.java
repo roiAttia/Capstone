@@ -2,12 +2,16 @@ package roiattia.com.capstone.ui.finances;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
 import org.joda.time.LocalDate;
 
+import java.util.List;
+
 import roiattia.com.capstone.database.AppExecutors;
+import roiattia.com.capstone.model.ExpensesModel;
 import roiattia.com.capstone.model.OverallExpensesModel;
 import roiattia.com.capstone.model.OverallIncomeModel;
 import roiattia.com.capstone.repositories.ExpensesRepository;
@@ -43,6 +47,11 @@ public class FinancesViewModel extends AndroidViewModel {
         mExpectedExpensesLiveData = new MutableLiveData<>();
         mOverallIncomeProfitLiveData = new MutableLiveData<>();
         mOverallExpensesLiveData = new MutableLiveData<>();
+    }
+
+    public LiveData<List<ExpensesModel>> getExpensesLiveModel() {
+        return mExpensesRepository.getExpensesModelBetweenDates(mDateModel.getCurrentFromDate(),
+                mDateModel.getExpectedToDate());
     }
 
     public void setDates(final LocalDate from, final LocalDate to, final MutableLiveData income,

@@ -14,7 +14,6 @@ import roiattia.com.capstone.database.entry.CategoryEntry;
 import roiattia.com.capstone.database.entry.ExpenseEntry;
 import roiattia.com.capstone.database.entry.JobEntry;
 import roiattia.com.capstone.database.entry.PaymentEntry;
-import roiattia.com.capstone.model.FinancialModel;
 import roiattia.com.capstone.model.JobCalendarModel;
 import roiattia.com.capstone.model.OverallIncomeModel;
 
@@ -43,10 +42,6 @@ public class JobsRepository {
 
     public OverallIncomeModel getIncomeAndProfitsBetweenDates(LocalDate from, LocalDate to) {
         return mDb.jobDao().loadJobsBetweenDates(from, to);
-    }
-
-    public FinancialModel getFinancesBetweenDates(LocalDate from, LocalDate to) {
-        return mDb.jobDao().getFinancialModelBetweenDates(from, to);
     }
 
     public interface OnJobListener{

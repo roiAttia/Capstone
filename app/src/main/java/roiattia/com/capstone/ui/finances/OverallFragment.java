@@ -30,7 +30,7 @@ public class OverallFragment extends BaseFinancialFragment {
 
     private FinancesViewModel mViewModel;
     private DateModel mDateModel;
-    private Unbinder unbinder;
+    private Unbinder mUnbinder;
 
     @BindView(R.id.tv_current_income)TextView mCurrentIncomeView;
     @BindView(R.id.tv_current_expenses)TextView mCurrentExpensesView;
@@ -60,7 +60,7 @@ public class OverallFragment extends BaseFinancialFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_overall, container, false);
-        unbinder = ButterKnife.bind(this, rootView);
+        mUnbinder = ButterKnife.bind(this, rootView);
         mDateModel = DateModel.getInstance();
 
         setupViewModel();
@@ -70,7 +70,7 @@ public class OverallFragment extends BaseFinancialFragment {
 
     @Override public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        mUnbinder.unbind();
     }
 
     private void setupViewModel() {
