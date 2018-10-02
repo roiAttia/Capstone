@@ -97,8 +97,8 @@ public class FinancesActivity extends AppCompatActivity
         Bundle categoryDataBundle = new Bundle();
         categoryDataBundle.putString(BUNDLE_CATEGORY_NAME, categoryName);
         categoryDataBundle.putLong(BUNDLE_CATEGORY_ID, categoryId);
-        categoryDataBundle.putString(BUNDLE_START_DATE, mStartDate.toString());
-        categoryDataBundle.putString(BUNDLE_END_DATE, mEndDate.toString());
+        categoryDataBundle.putString(BUNDLE_START_DATE, mDateModel.getCurrentFromDate().toString());
+        categoryDataBundle.putString(BUNDLE_END_DATE, mDateModel.getExpectedToDate().toString());
         Intent intent = new Intent(this, PaymentsActivity.class);
         intent.putExtra(BUNDLE_CATEGORY_DATA, categoryDataBundle);
         startActivity(intent);

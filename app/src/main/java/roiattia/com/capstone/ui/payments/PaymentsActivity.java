@@ -32,6 +32,7 @@ public class PaymentsActivity extends AppCompatActivity {
     private final String TAG = PaymentsActivity.class.getSimpleName();
 
     private PaymentsAdapter mPaymentsAdapter;
+    private PaymentsViewModel mViewModel;
 
     @BindView(R.id.tv_header) TextView mCategoryHeader;
     @BindView(R.id.rv_job_list) RecyclerView mDetailsList;
@@ -42,39 +43,33 @@ public class PaymentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_payments_details);
         ButterKnife.bind(this);
 
+        setupRecyclerView();
 
+        setupViewModel();
 
         Intent intent = getIntent();
         // check for intent extra as bundle
         if(intent != null && intent.hasExtra(BUNDLE_CATEGORY_DATA)){
-            // extract all data from bundle
-            Bundle categoryDataBundle = intent.getBundleExtra(BUNDLE_CATEGORY_DATA);
-            String categoryName = categoryDataBundle.getString(BUNDLE_CATEGORY_NAME);
-            long categoryId = categoryDataBundle.getLong(BUNDLE_CATEGORY_ID);
-            LocalDate startDate = new LocalDate(
-                    categoryDataBundle.getString(BUNDLE_START_DATE));
-            LocalDate endDate = new LocalDate(
-                    categoryDataBundle.getString(BUNDLE_END_DATE));
-
-            // set head_line as follows: *category_name* transactions <br> *start_date*
-            // - *end_date*. example: Fuel transactions <br> 20/08/2018 - 26/08/2018
-            mCategoryHeader.setText(Html.fromHtml(categoryName + getString(R.string.payments_list_headline)
-                    + "<br>" + DateUtils.getDateStringFormat(startDate) + " - " +
-                    DateUtils.getDateStringFormat(endDate)));
-
-
-            PaymentsViewModel viewModel = ViewModelProviders.of(this).get(PaymentsViewModel.class);
-            // observe on payments
-            viewModel.getPaymentsDetails().observe(this, new Observer<List<PaymentItemModel>>() {
-                @Override
-                public void onChanged(List<PaymentItemModel> paymentsList) {
-                    mPaymentsAdapter.setData(paymentsList);
-                    for(PaymentItemModel paymentItemModel : paymentsList){
-                        Log.i(TAG, paymentItemModel.toString());
-                    }
-                }
-            });
+           loadDataFromIntent(intent);
         }
+    }
+
+    private void loadDataFromIntent(Intent intent){
+        // extract all data from bundle
+        Bundle categoryDataBundle = intent.getBundleExtra(BUNDLE_CATEGORY_DATA);
+        String categoryName = categoryDataBundle.getString(BUNDLE_CATEGORY_NAME);
+        long categoryId = categoryDataBundle.getLong(BUNDLE_CATEGORY_ID);
+        LocalDate startDate = new LocalDate(
+                categoryDataBundle.getString(BUNDLE_START_DATE));
+        LocalDate endDate = new LocalDate(
+                categoryDataBundle.getString(BUNDLE_END_DATE));
+        mViewModel.setPaymentsList(categoryId, startDate, endDate);
+
+        // set head_line as follows: *category_name* transactions <br> *start_date*
+        // - *end_date*. example: Fuel transactions <br> 20/08/2018 - 26/08/2018
+        mCategoryHeader.setText(Html.fromHtml(categoryName + " " + getString(R.string.payments_list_headline)
+                + "<br>" + DateUtils.getDateStringFormat(startDate) + " - " +
+                DateUtils.getDateStringFormat(endDate)));
     }
 
     private void setupRecyclerView(){
@@ -86,6 +81,16 @@ public class PaymentsActivity extends AppCompatActivity {
     }
 
     private void setupViewModel(){
-
+        mViewModel = ViewModelProviders.of(this).get(PaymentsViewModel.class);
+        // observe on payments
+        mViewModel.getItemModelMutableLiveData().observe(this, new Observer<List<PaymentItemModel>>() {
+            @Override
+            public void onChanged(List<PaymentItemModel> paymentsList) {
+                mPaymentsAdapter.setData(paymentsList);
+                for (PaymentItemModel paymentItemModel : paymentsList) {
+                    Log.i(TAG, paymentItemModel.toString());
+                }
+            }
+        });
     }
 }

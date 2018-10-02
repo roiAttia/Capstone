@@ -21,7 +21,7 @@ public interface PaymentDao {
             "number_of_payments AS mTotalPayments, payment_date AS mPaymentDate " +
             "FROM payment JOIN expense ON payment.expense_id = expense.expense_id " +
             "WHERE payment_date BETWEEN :from AND :to AND expense.category_id=:categoryId")
-    LiveData<List<PaymentItemModel>> getPaymentsInDateRange(
+    List<PaymentItemModel> loadPaymentByCategoryBetweenDates(
             LocalDate from, LocalDate to, long categoryId);
 
     @Insert

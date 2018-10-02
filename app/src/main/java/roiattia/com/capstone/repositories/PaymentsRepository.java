@@ -10,6 +10,7 @@ import roiattia.com.capstone.database.AppDatabase;
 import roiattia.com.capstone.database.AppExecutors;
 import roiattia.com.capstone.database.entry.PaymentEntry;
 import roiattia.com.capstone.model.OverallExpensesModel;
+import roiattia.com.capstone.model.PaymentItemModel;
 
 public class PaymentsRepository {
 
@@ -45,5 +46,9 @@ public class PaymentsRepository {
 
     public OverallExpensesModel getPaymentsBetweenDates(LocalDate from, LocalDate to) {
         return mDb.paymentDao().getPaymentsBetweenDates(from, to);
+    }
+
+    public List<PaymentItemModel> getPaymentsByCategoryBetweenDates(long categoryId, LocalDate from, LocalDate to) {
+        return mDb.paymentDao().loadPaymentByCategoryBetweenDates(from, to, categoryId);
     }
 }
