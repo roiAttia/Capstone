@@ -1,4 +1,4 @@
-package roiattia.com.capstone.ui.expenses_list;
+package roiattia.com.capstone.ui.expenseslist;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;

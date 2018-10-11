@@ -55,13 +55,17 @@ public class ExpensesRepository {
         return mDb.expenseDao().loadExpenses();
     }
 
-    public LiveData<List<ExpandableListChild>> getExpensesByIds(long[] expensesIds) {
+    public List<ExpandableListChild> getExpensesByIds(Long[] expensesIds) {
         return mDb.expenseDao().loadExpensesByIds(expensesIds);
     }
 
     public List<ExpensesModel> getExpensesModelBetweenDates(
             LocalDate currentFromDate, LocalDate expectedToDate) {
         return mDb.expenseDao().loadPaymentsPerCategoryBetweenDates(currentFromDate, expectedToDate);
+    }
+
+    public ExpandableListChild getExpenseChild(long expenseId) {
+        return mDb.expenseDao().loadExpenseChildById(expenseId);
     }
 
     public interface OnExpenseListener{

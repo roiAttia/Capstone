@@ -7,7 +7,7 @@
     tools:context=".ui.payments.PaymentsActivity">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_job_list"
+        android:id="@+id/rv_payments_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="16dp"

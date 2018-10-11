@@ -18,7 +18,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.newjob.JobActivity" />
-        <activity android:name=".ui.expenses_list.ExpensesListActivity" />
+        <activity android:name=".ui.expenseslist.ExpensesListActivity" />
         <activity android:name=".ui.payments.PaymentsActivity" />
         <activity
             android:name=".ui.finances.FinancesActivity"
@@ -41,7 +41,8 @@
             android:name=".ui.NavigationDrawerActivity"
             android:label="@string/title_activity_navigation_drawer"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.job.JobActivity"></activity>
+        <activity android:name=".ui.job.JobActivity" />
+        <activity android:name=".ui.jobslist.JobsListActivity"></activity>
     </application>
 
 </manifest>

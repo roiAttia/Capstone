@@ -18,7 +18,7 @@ public interface PaymentDao {
 
     // Return payment record with it's expense total number of payments
     @Query("SELECT payment_cost AS mCost, payment_number AS mPaymentNumber, " +
-            "number_of_payments AS mTotalPayments, payment_date AS mPaymentDate " +
+            "number_of_payments AS mTotalPayments, payment_date AS mPaymentDate, description AS mDescription " +
             "FROM payment JOIN expense ON payment.expense_id = expense.expense_id " +
             "WHERE payment_date BETWEEN :from AND :to AND expense.category_id=:categoryId")
     List<PaymentItemModel> loadPaymentByCategoryBetweenDates(

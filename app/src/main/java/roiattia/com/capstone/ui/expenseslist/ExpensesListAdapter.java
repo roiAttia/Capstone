@@ -1,4 +1,4 @@
-package roiattia.com.capstone.ui.expenses_list;
+package roiattia.com.capstone.ui.expenseslist;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -17,7 +17,6 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import roiattia.com.capstone.R;
-import roiattia.com.capstone.database.entry.ExpenseEntry;
 import roiattia.com.capstone.model.ExpenseListModel;
 import roiattia.com.capstone.utils.AmountUtils;
 import roiattia.com.capstone.utils.DateUtils;

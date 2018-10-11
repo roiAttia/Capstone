@@ -13,6 +13,7 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -65,21 +66,14 @@ public class JobActivity extends AppCompatActivity
 
     private List<CategoryEntry> mCategoriesList;
     private List<ExpenseEntry> mExpenses;
-    private LocalDate mJobDate;
-    private LocalDate mJobPaymentDate;
-    private double mJobIncome;
-    private double mJobExpense;
-    private double mJobProfit;
-    private long mCategoryId;
-    private String mCategoryName;
-    private String mDescription;
-    private long mJobId;
-
+    private LocalDate mJobDate, mJobPaymentDate;
+    private double mJobIncome, mJobExpense, mJobProfit;
+    private long mCategoryId, mJobId;
+    private String mCategoryName, mDescription;
     private JobViewModel mViewModel;
     private Section<ExpandableListParent, ExpandableListChild> mSection;
-    private List<ExpandableListChild> mExpandableListChilds;
+    private ExpandableListParent mParent;
     private List<Long> mExpensesIds;
-    ExpandableListParent mParent;
 
     @BindView(R.id.rb_existed_category) RadioButton mExistedCategoryButton;
     @BindView(R.id.rb_new_category) RadioButton mNewCategoryButton;
@@ -106,7 +100,6 @@ public class JobActivity extends AppCompatActivity
         ButterKnife.bind(this);
 
         mExpensesIds = new ArrayList<>();
-        mExpandableListChilds = new ArrayList<>();
 
         setupViewModel();
 
@@ -149,7 +142,6 @@ public class JobActivity extends AppCompatActivity
 
             @Override
             public void renderChild(final View view, final ExpandableListChild child, final int i, final int i1) {
-                ButterKnife.bind(this, view);
                 TextView categoryName = view.findViewById(R.id.tv_expandalbe_child_category);
                 TextView categoryAmount = view.findViewById(R.id.tv_expandalbe_child_amount);
                 ImageButton delete = view.findViewById(R.id.btn_expandable_child_delete);
@@ -159,11 +151,10 @@ public class JobActivity extends AppCompatActivity
                 delete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        ((ViewManager)view.getParent()).removeView(view);
+                        mExpensesIds.remove(child.getExpenseId());
+                        mViewModel.setMutableLiveExpenseChildes(mExpensesIds);
                         mViewModel.deleteExpenseById(child.getExpenseId());
-                        mExpenses.remove(i1);
-                        mExpandableListChilds.remove(i1);
-                        updateJobFinances();
-                        updateExpandableList();
                     }
                 });
             }
@@ -192,10 +183,6 @@ public class JobActivity extends AppCompatActivity
         mParent = new ExpandableListParent(mJobExpense, mExpenses.size());
         mSection.parent = mParent;
         mExpensesLayout.addSection(mSection);
-    }
-
-    private void updateExpandableList() {
-
     }
 
     private void setupUI() {
@@ -251,6 +238,8 @@ public class JobActivity extends AppCompatActivity
 
     private void setupViewModel() {
         mViewModel = ViewModelProviders.of(this).get(JobViewModel.class);
+
+        // load categories
         mViewModel.getLiveDataCategories().observe(this, new Observer<List<CategoryEntry>>() {
             @Override
             public void onChanged(@Nullable List<CategoryEntry> categoryEntries) {
@@ -261,6 +250,8 @@ public class JobActivity extends AppCompatActivity
                 }
             }
         });
+
+        // load job details for update operation
         mViewModel.getMutableLiveJob().observe(this, new Observer<JobEntry>() {
             @Override
             public void onChanged(@Nullable JobEntry jobEntry) {
@@ -269,43 +260,30 @@ public class JobActivity extends AppCompatActivity
                 }
             }
         });
-        mViewModel.getMutableLiveExpense().observe(this, new Observer<ExpenseEntry>() {
-            @Override
-            public void onChanged(@Nullable ExpenseEntry expenseEntry) {
-                if(expenseEntry != null) {
-                    mExpenses.add(expenseEntry);
-                    mViewModel.setMutableLiveCategory(expenseEntry.getCategoryId());
-                    updateJobFinances();
-                }
-            }
-        });
-        mViewModel.getMutableLiveCategory().observe(this, new Observer<CategoryEntry>() {
-            @Override
-            public void onChanged(@Nullable CategoryEntry categoryEntry) {
-                if(categoryEntry != null) {
-                    ExpenseEntry expenseEntry = mExpenses.get(mExpenses.size()-1);
-                    ExpandableListChild child = new ExpandableListChild(expenseEntry.getExpenseId(),
-                            categoryEntry.getCategoryName(), expenseEntry.getDescription(),
-                            expenseEntry.getExpenseCost());
-                    mExpandableListChilds.add(child);
-                    updateExpensesList();
-                }
-            }
-        });
 
+        // load child expenses for expenses list
+        mViewModel.getMutableLiveExpenseChildes().observe(this, new Observer<List<ExpandableListChild>>() {
+            @Override
+            public void onChanged(@Nullable List<ExpandableListChild> expandableListChildren) {
+                if(expandableListChildren != null) {
+                    updateJobFinances(expandableListChildren);
+                    updateExpensesList(expandableListChildren);
+                }
+            }
+        });
     }
 
-    private void updateJobFinances() {
+    private void updateJobFinances(List<ExpandableListChild> expandableListChildren) {
         mJobExpense = 0;
-        for(ExpenseEntry expenseEntry : mExpenses)
-            mJobExpense += expenseEntry.getExpenseCost();
+        for(ExpandableListChild expandableListChild : expandableListChildren)
+            mJobExpense += expandableListChild.getCost();
         updateSummary();
     }
 
-    private void updateExpensesList() {
+    private void updateExpensesList(List<ExpandableListChild> expandableListChildren) {
         mSection.children.clear();
-        mSection.children.addAll(mExpandableListChilds);
-        mParent = new ExpandableListParent(mJobExpense, mExpenses.size());
+        mSection.children.addAll(expandableListChildren);
+        mParent = new ExpandableListParent(mJobExpense, expandableListChildren.size());
         mSection.parent = mParent;
         mExpensesLayout.notifyParentChanged(0);
     }
@@ -407,7 +385,8 @@ public class JobActivity extends AppCompatActivity
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 long expenseId = data.getLongExtra(EXPENSE_FOR_RESULT, 0);
-                mViewModel.setMutableLiveExpense(expenseId);
+                mExpensesIds.add(expenseId);
+                mViewModel.setMutableLiveExpenseChildes(mExpensesIds);
             }
         }
     }

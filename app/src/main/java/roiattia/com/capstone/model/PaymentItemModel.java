@@ -8,12 +8,15 @@ public class PaymentItemModel {
     private int mPaymentNumber;
     private int mTotalPayments;
     private LocalDate mPaymentDate;
+    private String mDescription;
 
-    public PaymentItemModel(double cost, int paymentNumber, int totalPayments, LocalDate paymentDate) {
+    public PaymentItemModel(double cost, int paymentNumber, int totalPayments,
+                            LocalDate paymentDate, String description) {
         mCost = cost;
         mPaymentNumber = paymentNumber;
         mTotalPayments = totalPayments;
         mPaymentDate = paymentDate;
+        mDescription = description;
     }
 
     public double getCost() {
@@ -46,5 +49,13 @@ public class PaymentItemModel {
 
     public void setPaymentDate(LocalDate paymentDate) {
         mPaymentDate = paymentDate;
+    }
+
+    public String getDescription() {
+        return mDescription;
+    }
+
+    public void setDescription(String description) {
+        mDescription = description;
     }
 }

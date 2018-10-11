@@ -34,7 +34,7 @@ public class FinanceExpensesFragment extends BaseFinancialFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_finances_expenses, container, false);
-        super.mUnbinder = ButterKnife.bind(this, rootView);
+        mUnbinder = ButterKnife.bind(this, rootView);
 
         setupRecyclerView();
 

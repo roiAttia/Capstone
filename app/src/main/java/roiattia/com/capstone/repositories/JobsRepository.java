@@ -51,6 +51,10 @@ public class JobsRepository {
                 currentFromDate, expectedToDate, CategoryEntry.Type.JOB);
     }
 
+    public List<JobEntry> getJobsByCategoryBetweenDates(long categoryId, LocalDate from, LocalDate to) {
+        return mDb.jobDao().loadJobsByCategoryBetweenDates(categoryId, from, to);
+    }
+
     public interface OnJobListener{
         void onJobInserted(long jobId);
     }

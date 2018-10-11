@@ -1,18 +1,13 @@
-package roiattia.com.capstone.ui.expenses_list;
+package roiattia.com.capstone.ui.expenseslist;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
-
-import org.joda.time.LocalDate;
 
 import java.util.List;
 
 import roiattia.com.capstone.database.AppExecutors;
-import roiattia.com.capstone.database.entry.ExpenseEntry;
 import roiattia.com.capstone.model.ExpenseListModel;
 import roiattia.com.capstone.repositories.ExpensesRepository;
 

@@ -52,8 +52,8 @@
 
     <!-- PAYMENTS LIST -->
     <string name="payments_list_headline">Payments</string>
-    <string name="payment_date">Payment date: %s</string>
-    <string name="payment_cost">Cost: %s</string>
+    <string name="payment_date">Payment date:</string>
+    <string name="payment_cost">Cost:</string>
     <string name="payment_number">Payment number:</string>
 
     <!-- DRAWER -->
@@ -95,6 +95,11 @@
     <string name="expenses_list_title">Expenses</string>
     <string name="job_saved_toast_message">Job saved successfully!</string>
     <string name="current">CURRENT:</string>
+    <string name="select_period_dialog_title">Select period</string>
+    <string name="no_decription">No description</string>
+    <string name="job_profit">Profit:</string>
+    <string name="total_profits">Total profits:</string>
+    <string name="profits">Profits</string>
 
 
 </resources>

@@ -27,10 +27,9 @@ public class JobViewModel extends AndroidViewModel {
     private JobsRepository mJobsRepository;
     private ExpensesRepository mExpensesRepository;
     private AppExecutors mExecutors;
-    private MutableLiveData<ExpenseEntry> mMutableLiveExpense;
     private MutableLiveData<JobEntry> mMutableLiveJob;
-    private MutableLiveData<CategoryEntry> mMutableLiveCategory;
     private LiveData<List<CategoryEntry>> mLiveDataCategories;
+    private MutableLiveData<List<ExpandableListChild>> mMutableLiveExpenseChildes;
 
     public JobViewModel(@NonNull Application application) {
         super(application);
@@ -38,45 +37,33 @@ public class JobViewModel extends AndroidViewModel {
         mJobsRepository = JobsRepository.getInstance(application.getApplicationContext());
         mExpensesRepository = ExpensesRepository.getInstance(application.getApplicationContext());
         mExecutors = AppExecutors.getInstance();
-        mMutableLiveExpense = new MutableLiveData<>();
         mMutableLiveJob = new MutableLiveData<>();
-        mMutableLiveCategory = new MutableLiveData<>();
         mLiveDataCategories = mCategoriesRepository.getCategories(JOB);
+        mMutableLiveExpenseChildes = new MutableLiveData<>();
     }
 
-    public LiveData<List<ExpandableListChild>> getChildLiveData(long[] expensesIds) {
-        return mExpensesRepository.getExpensesByIds(expensesIds);
-    }
-
+    /**
+     * Get categories for selection
+     * @return categories live data
+     */
     public LiveData<List<CategoryEntry>> getLiveDataCategories() {
         return mLiveDataCategories;
     }
 
+    /**
+     * Insert new category inserted by user
+     * @param name category name
+     * @param listener notify listener with new category id
+     */
     public void insertNewCategory(final String name, CategoriesRepository.OnCategoryListener listener) {
         CategoryEntry categoryEntry = new CategoryEntry(name, JOB);
         mCategoriesRepository.insertCategory(categoryEntry, listener);
     }
 
-    public void setMutableLiveExpense(final long expenseId){
-        mExecutors.diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                ExpenseEntry expenseEntry = mExpensesRepository.getExpenseById(expenseId);
-                mMutableLiveExpense.postValue(expenseEntry);
-            }
-        });
-    }
-
-    public void setMutableLiveCategory(final long categoryId){
-        mExecutors.diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                CategoryEntry categoryEntry = mCategoriesRepository.getCategoryById(categoryId);
-                mMutableLiveCategory.postValue(categoryEntry);
-            }
-        });
-    }
-
+    /**
+     * Load job data using jobId into MutableLiveData for observation
+     * @param jobId job id to load job by
+     */
     public void setMutableLiveJob(final long jobId){
         mExecutors.diskIO().execute(new Runnable() {
             @Override
@@ -87,18 +74,17 @@ public class JobViewModel extends AndroidViewModel {
         });
     }
 
-    public MutableLiveData<ExpenseEntry> getMutableLiveExpense(){
-        return mMutableLiveExpense;
-    }
-
+    /**
+     * Get the Mutable live data for Job loading observation
+     * @return Mutable live data of Job Entry
+     */
     public MutableLiveData<JobEntry> getMutableLiveJob(){
         return mMutableLiveJob;
     }
 
-    public MutableLiveData<CategoryEntry> getMutableLiveCategory() {
-        return mMutableLiveCategory;
-    }
-
+    /**
+     * Insert Job to DB
+     */
     public void insertJob(Long jobId, long categoryId, String description, LocalDate jobDate, LocalDate jobPaymentDate,
                           double jobIncome, double jobExpense, double jobProfit, JobsRepository.OnJobListener listener){
         JobEntry job = new JobEntry(jobId, categoryId, description, jobDate, jobPaymentDate,
@@ -106,11 +92,40 @@ public class JobViewModel extends AndroidViewModel {
         mJobsRepository.insertJob(job, listener);
     }
 
+    /**
+     * Delete expense by id - done from expenses list
+     * @param expenseId id of the expense needs deletion
+     */
+    public void deleteExpenseById(long expenseId) {
+        mExpensesRepository.deleteExpense(expenseId);
+    }
+
+    /**
+     * Get the Mutable live data for Expenses childes observation
+     * @return Mutable live data of ExpandableListChild
+     */
+    public MutableLiveData<List<ExpandableListChild>> getMutableLiveExpenseChildes() {
+        return mMutableLiveExpenseChildes;
+    }
+
+    /**
+     * Set expenses childes list using a list of expenses ids
+     * @param expensesIds expenses to load by id
+     */
+    public void setMutableLiveExpenseChildes(final List<Long> expensesIds) {
+        mExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                Long[] array = new Long[expensesIds.size()];
+                expensesIds.toArray(array);
+                List<ExpandableListChild> childes = mExpensesRepository.getExpensesByIds(array);
+                mMutableLiveExpenseChildes.postValue(childes);
+            }
+        });
+    }
+    
     public void insertExpense(List<ExpenseEntry> expenses) {
         mExpensesRepository.insertExpenses(expenses);
     }
 
-    public void deleteExpenseById(long expenseId) {
-        mExpensesRepository.deleteExpense(expenseId);
-    }
 }

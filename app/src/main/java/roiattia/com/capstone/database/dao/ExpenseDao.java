@@ -68,12 +68,6 @@ public interface ExpenseDao {
             "WHERE expense_id IN (:ids) ")
     LiveData<List<ExpenseEntry>> loadExpensesById(long[] ids);
 
-    @Query("SELECT expense_id AS mExpenseId, description AS mDescription, expense_cost AS mCost, " +
-            "category_name AS mCategoryName FROM expense JOIN category ON " +
-            "expense.category_id = category.category_id " +
-            "WHERE expense_id IN (:ids) ")
-    LiveData<List<ExpandableListChild>> loadExpensesByIds(long[] ids);
-
     @Query("SELECT * FROM expense " +
             "WHERE category_id=:categoryId " +
             "AND expense_first_payment_date BETWEEN :from AND :to " +
@@ -99,4 +93,16 @@ public interface ExpenseDao {
 
     @Query("DELETE FROM expense")
     void deleteAllExpenses();
+
+    @Query("SELECT expense_id AS mExpenseId, description AS mDescription, expense_cost AS mCost, " +
+            "category_name AS mCategoryName FROM expense JOIN category ON " +
+            "expense.category_id = category.category_id " +
+            "WHERE expense_id IN (:ids) ")
+    List<ExpandableListChild> loadExpensesByIds(Long[] ids);
+
+    @Query("SELECT expense.expense_id as mExpenseId, category.category_name as mCategoryName, " +
+            "expense.description as mDescription, expense.expense_cost as mCost " +
+            "FROM expense JOIN category ON expense.category_id = category.category_id " +
+            "WHERE expense.expense_id =:expenseId")
+    ExpandableListChild loadExpenseChildById(long expenseId);
 }

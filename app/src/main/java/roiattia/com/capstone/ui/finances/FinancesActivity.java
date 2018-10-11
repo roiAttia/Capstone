@@ -26,6 +26,7 @@ import roiattia.com.capstone.model.OverallIncomeModel;
 import roiattia.com.capstone.model.IncomeModel;
 import roiattia.com.capstone.ui.dialogs.RadioButtonsDialog;
 import roiattia.com.capstone.ui.job.JobActivity;
+import roiattia.com.capstone.ui.jobslist.JobsListActivity;
 import roiattia.com.capstone.ui.payments.PaymentsActivity;
 import roiattia.com.capstone.ui.expense.ExpenseActivity;
 import roiattia.com.capstone.utils.DateUtils;
@@ -39,12 +40,11 @@ import static roiattia.com.capstone.utils.Constants.FRAGMENT_TO_OPEN;
 import static roiattia.com.capstone.utils.Constants.OVERALL;
 
 public class FinancesActivity extends AppCompatActivity
-    implements RadioButtonsDialog.NoticeDialogListener, ExpensesAdapter.OnExpenseClickHandler{
+    implements RadioButtonsDialog.NoticeDialogListener, ExpensesAdapter.OnExpenseClickHandler,
+    IncomeAdapter.OnJobClickHandler{
 
     private static final String TAG = FinancesActivity.class.getSimpleName();
 
-    private LocalDate mStartDate = new LocalDate();
-    private LocalDate mEndDate = new LocalDate();
     private OverallFragment mOverallFragment;
     private IncomeFragment mIncomeFragment;
     private FinanceExpensesFragment mExpensesFragment;
@@ -82,26 +82,8 @@ public class FinancesActivity extends AppCompatActivity
         mExpensesFragment = new FinanceExpensesFragment();
         setupViewpager(fragmentNumber);
 
-        // initialize start and end dates
-        mStartDate = DateUtils.getStartDateOfTheMonth();
-        mEndDate = DateUtils.getEndDateOfTheMonth();
-
         // setup view_model
         mViewModel = ViewModelProviders.of(this).get(FinancesViewModel.class);
-
-    }
-
-
-    @Override
-    public void onExpenseClick(long categoryId, String categoryName) {
-        Bundle categoryDataBundle = new Bundle();
-        categoryDataBundle.putString(BUNDLE_CATEGORY_NAME, categoryName);
-        categoryDataBundle.putLong(BUNDLE_CATEGORY_ID, categoryId);
-        categoryDataBundle.putString(BUNDLE_START_DATE, mDateModel.getCurrentFromDate().toString());
-        categoryDataBundle.putString(BUNDLE_END_DATE, mDateModel.getExpectedToDate().toString());
-        Intent intent = new Intent(this, PaymentsActivity.class);
-        intent.putExtra(BUNDLE_CATEGORY_DATA, categoryDataBundle);
-        startActivity(intent);
     }
 
     private void setupViewpager(int fragmentNumber) {
@@ -148,6 +130,33 @@ public class FinancesActivity extends AppCompatActivity
     @Override
     public void onDialogFinishClick(int whichSelected) {
         mDateModel.setDates(whichSelected);
+        if(mOverallFragment.isVisible()){
+            mOverallFragment.updatePeriodText(mDateModel.getCurrentFromDate(), mDateModel.getExpectedToDate());
+        }
         mViewModel.updateDates();
+    }
+
+    @Override
+    public void onExpenseClick(long categoryId, String categoryName) {
+        Bundle categoryDataBundle = new Bundle();
+        categoryDataBundle.putString(BUNDLE_CATEGORY_NAME, categoryName);
+        categoryDataBundle.putLong(BUNDLE_CATEGORY_ID, categoryId);
+        categoryDataBundle.putString(BUNDLE_START_DATE, mDateModel.getCurrentFromDate().toString());
+        categoryDataBundle.putString(BUNDLE_END_DATE, mDateModel.getExpectedToDate().toString());
+        Intent intent = new Intent(this, PaymentsActivity.class);
+        intent.putExtra(BUNDLE_CATEGORY_DATA, categoryDataBundle);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onJobClick(long categoryId, String categoryName) {
+        Bundle categoryDataBundle = new Bundle();
+        categoryDataBundle.putString(BUNDLE_CATEGORY_NAME, categoryName);
+        categoryDataBundle.putLong(BUNDLE_CATEGORY_ID, categoryId);
+        categoryDataBundle.putString(BUNDLE_START_DATE, mDateModel.getCurrentFromDate().toString());
+        categoryDataBundle.putString(BUNDLE_END_DATE, mDateModel.getExpectedToDate().toString());
+        Intent intent = new Intent(this, JobsListActivity.class);
+        intent.putExtra(BUNDLE_CATEGORY_DATA, categoryDataBundle);
+        startActivity(intent);
     }
 }

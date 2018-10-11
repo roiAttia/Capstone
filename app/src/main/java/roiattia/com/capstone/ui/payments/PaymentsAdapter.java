@@ -46,16 +46,22 @@ public class PaymentsAdapter extends RecyclerView
     @Override
     public void onBindViewHolder(@NonNull CategoryDetailsViewHolder holder, int position) {
         final PaymentItemModel payment = mPaymentsList.get(position);
-        holder.mPaymentDate.setText(String.format(
+        holder.mPaymentDate.setText(String.format("%s %s",
                 mContext.getString(R.string.payment_date), DateUtils.getDateStringFormat(payment.getPaymentDate())));
-        holder.mPaymentCost.setText(String.format(mContext.getString(R.string.payment_cost), AmountUtils.getStringFormatFromDouble(
+        holder.mPaymentCost.setText(String.format("%s %s",
+                mContext.getString(R.string.payment_cost), AmountUtils.getStringFormatFromDouble(
                 payment.getCost())));
         if(payment.getTotalPayments() > 1) {
-            holder.mPaymentNumber.setText(String.format(Locale.getDefault(), "%s%d/%d",
+            holder.mPaymentNumber.setText(String.format(Locale.getDefault(), "%s %d/%d",
                     mContext.getString(R.string.payment_number),
                     payment.getPaymentNumber(), payment.getTotalPayments()));
         } else {
             holder.mPaymentNumber.setVisibility(View.GONE);
+        }
+        if(payment.getDescription() != null){
+            holder.mPaymentDescription.setText(payment.getDescription());
+        } else {
+            holder.mPaymentDescription.setText(R.string.no_decription);
         }
     }
 
@@ -69,6 +75,7 @@ public class PaymentsAdapter extends RecyclerView
         @BindView(R.id.tv_payment_date) TextView mPaymentDate;
         @BindView(R.id.tv_payment_cost) TextView mPaymentCost;
         @BindView(R.id.tv_payment_number) TextView mPaymentNumber;
+        @BindView(R.id.tv_payment_description) TextView mPaymentDescription;
 
         CategoryDetailsViewHolder(View itemView) {
             super(itemView);

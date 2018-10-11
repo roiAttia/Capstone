@@ -34,7 +34,7 @@ public class IncomeFragment extends BaseFinancialFragment{
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_income, container, false);
-        super.mUnbinder = ButterKnife.bind(this, rootView);
+        mUnbinder = ButterKnife.bind(this, rootView);
 
         setupRecyclerView();
 
@@ -53,7 +53,7 @@ public class IncomeFragment extends BaseFinancialFragment{
     }
 
     private void setupRecyclerView() {
-        mIncomeJobsAdapter = new IncomeAdapter(mListener);
+        mIncomeJobsAdapter = new IncomeAdapter(mListener, (IncomeAdapter.OnJobClickHandler) mListener);
         super.setupRecyclerView(mIncomeListView, mIncomeJobsAdapter);
     }
 

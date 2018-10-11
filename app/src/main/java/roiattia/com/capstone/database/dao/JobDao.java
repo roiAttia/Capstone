@@ -54,7 +54,7 @@ public interface JobDao {
      * @return number of transactions of each job/expense and a financial summary
      */
     @Query("SELECT COUNT(category_name) as mCount, category_name as mName, SUM(job_income) as mIncome," +
-            " SUM(job_profits) as mProfit " +
+            " SUM(job_profits) as mProfit, job.category_id AS mCategoryId " +
             "FROM job JOIN category ON job.category_id = category.category_id " +
             "WHERE job_payment_date BETWEEN :from AND :to " +
             "AND category_type=:type " +
@@ -74,4 +74,8 @@ public interface JobDao {
 
     @Query("DELETE FROM job")
     void deleteAllJobs();
+
+    @Query("SELECT * FROM job WHERE category_id=:categoryId " +
+            "AND job_payment_date BETWEEN :from AND :to")
+    List<JobEntry> loadJobsByCategoryBetweenDates(long categoryId, LocalDate from, LocalDate to);
 }

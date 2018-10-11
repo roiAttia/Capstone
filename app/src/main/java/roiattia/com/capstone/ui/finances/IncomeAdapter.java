@@ -20,9 +20,15 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeJobs
 
     private Context mContext;
     private List<IncomeModel> mIncomeList;
+    private OnJobClickHandler mClickCallback;
 
-    public IncomeAdapter(Context context) {
+    public IncomeAdapter(Context context, OnJobClickHandler clickCallback) {
         mContext = context;
+        mClickCallback = clickCallback;
+    }
+
+    public interface OnJobClickHandler{
+        void onJobClick(long categoryId, String categoryName);
     }
 
     public void setData(List<IncomeModel> incomeList){
@@ -47,10 +53,6 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeJobs
             holder.mNumberOfJobsView.setText(String.format(
                     "%s %s", mContext.getString(R.string.job_category_number_of_jobs),
                     String.valueOf(incomeModel.getCount())));
-            holder.mTotalIncomeView.setText(
-                    String.format("%s %s",
-                            mContext.getString(R.string.job_category_total_income),
-                            AmountUtils.getStringFormatFromDouble(incomeModel.getIncome())));
             holder.mTotalProfitsView.setText(String.format("%s %s",
                     mContext.getString(R.string.job_category_total_profits),
                     AmountUtils.getStringFormatFromDouble(incomeModel.getProfit())));
@@ -62,16 +64,24 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeJobs
         return mIncomeList == null ? 0 : mIncomeList.size();
     }
 
-    class IncomeJobsViewHolder extends RecyclerView.ViewHolder{
+    class IncomeJobsViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener{
 
         @BindView(R.id.tv_income_category_name) TextView mCategoryNameView;
         @BindView(R.id.tv_income_category_number_of_jobs) TextView mNumberOfJobsView;
-        @BindView(R.id.tv_income_category_total_income) TextView mTotalIncomeView;
         @BindView(R.id.tv_income_category_total_profits) TextView mTotalProfitsView;
 
         IncomeJobsViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            long categoryId = mIncomeList.get(getAdapterPosition()).getCategoryId();
+            String categoryName = mIncomeList.get(getAdapterPosition()).getName();
+            mClickCallback.onJobClick(categoryId, categoryName);
         }
     }
 }

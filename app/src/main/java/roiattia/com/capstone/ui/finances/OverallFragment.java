@@ -49,8 +49,8 @@ public class OverallFragment extends BaseFinancialFragment {
         RadioButtonsDialog pickPeriodDialog = new RadioButtonsDialog();
         final String[] itemsFromR = getResources().getStringArray(R.array.period_selection_options);
         pickPeriodDialog.setData(itemsFromR);
-        pickPeriodDialog.setTitle("Select period");
-        pickPeriodDialog.show(getChildFragmentManager(), "pop");
+        pickPeriodDialog.setTitle(getString(R.string.select_period_dialog_title));
+        pickPeriodDialog.show(getChildFragmentManager(), "period");
     }
 
     @Nullable
@@ -151,10 +151,16 @@ public class OverallFragment extends BaseFinancialFragment {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updatePeriodText(mDateModel.getCurrentFromDate(), mDateModel.getExpectedToDate());
+    }
+
     public void updatePeriodText(LocalDate startDate, LocalDate endDate) {
         if(mSelectPeriodButton != null){
-            mSelectPeriodButton.setText(DateUtils.getDateStringFormat(startDate) + " - " +
-                    DateUtils.getDateStringFormat(endDate));
+            mSelectPeriodButton.setText(String.format("%s - %s",
+                    DateUtils.getDateStringFormat(startDate), DateUtils.getDateStringFormat(endDate)));
         }
     }
 }

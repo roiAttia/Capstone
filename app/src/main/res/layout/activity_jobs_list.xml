@@ -4,17 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.payments.PaymentsActivity">
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_payments_list"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_header" />
+    tools:context=".ui.jobslist.JobsListActivity">
 
     <TextView
         android:id="@+id/tv_header"
@@ -22,6 +12,7 @@
         android:layout_height="wrap_content"
         android:background="@color/colorLightPrimary"
         android:padding="16dp"
+        android:text="TextView"
         android:textColor="@color/colorAccent"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -29,4 +20,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Fuel transactions - between 20/08/2018 and 26/08/2018" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_jobs"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_header" />
 </android.support.constraint.ConstraintLayout>
